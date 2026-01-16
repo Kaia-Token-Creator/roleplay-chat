@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>roleplay-chat.com | No-login AI Roleplay</title>
+  <title>Roleplay-chat.com | No-login AI Roleplay</title>
   <meta name="description" content="Create a character and start a no-login AI roleplay chat instantly. General and +18 Uncensored options available." />
   <meta name="robots" content="index,follow" />
   <meta name="theme-color" content="#000000" />
@@ -97,6 +97,21 @@
       box-shadow: var(--shadow);
       user-select:none;
     }
+
+    .logoRole{
+  color: #b59b2a; /* dark yellow */
+}
+
+.logoRest{
+  color: rgba(255,255,255,.95); /* keep white */
+}
+
+.logoDot{
+  color: rgba(255,255,255,.95); /* keep white */
+  font-size: 0.5em;            /* half size */
+  vertical-align: baseline;
+}
+
     .logo span{ opacity:.95; }
     .sub{
       text-align:center;
@@ -364,6 +379,15 @@
       margin-bottom: 10px;
       align-items:flex-start;
     }
+
+    /* (4) ADDED: user messages on the right */
+    .chatMsg.me{
+      flex-direction: row-reverse;
+    }
+    .chatMsg.me .text{
+      text-align: right;
+    }
+
     .chatMsg .who{
       width: 38px; height: 38px;
       border-radius: 12px;
@@ -493,7 +517,10 @@
     <div class="shell">
 
       <header>
-        <div class="logo"><span>roleplay-chat.com</span></div>
+        <div class="logo">
+  <span class="logoRole">Roleplay</span><span class="logoRest">-chat</span><span class="logoDot">.com</span>
+</div>
+
       </header>
       <div class="sub">No-login AI roleplay. Create a character, then chat instantly.</div>
 
@@ -534,22 +561,22 @@
             <div>
               <label for="language">Language</label>
               <select id="language" name="language" required>
-  <option value="English">English</option>
-  <option value="Spanish">Español</option>
-  <option value="Chinese">中文</option>
-  <option value="French">Français</option>
-  <option value="Portuguese">Português</option>
-  <option value="German">Deutsch</option>
-  <option value="Japanese">日本語</option>
-  <option value="Italian">Italiano</option>
-  <option value="Korean">한국어</option>
-  <option value="Dutch">Nederlands</option>
-  <option value="Russian">Русский</option>
-  <option value="Arabic">العربية</option>
-  <option value="Swedish">Svenska</option>
-  <option value="Norwegian">Norsk</option>
-  <option value="Danish">Dansk</option>
-</select>
+                <option value="English">English</option>
+                <option value="Spanish">Español</option>
+                <option value="Chinese">中文</option>
+                <option value="French">Français</option>
+                <option value="Portuguese">Português</option>
+                <option value="German">Deutsch</option>
+                <option value="Japanese">日本語</option>
+                <option value="Italian">Italiano</option>
+                <option value="Korean">한국어</option>
+                <option value="Dutch">Nederlands</option>
+                <option value="Russian">Русский</option>
+                <option value="Arabic">العربية</option>
+                <option value="Swedish">Svenska</option>
+                <option value="Norwegian">Norsk</option>
+                <option value="Danish">Dansk</option>
+              </select>
             </div>
 
             <div class="span2">
@@ -652,7 +679,6 @@
             </div>
 
             <div class="chatControls">
-              <!-- CHANGED: only removed disabled + added ids -->
               <input class="chatInput" id="chatInput" type="text" placeholder="Type a message (placeholder)..." />
               <button class="sendBtn" id="sendBtn" type="button" title="Send">➤</button>
             </div>
@@ -694,6 +720,9 @@
     const $ = (q) => document.querySelector(q);
     const $$ = (q) => Array.from(document.querySelectorAll(q));
 
+    const DEFAULT_TITLE = "roleplay-chat.com | No-login AI Roleplay"; // (3) ADDED
+    document.title = DEFAULT_TITLE; // (3) ADDED
+
     const viewSetup = $("#viewSetup");
     const viewChat = $("#viewChat");
 
@@ -725,16 +754,16 @@
     const STORAGE_KEY = "roleplay-chat_session_v1";
 
     // Colors: bright & readable colors
-const colorOptions = [
-  { name: "White", value: "#ffffff" },
-  { name: "Sky Blue", value: "#5cc8ff" },
-  { name: "Mint", value: "#5cffc4" },
-  { name: "Lime", value: "#b8ff5c" },
-  { name: "Yellow", value: "#ffd95c" },
-  { name: "Orange", value: "#ff9f5c" },
-  { name: "Pink", value: "#ff7ac8" },
-  { name: "Violet", value: "#b68cff" },
-];
+    const colorOptions = [
+      { name: "White", value: "#ffffff" },
+      { name: "Sky Blue", value: "#5cc8ff" },
+      { name: "Mint", value: "#5cffc4" },
+      { name: "Lime", value: "#b8ff5c" },
+      { name: "Yellow", value: "#ffd95c" },
+      { name: "Orange", value: "#ff9f5c" },
+      { name: "Pink", value: "#ff7ac8" },
+      { name: "Violet", value: "#b68cff" },
+    ];
 
     let selectedColor = colorOptions[0].value;
     let selectedColorName = colorOptions[0].name;
@@ -821,6 +850,9 @@ const colorOptions = [
       viewChat.classList.remove("active");
       view.classList.add("active");
       window.scrollTo({ top: 0, behavior: "smooth" });
+
+      // (3) ADDED: when returning to setup, restore default title
+      if (view === viewSetup) document.title = DEFAULT_TITLE;
     }
 
     // --------- Save & load (tab-scoped)
@@ -853,6 +885,9 @@ const colorOptions = [
       chatName.textContent = session.name;
       document.documentElement.style.setProperty("--chatColor", session.fontColor || "#000000");
 
+      // (3) ADDED: tab title uses character name
+      document.title = session.name + " | roleplay-chat.com";
+
       if (session.avatarDataUrl){
         chatAvatar.innerHTML = `<img alt="Profile" src="${session.avatarDataUrl}">`;
       } else {
@@ -877,8 +912,6 @@ const colorOptions = [
     });
 
     // --------- PayPal Buttons (client-only demo)
-    // IMPORTANT: In production, you should create orders on your server and return an orderID.
-    // This is a UI placeholder flow to match your request for a popup-like in-page checkout.
     function mountPayPalButtons(onSuccess){
       const container = $("#paypalButtons");
       container.innerHTML = "";
@@ -891,7 +924,6 @@ const colorOptions = [
       window.paypal.Buttons({
         style: { layout: "vertical", shape: "pill" },
         createOrder: (data, actions) => {
-          // Demo purchase: $2
           return actions.order.create({
             purchase_units: [{
               description: "roleplay-chat.com +18 Uncensored",
@@ -935,12 +967,14 @@ const colorOptions = [
 
     let chatHistory = []; // {role:"user"|"assistant", content:string}
     const PAYMENT_KEY = "roleplay-chat_paid_v1";
-let paymentStatus = sessionStorage.getItem(PAYMENT_KEY) || "unpaid"; // refresh-safe within this tab
-
+    let paymentStatus = sessionStorage.getItem(PAYMENT_KEY) || "unpaid"; // refresh-safe within this tab
 
     function appendMsg(role, content){
       const msg = document.createElement("div");
       msg.className = "chatMsg";
+
+      // (4) ADDED: user messages on right
+      if (role === "user") msg.classList.add("me");
 
       const who = document.createElement("div");
       who.className = "who";
@@ -952,8 +986,9 @@ let paymentStatus = sessionStorage.getItem(PAYMENT_KEY) || "unpaid"; // refresh-
       bubble.className = "text";
 
       if (role === "assistant"){
+        // (2) CHANGED: assistant content color uses --chatColor too
         bubble.innerHTML = `<div class="name" style="color: var(--chatColor);">${chatName.textContent}</div>
-                            <div style="margin-top:6px; color: rgba(255,255,255,.86); white-space:pre-wrap;"></div>`;
+                            <div style="margin-top:6px; color: var(--chatColor); white-space:pre-wrap;"></div>`;
       } else {
         bubble.innerHTML = `<div style="font-weight:800; margin-bottom:6px;">You</div>
                             <div style="color: rgba(255,255,255,.86); white-space:pre-wrap;"></div>`;
@@ -1061,19 +1096,15 @@ let paymentStatus = sessionStorage.getItem(PAYMENT_KEY) || "unpaid"; // refresh-
         createdAt: Date.now()
       };
 
-      // Save immediately (tab-scoped)
       saveSession(session);
 
       if (tier === "general"){
-        // In the future: route to /chat and call general.ts
         enterChat(session);
       } else {
-        // +18: open PayPal checkout overlay
         openPayModal();
         mountPayPalButtons(() => {
-          // After successful payment, proceed to chat using uncensored model
           paymentStatus = "paid";
-sessionStorage.setItem(PAYMENT_KEY, "paid"); // ✅ refresh-safe
+          sessionStorage.setItem(PAYMENT_KEY, "paid"); // refresh-safe
 
           const latest = loadSession();
           if (latest){
@@ -1085,16 +1116,23 @@ sessionStorage.setItem(PAYMENT_KEY, "paid"); // ✅ refresh-safe
       }
     });
 
+    // (1) CHANGED: New opens a fresh setup tab (clears session in that new tab only)
+    resetBtn.addEventListener("click", () => {
+      window.open("/?new=1", "_blank");
+    });
 
-   // --------- Reset/new character (open in new tab)
-resetBtn.addEventListener("click", () => {
-  window.open("/", "_blank");
-});
+    // (1) ADDED: if opened as /?new=1, clear this tab's session and payment state
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "1"){
+      clearSession();
+      sessionStorage.removeItem(PAYMENT_KEY);
+      paymentStatus = "unpaid";
+      show(viewSetup);
+    }
 
     // --------- Restore session if exists
     const existing = loadSession();
     if (existing && existing.name){
-      // If they already created a character in this tab, jump into chat
       enterChat(existing);
     }
 
@@ -1103,5 +1141,3 @@ resetBtn.addEventListener("click", () => {
   </script>
 </body>
 </html>
-
-
