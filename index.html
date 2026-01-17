@@ -1059,7 +1059,17 @@ if (shareBtn){
       msg.appendChild(bubble);
       $("#chatBox").appendChild(msg);
       $("#chatBox").scrollTop = $("#chatBox").scrollHeight;
+      return msg; // ✅ 이 줄 추가
     }
+
+    async function typeWriter(targetEl, text, speed = 18){
+  targetEl.textContent = "";
+  for (let i = 0; i < text.length; i++){
+    targetEl.textContent += text[i];
+    $("#chatBox").scrollTop = $("#chatBox").scrollHeight;
+    await new Promise(r => setTimeout(r, speed));
+  }
+}
 
     async function sendToChatApi(text){
       const session = loadSession();
@@ -1107,8 +1117,11 @@ if (shareBtn){
 
         const reply = await sendToChatApi(text);
 
-        appendMsg("assistant", reply);
-        chatHistory.push({ role: "assistant", content: reply });
+        const msgEl = appendMsg("assistant", ""); // 빈 메시지 먼저 만들고
+const textEl = msgEl.querySelector(".text div:last-child"); // 본문 div 잡기
+await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
+chatHistory.push({ role: "assistant", content: reply });
+        
       }catch(e){
         appendMsg("assistant", `Error: ${String(e.message || e)}`);
       }finally{
@@ -1200,6 +1213,7 @@ if (shareBtn){
   </script>
 </body>
 </html>
+
 
 
 
