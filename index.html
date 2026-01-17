@@ -80,17 +80,19 @@
     }
 
     header{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding-top: 8px;
-    }
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 10px 6px 0;
+  gap: 12px;
+}
+
     .logo{
       font-family: "Baloo 2", Inter, sans-serif;
       font-weight: 700;
       letter-spacing: .3px;
-      font-size: clamp(30px, 6vw, 48px);
-      padding: 10px 16px;
+      font-size: clamp(22px, 4.6vw, 34px);
+padding: 8px 12px;
       border-radius: 999px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
@@ -503,6 +505,33 @@
       display:none;
     }
 
+    .shareBtn{
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  box-shadow: var(--shadow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:.15s ease;
+  flex: 0 0 auto;
+}
+.shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+.shareBtn:active{ transform: translateY(0px); }
+
+.shareBtn svg{
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: rgba(255,255,255,.92);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
     footer{
       text-align:center;
       font-size: 12px;
@@ -517,11 +546,21 @@
     <div class="shell">
 
       <header>
-        <div class="logo">
-  <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
-</div>
+  <div class="logo">
+    <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+  </div>
 
-      </header>
+  <button class="shareBtn" id="shareBtn" type="button" aria-label="Share">
+    <!-- share icon (feather share-2 style) -->
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="18" cy="5" r="3"></circle>
+      <circle cx="6" cy="12" r="3"></circle>
+      <circle cx="18" cy="19" r="3"></circle>
+      <path d="M8.6 13.5l6.8 3.9"></path>
+      <path d="M15.4 6.6L8.6 10.5"></path>
+    </svg>
+  </button>
+</header>
       <div class="sub">Create a character, Enjoy roleplay.</div>
       <div class="sub">no-login. Safe. Anonymous.</div>
 
@@ -753,6 +792,26 @@
     const resetBtn = $("#resetBtn");
 
     const STORAGE_KEY = "roleplay-chat_session_v1";
+
+    // Share button
+const shareBtn = document.querySelector("#shareBtn");
+if (shareBtn){
+  shareBtn.addEventListener("click", async () => {
+    const url = window.location.href;
+    try{
+      if (navigator.share){
+        await navigator.share({ title: document.title, url });
+      }else{
+        await navigator.clipboard.writeText(url);
+        // optional tiny feedback
+        shareBtn.title = "Copied!";
+        setTimeout(() => (shareBtn.title = "Share"), 900);
+      }
+    }catch(e){
+      // user cancelled or blocked
+    }
+  });
+}
 
     // Colors: bright & readable colors
     const colorOptions = [
@@ -1142,6 +1201,7 @@
   </script>
 </body>
 </html>
+
 
 
 
