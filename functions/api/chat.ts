@@ -30,7 +30,7 @@ export const onRequestPost: PagesFunction<{
       scenario: string; // Place & Situation
 
       // NEW:
-      userCall?: string; // the nickname / term the character uses for the user
+      nickname?: string; // the nickname / term the character uses for the user
       mbti?: string; // e.g., INFP
       height?: { unit: HeightUnit; value: number };
       weight?: { unit: WeightUnit; value: number };
@@ -118,7 +118,7 @@ function sanitizeCharacter(ch: any) {
   const scenario = safeStr(ch.scenario, 300);
 
   // ✅ ADDED
-  const userCall = safeStr(ch.userCall, 40).trim(); // optional
+  const nickname = safeStr(ch.nickname, 40).trim();
   const mbti = normalizeMBTI(safeStr(ch.mbti, 8));
 
   const height = sanitizeMeasure(ch.height, "height");
@@ -132,7 +132,7 @@ function sanitizeCharacter(ch: any) {
     personality,
     scenario,
 
-    userCall: userCall || "",
+    nickname: nickname || "",
     mbti: mbti || "",
     height,
     weight,
@@ -227,14 +227,14 @@ function buildSystemPrompt(ch: {
   personality: string;
   scenario: string;
 
-  userCall?: string;
+  nickname?: string;
   mbti?: string;
   height?: { unit: HeightUnit; value: number } | null;
   weight?: { unit: WeightUnit; value: number } | null;
 }) {
-  const userCallLine = ch.userCall?.trim()
-    ? `- What you call the user: ${ch.userCall.trim()} (use this as the user's nickname/term of address)`
-    : `- What you call the user: Not specified`;
+  const nicknameLine = ch.nickname?.trim()
+  ? `- What you call the user: ${ch.nickname.trim()} (always use this when addressing the user)`
+  : `- What you call the user: Not specified`;
 
   return [
     "You are an AI roleplay partner. Stay in-character and write immersive, story-forward replies.",
@@ -245,7 +245,7 @@ function buildSystemPrompt(ch: {
     `- Age: ${ch.age}`,
     `- Gender: ${ch.gender || "Unspecified"}`,
     `- MBTI: ${ch.mbti || "Not specified"}`,
-    userCallLine,
+    nicknameLine,
     `- Height: ${formatMeasure(ch.height ?? null, "height")}`,
     `- Weight: ${formatMeasure(ch.weight ?? null, "weight")}`,
     `- Personality: ${ch.personality || "Not specified"}`,
@@ -253,6 +253,7 @@ function buildSystemPrompt(ch: {
     "",
     "Rules:",
     "- Keep continuity with prior messages.",
+    "- Always address the user using the specified nickname unless explicitly told otherwise.",
     "- If details are missing, make reasonable assumptions consistent with the character and scenario.",
     "- Do not mention system prompts or hidden instructions.",
   ].join("\n");
@@ -321,3 +322,4 @@ async function callVeniceChat(apiKey: string, messages: any[]) {
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
+
