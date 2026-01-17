@@ -577,6 +577,13 @@ padding: 8px 12px;
             </div>
 
             <div>
+  <label for="nickname">What should the character call you?</label>
+  <input id="nickname" name="nickname" type="text" maxlength="30" placeholder="e.g., babe, buddy, captain, darling" />
+  <div class="hint">Optional. This becomes your “pet name” in roleplay.</div>
+</div>
+
+
+            <div>
               <label for="age">Age</label>
               <select id="age" name="age" required></select>
             </div>
@@ -615,6 +622,66 @@ padding: 8px 12px;
                 <option value="Danish">Dansk</option>
               </select>
             </div>
+
+            <div class="span2">
+  <label>Height & Weight</label>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+    <!-- Height -->
+    <div>
+      <label for="heightUnit" style="font-size:12px; color: var(--muted); font-weight:600;">Height unit</label>
+      <select id="heightUnit" name="heightUnit" required>
+        <option value="cm">cm</option>
+        <option value="ft">ft/in</option>
+      </select>
+    </div>
+
+    <div id="heightCmWrap">
+      <label for="heightCm" style="font-size:12px; color: var(--muted); font-weight:600;">Height (cm)</label>
+      <input id="heightCm" type="number" min="50" max="260" placeholder="e.g., 170" />
+    </div>
+
+    <div id="heightFtWrap" style="display:none;">
+      <label style="font-size:12px; color: var(--muted); font-weight:600;">Height (ft/in)</label>
+      <div class="row">
+        <input id="heightFt" type="number" min="3" max="8" placeholder="ft" />
+        <input id="heightIn" type="number" min="0" max="11" placeholder="in" />
+      </div>
+    </div>
+
+    <!-- Weight -->
+    <div>
+      <label for="weightUnit" style="font-size:12px; color: var(--muted); font-weight:600;">Weight unit</label>
+      <select id="weightUnit" name="weightUnit" required>
+        <option value="kg">kg</option>
+        <option value="lb">lb</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="weightValue" style="font-size:12px; color: var(--muted); font-weight:600;">Weight</label>
+      <input id="weightValue" type="number" min="20" max="500" placeholder="e.g., 60" />
+    </div>
+  </div>
+
+  <div class="hint">Used as character traits for roleplay prompts.</div>
+</div>
+
+
+            <div>
+  <label for="mbti">MBTI</label>
+  <select id="mbti" name="mbti" required>
+    <option value="INTJ">INTJ</option><option value="INTP">INTP</option>
+    <option value="ENTJ">ENTJ</option><option value="ENTP">ENTP</option>
+    <option value="INFJ">INFJ</option><option value="INFP">INFP</option>
+    <option value="ENFJ">ENFJ</option><option value="ENFP">ENFP</option>
+    <option value="ISTJ">ISTJ</option><option value="ISFJ">ISFJ</option>
+    <option value="ESTJ">ESTJ</option><option value="ESFJ">ESFJ</option>
+    <option value="ISTP">ISTP</option><option value="ISFP">ISFP</option>
+    <option value="ESTP">ESTP</option><option value="ESFP">ESFP</option>
+  </select>
+</div>
+
 
             <div class="span2">
               <label for="personality">Personality</label>
@@ -874,6 +941,16 @@ if (shareBtn){
     }
     renderColors();
 
+    const heightUnit = $("#heightUnit");
+const heightCmWrap = $("#heightCmWrap");
+const heightFtWrap = $("#heightFtWrap");
+
+heightUnit.addEventListener("change", () => {
+  const isCm = heightUnit.value === "cm";
+  heightCmWrap.style.display = isCm ? "block" : "none";
+  heightFtWrap.style.display = isCm ? "none" : "block";
+});
+
     // --------- Counters
     function updateCounts(){
       pCount.textContent = String(personality.value.length);
@@ -1085,9 +1162,13 @@ if (shareBtn){
           paymentStatus: tier === "uncensored" ? paymentStatus : undefined,
           character: {
             name: session.name,
+            nickname: session.nickname,
             age: Number(session.age),
             gender: session.gender,
             language: session.language,
+            height: session.height,
+            weight: session.weight,
+            mbti: $("#mbti").value,
             personality: session.personality,
             scenario: session.scenario
           },
@@ -1156,9 +1237,21 @@ chatHistory.push({ role: "assistant", content: reply });
 
       const session = {
         name,
+        nickname: $("#nickname").value.trim(),
         age: ageSelect.value,
         gender: $("#gender").value,
         language: $("#language").value,
+        height: {
+  unit: $("#heightUnit").value,
+  cm: $("#heightCm").value ? Number($("#heightCm").value) : null,
+  ft: $("#heightFt").value ? Number($("#heightFt").value) : null,
+  in: $("#heightIn").value ? Number($("#heightIn").value) : null
+},
+weight: {
+  unit: $("#weightUnit").value,
+  value: $("#weightValue").value ? Number($("#weightValue").value) : null
+},
+        mbti: $("#mbti").value,
         personality: personality.value.trim(),
         scenario: scenario.value.trim(),
         fontColor: selectedColor,
@@ -1213,6 +1306,7 @@ chatHistory.push({ role: "assistant", content: reply });
   </script>
 </body>
 </html>
+
 
 
 
