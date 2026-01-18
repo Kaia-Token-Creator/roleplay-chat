@@ -1116,18 +1116,48 @@ function clearHistory(){
   sessionStorage.removeItem(HISTORY_KEY);
 }
 
-    // --------- Fill chat view
-    function enterChat(session){
-      // Basic display
-      const tierLabel = session.tier === "uncensored" ? "+18 Uncensored ($2)" : "General";
-      const modelLabel = session.tier === "uncensored" ? "Venice Uncensored" : "DeepSeek";
+    // --------- Fill chat view (NULL-SAFE)
+function enterChat(session){
+  // Basic display
+  const tierLabel = session.tier === "uncensored" ? "+18 Uncensored ($2)" : "General";
+  // const modelLabel = session.tier === "uncensored" ? "Venice Uncensored" : "DeepSeek"; // 필요 없으면 주석 유지
 
-      chipName.textContent = "Name: " + session.name;
-      chipLang.textContent = "Language: " + session.language;
-      chipTier.textContent = "Tier: " + tierLabel;
+  // ✅ UI 요소가 있어도/없어도 에러 안 나게 (Name/Language/Tier 칩)
+  if (chipName) chipName.textContent = "Name: " + session.name;
+  if (chipLang) chipLang.textContent = "Language: " + session.language;
+  if (chipTier) chipTier.textContent = "Tier: " + tierLabel;
 
-      chatName.textContent = session.name;
-      document.documentElement.style.setProperty("--chatColor", session.fontColor || "#000000");
+  // ✅ 채팅에서 사용할 이름/색
+  if (chatName) chatName.textContent = session.name;
+  document.documentElement.style.setProperty("--chatColor", session.fontColor || "#000000");
+
+  // ✅ 탭 타이틀
+  document.title = session.name + " | roleplay-chat.com";
+
+  // ✅ 아바타 (DOM이 없어도 에러 안 나게)
+  if (chatAvatar){
+    chatAvatar.innerHTML = session.avatarDataUrl
+      ? `<img alt="Profile" src="${session.avatarDataUrl}">`
+      : "🙂";
+  }
+
+  // ✅ 화면 전환
+  show(viewChat);
+
+  // ✅ history restore
+  chatHistory = loadHistory();
+
+  // 채팅 UI 비우고 다시 그리기
+  const box = document.getElementById("chatBox");
+  if (box){
+    box.innerHTML = "";
+    for (const m of chatHistory){
+      appendMsg(m.role, m.content);
+    }
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
 
       // (3) ADDED: tab title uses character name
       document.title = session.name + " | roleplay-chat.com";
@@ -1235,7 +1265,7 @@ for (const m of chatHistory){
       const who = document.createElement("div");
       who.className = "who";
       who.innerHTML = (role === "assistant")
-        ? (chatAvatar.innerHTML || "🙂")
+        ? (chatAvatar ? (chatAvatar.innerHTML || "🙂") : "🙂")
         : "<span>YOU</span>";
 
       const bubble = document.createElement("div");
@@ -1243,7 +1273,7 @@ for (const m of chatHistory){
 
       if (role === "assistant"){
         // (2) CHANGED: assistant content color uses --chatColor too
-        bubble.innerHTML = `<div class="name" style="color: var(--chatColor);">${chatName.textContent}</div>
+        bubble.innerHTML = `<div class="name" style="color: var(--chatColor);">${chatName ? chatName.textContent : session.name}</div>
                             <div style="margin-top:6px; color: var(--chatColor); white-space:pre-wrap;"></div>`;
       } else {
         bubble.innerHTML = `<div style="font-weight:800; margin-bottom:6px;">You</div>
@@ -1539,6 +1569,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
