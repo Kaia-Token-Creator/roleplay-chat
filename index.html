@@ -1081,9 +1081,9 @@ heightUnit.addEventListener("change", () => {
 
 
     // --------- Avatar preview
-    let avatarDataUrl = "";
+let avatarDataUrl = "";
 
-    function clearAvatar(){
+function clearAvatar(){
   avatarDataUrl = "";
   avatarInput.value = ""; // 파일 인풋 비우기
 
@@ -1103,22 +1103,12 @@ heightUnit.addEventListener("change", () => {
 avatarInput.addEventListener("change", async () => {
   const file = avatarInput.files && avatarInput.files[0];
 
+  // 파일 선택 취소/비움
   if (!file){
-    avatarDataUrl = "";
-    avatarPreview.innerHTML = `
-      <button type="button"
-              class="avatarClear"
-              id="avatarClearBtn"
-              aria-label="Remove photo"
-              title="Remove">×</button>
-      <span>🙂</span>
-    `;
-    const b = document.getElementById("avatarClearBtn");
-    if (b) b.style.display = "none";
+    clearAvatar();
     return;
   }
 
-  // 파일이 있을 때만 여기로 내려옴
   avatarPreview.innerHTML = "<span>⏳</span>";
 
   try{
@@ -1138,13 +1128,16 @@ avatarInput.addEventListener("change", async () => {
       btn.style.display = "flex";
       btn.addEventListener("click", clearAvatar);
     }
-
   } catch (e){
     console.error(e);
     clearAvatar();
     alert("Couldn’t load this image.");
   }
 });
+
+// 처음 로드시 기본 상태 확실히
+clearAvatar();
+
 
   if (!file){
     avatarDataUrl = "";
@@ -1275,8 +1268,6 @@ function enterChat(session){
 }
 
 
-    }
-
     // --------- Paywall modal controls
     function openPayModal(){
       payErr.style.display = "none";
@@ -1350,6 +1341,12 @@ function enterChat(session){
     let paymentStatus = sessionStorage.getItem(PAYMENT_KEY) || "unpaid"; // refresh-safe within this tab
 
     function appendMsg(role, content){
+      const currentSession = loadSession();
+const assistantName =
+  (chatName && chatName.textContent) ||
+  (currentSession && currentSession.name) ||
+  "Character";
+      
       const msg = document.createElement("div");
       msg.className = "chatMsg";
 
@@ -1663,6 +1660,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
