@@ -33,12 +33,25 @@ export const onRequestPost: PagesFunction<{
       weight?: { unit: WeightUnit; value: number };
     };
 
+    // ---------------- LIMITS (3~4 lines-ish) ----------------
+    // 모바일 기준으로 "정상 입력"만 허용하고 싶다면 문자 제한이 가장 안정적임.
+    const MAX_MESSAGE_CHARS = 600;     // ✅ 유저 입력 3~4줄 정도
+    const MAX_REPLY_CHARS = 900;       // ✅ 모델 출력 3~4줄 정도
+    const MAX_PROMPT_CHARS = 6000;     // ✅ system + history + user 합산 예산
+    const MAX_HISTORY_MSGS = 20;       // ✅ 히스토리 메시지 개수 상한 (추가 안전장치)
+
+    // 모델 출력 토큰 제한 (토큰은 언어/문장에 따라 흔들리므로 낮게 잡고,
+    // 마지막에 MAX_REPLY_CHARS로 한 번 더 컷)
+    const MAX_TOKENS_DEEPSEEK = 320;
+    const MAX_TOKENS_VENICE = 420;
+    // ---------------------------------------------------------
+
     const body = await request.json<{
-      init?: boolean; // ✅ 추가
+      init?: boolean;
       tier: Tier;
       paymentStatus?: "paid" | "unpaid" | "cancelled";
       character: Character;
-      message?: string; // ✅ init에서는 없음
+      message?: string;
       history?: Msg[];
     }>();
 
@@ -56,27 +69,30 @@ export const onRequestPost: PagesFunction<{
 
       const ch = sanitizeCharacter(body.character);
 
-      const messages: Msg[] = [
-        {
-          role: "system",
-          content: `
+      // INIT도 프롬프트 총량 예산 지키기 (system만 있지만 안전하게)
+      const initSystem: Msg = {
+        role: "system",
+        content: `
 You are ${ch.name}.
 This is the very first message of the roleplay.
 Start the conversation naturally, in character.
 Do not greet like an assistant.
 `.trim(),
-        },
-      ];
+      };
 
-      const reply =
+      const messages: Msg[] = fitMessagesToBudget([initSystem], MAX_PROMPT_CHARS);
+
+      const replyRaw =
         tier === "uncensored"
-          ? await callVeniceChat(env.VENICE_API_KEY, messages)
-          : await callDeepSeekChat(env.DEEPSEEK_API_KEY, messages);
+          ? await callVeniceChat(env.VENICE_API_KEY, messages, MAX_TOKENS_VENICE)
+          : await callDeepSeekChat(env.DEEPSEEK_API_KEY, messages, MAX_TOKENS_DEEPSEEK);
+
+      const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
 
       return json({ reply, tier }, 200, CORS);
     }
 
-    // ---------- 기존 로직 (절대 안 건드림) ----------
+    // ---------- 기존 로직 (기능 유지 + 제한 가드만 추가) ----------
 
     if (tier === "uncensored" && body.paymentStatus !== "paid") {
       return json(
@@ -90,26 +106,50 @@ Do not greet like an assistant.
       return json({ error: "Missing message." }, 400, CORS);
     }
 
+    // ✅ 입력(유저 message) 길이 제한
+    const userMsg = body.message.trim();
+    if (userMsg.length > MAX_MESSAGE_CHARS) {
+      return json(
+        {
+          error: "Message too long.",
+          detail: `Max ${MAX_MESSAGE_CHARS} characters.`,
+        },
+        400,
+        CORS
+      );
+    }
+
     if (!body.character || typeof body.character !== "object") {
       return json({ error: "Missing character." }, 400, CORS);
     }
 
     const ch = sanitizeCharacter(body.character);
-    const history = Array.isArray(body.history) ? body.history : [];
+
+    // ✅ history 정규화 + 상한
+    const rawHistory = Array.isArray(body.history) ? body.history : [];
+    const history = rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
 
     const systemPrompt = buildSystemPrompt(ch);
 
-    const messages: Msg[] = [
+    // 원본대로 messages 구성하되, 프롬프트 예산(MAX_PROMPT_CHARS)에 맞게 history를 뒤에서부터 깎음
+    const messagesBeforeFit: Msg[] = [
       { role: "system", content: systemPrompt },
-      ...history.filter(isValidMsg).map((m) => ({ role: m.role, content: String(m.content) })),
-      { role: "user", content: body.message.trim() },
+      ...history.map((m) => ({ role: m.role, content: String(m.content) })),
+      { role: "user", content: userMsg },
     ];
 
+    const messages: Msg[] = fitMessagesToBudget(messagesBeforeFit, MAX_PROMPT_CHARS);
+
+    // (선택) 예산 때문에 history가 너무 잘리면, 사용자에게 안내하고 싶을 때:
+    // const trimmed = messages.length !== messagesBeforeFit.length;
+
     if (tier === "general") {
-      const reply = await callDeepSeekChat(env.DEEPSEEK_API_KEY, messages);
+      const replyRaw = await callDeepSeekChat(env.DEEPSEEK_API_KEY, messages, MAX_TOKENS_DEEPSEEK);
+      const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
       return json({ reply, tier, model: "deepseek-chat" }, 200, CORS);
     } else {
-      const reply = await callVeniceChat(env.VENICE_API_KEY, messages);
+      const replyRaw = await callVeniceChat(env.VENICE_API_KEY, messages, MAX_TOKENS_VENICE);
+      const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
       return json({ reply, tier, model: "venice-uncensored" }, 200, CORS);
     }
   } catch (err: any) {
@@ -266,8 +306,85 @@ function buildSystemPrompt(ch: any) {
   ].join("\n");
 }
 
+// ---------------- Budget / Truncation helpers ----------------
+
+// 프롬프트 전체 글자 예산에 맞게 messages를 줄임.
+// 원칙:
+// 1) system(첫 메시지)은 유지
+// 2) 가장 최신 히스토리를 우선 유지 (뒤에서부터 채움)
+// 3) 마지막 user 메시지는 유지
+function fitMessagesToBudget(messages: { role: any; content: string }[], maxChars: number) {
+  if (!Array.isArray(messages) || messages.length === 0) return [];
+
+  // 최소 구성: system + (마지막 user)
+  const system = messages[0];
+  const last = messages[messages.length - 1];
+
+  // 만약 system이 아니면 그대로 처리하되, 예산 내로만
+  const sys = system?.role === "system" ? system : null;
+
+  const middle = messages.slice(sys ? 1 : 0, -1);
+
+  const safeSys = sys ? { role: "system" as const, content: String(sys.content || "") } : null;
+  const safeLast = { role: last.role, content: String(last.content || "") };
+
+  // 먼저 system + last로 시작
+  let result: any[] = [];
+  if (safeSys) result.push(safeSys);
+  result.push(safeLast);
+
+  // 예산 계산
+  const sizeOf = (arr: any[]) => arr.reduce((s, m) => s + String(m.content || "").length, 0);
+
+  // system+last만으로도 예산 초과면, last를 줄이는 수밖에 없음
+  if (sizeOf(result) > maxChars) {
+    if (safeSys) {
+      // system은 가능한 유지, last를 잘라냄
+      safeLast.content = truncateString(safeLast.content, Math.max(0, maxChars - safeSys.content.length));
+      return [safeSys, safeLast].filter(Boolean);
+    } else {
+      safeLast.content = truncateString(safeLast.content, maxChars);
+      return [safeLast];
+    }
+  }
+
+  // middle을 최신부터 역순으로 넣어보기
+  for (let i = middle.length - 1; i >= 0; i--) {
+    const m = middle[i];
+    const entry = { role: m.role, content: String(m.content || "") };
+
+    // system 바로 뒤에 끼워넣기 (system, ...history..., last)
+    const insertIndex = safeSys ? 1 : 0;
+    const candidate = result.slice(0, insertIndex).concat([entry], result.slice(insertIndex));
+
+    if (sizeOf(candidate) <= maxChars) {
+      result = candidate;
+    } else {
+      // 더 오래된 건 넣을수록 더 커지니, 여기서 중단해도 됨
+      // (최신부터 넣고 있으니까)
+      continue;
+    }
+  }
+
+  return result;
+}
+
+function truncateString(s: string, maxLen: number) {
+  const str = String(s || "");
+  if (maxLen <= 0) return "";
+  if (str.length <= maxLen) return str;
+  // 너무 딱 잘린 느낌 줄이기: 말줄임
+  return str.slice(0, Math.max(0, maxLen - 1)) + "…";
+}
+
+// 모델이 토큰 제한을 무시하거나(가끔), 줄바꿈/언어 차이로 길게 나올 때
+// 서버에서 최종 글자수로 한 번 더 안전컷
+function truncateReply(reply: string, maxChars: number) {
+  return truncateString(String(reply || "").trim(), maxChars);
+}
+
 // ---------------- DeepSeek ----------------
-async function callDeepSeekChat(apiKey: string, messages: any[]) {
+async function callDeepSeekChat(apiKey: string, messages: any[], maxTokens: number) {
   if (!apiKey) throw new Error("Missing DEEPSEEK_API_KEY");
 
   const res = await fetch("https://api.deepseek.com/chat/completions", {
@@ -281,7 +398,7 @@ async function callDeepSeekChat(apiKey: string, messages: any[]) {
       messages,
       stream: false,
       temperature: 0.8,
-      max_tokens: 900,
+      max_tokens: maxTokens, // ✅ 출력 토큰 제한
     }),
   });
 
@@ -297,7 +414,7 @@ async function callDeepSeekChat(apiKey: string, messages: any[]) {
 }
 
 // ---------------- Venice ----------------
-async function callVeniceChat(apiKey: string, messages: any[]) {
+async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number) {
   if (!apiKey) throw new Error("Missing VENICE_API_KEY");
 
   const res = await fetch("https://api.venice.ai/api/v1/chat/completions", {
@@ -311,7 +428,7 @@ async function callVeniceChat(apiKey: string, messages: any[]) {
       messages,
       stream: false,
       temperature: 0.9,
-      max_tokens: 1200,
+      max_tokens: maxTokens, // ✅ 출력 토큰 제한
     }),
   });
 
