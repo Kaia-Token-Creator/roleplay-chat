@@ -17,7 +17,6 @@ export const onRequestPost: PagesFunction<{
     type Tier = "general" | "uncensored";
     type Msg = { role: "system" | "user" | "assistant"; content: string };
 
-    // ✅ ADDED: new character fields
     type HeightUnit = "cm" | "ft";
     type WeightUnit = "kg" | "lb";
 
@@ -27,44 +26,58 @@ export const onRequestPost: PagesFunction<{
       gender: string;
       language: string;
       personality: string;
-      scenario: string; // Place & Situation
-
-      // NEW:
-      nickname?: string; // the nickname / term the character uses for the user
-      mbti?: string; // e.g., INFP
+      scenario: string;
+      nickname?: string;
+      mbti?: string;
       height?: { unit: HeightUnit; value: number };
       weight?: { unit: WeightUnit; value: number };
     };
 
     const body = await request.json<{
+      init?: boolean; // ✅ 추가
       tier: Tier;
       paymentStatus?: "paid" | "unpaid" | "cancelled";
       character: Character;
-      message: string;
+      message?: string; // ✅ init에서는 없음
       history?: Msg[];
     }>();
 
-    if (body.init){
-  messages.push({
-    role: "system",
-    content: `
-You are ${character.name}.
-This is the very first message of the roleplay.
-Start the conversation naturally, in character.
-Do not greet like an assistant.
-`
-  });
-
-  // 모델 호출 → reply 생성
-}
-
-
-    // ---------- Input validation (lightweight)
-    if (!body || typeof body !== "object") return json({ error: "Invalid body." }, 400, CORS);
+    if (!body || typeof body !== "object") {
+      return json({ error: "Invalid body." }, 400, CORS);
+    }
 
     const tier: Tier = body.tier === "uncensored" ? "uncensored" : "general";
 
-    // 핵심: 결제 취소/미결제면 uncensored 진입 불가
+    // ---------- INIT: 첫 인사 전용 처리 ----------
+    if (body.init) {
+      if (!body.character || typeof body.character !== "object") {
+        return json({ error: "Missing character." }, 400, CORS);
+      }
+
+      const ch = sanitizeCharacter(body.character);
+
+      const messages: Msg[] = [
+        {
+          role: "system",
+          content: `
+You are ${ch.name}.
+This is the very first message of the roleplay.
+Start the conversation naturally, in character.
+Do not greet like an assistant.
+`.trim(),
+        },
+      ];
+
+      const reply =
+        tier === "uncensored"
+          ? await callVeniceChat(env.VENICE_API_KEY, messages)
+          : await callDeepSeekChat(env.DEEPSEEK_API_KEY, messages);
+
+      return json({ reply, tier }, 200, CORS);
+    }
+
+    // ---------- 기존 로직 (절대 안 건드림) ----------
+
     if (tier === "uncensored" && body.paymentStatus !== "paid") {
       return json(
         { error: "Payment not completed. Uncensored is locked.", code: "PAYMENT_REQUIRED" },
@@ -92,7 +105,6 @@ Do not greet like an assistant.
       { role: "user", content: body.message.trim() },
     ];
 
-    // ---------- Route to model
     if (tier === "general") {
       const reply = await callDeepSeekChat(env.DEEPSEEK_API_KEY, messages);
       return json({ reply, tier, model: "deepseek-chat" }, 200, CORS);
@@ -132,7 +144,6 @@ function sanitizeCharacter(ch: any) {
   const personality = safeStr(ch.personality, 300);
   const scenario = safeStr(ch.scenario, 300);
 
-  // ✅ ADDED
   const nickname = safeStr(ch.nickname, 40).trim();
   const mbti = normalizeMBTI(safeStr(ch.mbti, 8));
 
@@ -146,7 +157,6 @@ function sanitizeCharacter(ch: any) {
     language,
     personality,
     scenario,
-
     nickname: nickname || "",
     mbti: mbti || "",
     height,
@@ -154,14 +164,14 @@ function sanitizeCharacter(ch: any) {
   };
 }
 
-function sanitizeMeasure(v: any, kind: "height" | "weight"):
-  | { unit: HeightUnit | WeightUnit; value: number }
-  | null {
+function sanitizeMeasure(
+  v: any,
+  kind: "height" | "weight"
+): { unit: HeightUnit | WeightUnit; value: number } | null {
   if (!v || typeof v !== "object") return null;
 
   const unitRaw = typeof v.unit === "string" ? v.unit.toLowerCase() : "";
   const valueNum = Number(v.value);
-
   if (!Number.isFinite(valueNum)) return null;
 
   if (kind === "height") {
@@ -169,29 +179,24 @@ function sanitizeMeasure(v: any, kind: "height" | "weight"):
       unitRaw === "cm" ? "cm" : unitRaw === "ft" || unitRaw === "feet" ? "ft" : "";
     if (!unit) return null;
 
-    // reasonable limits
-    const value = unit === "cm"
-      ? clamp(valueNum, 50, 260)
-      : clamp(valueNum, 1.5, 9.0);
-
+    const value = unit === "cm" ? clamp(valueNum, 50, 260) : clamp(valueNum, 1.5, 9.0);
     return { unit, value: round(value, 2) };
   }
 
-  // weight
   const unit: WeightUnit | "" =
-    unitRaw === "kg" ? "kg" : unitRaw === "lb" || unitRaw === "lbs" || unitRaw === "pound" || unitRaw === "pounds" ? "lb" : "";
+    unitRaw === "kg"
+      ? "kg"
+      : unitRaw === "lb" || unitRaw === "lbs" || unitRaw === "pound" || unitRaw === "pounds"
+      ? "lb"
+      : "";
   if (!unit) return null;
 
-  const value = unit === "kg"
-    ? clamp(valueNum, 10, 400)
-    : clamp(valueNum, 22, 880);
-
+  const value = unit === "kg" ? clamp(valueNum, 10, 400) : clamp(valueNum, 22, 880);
   return { unit, value: round(value, 2) };
 }
 
 function normalizeMBTI(s: string) {
   const t = s.trim().toUpperCase();
-  // MBTI should be exactly 4 letters of I/E, N/S, F/T, P/J (order)
   if (!/^[IE][NS][FT][PJ]$/.test(t)) return "";
   return t;
 }
@@ -224,32 +229,19 @@ function formatMeasure(
   kind: "height" | "weight"
 ) {
   if (!m) return "Not specified";
-  const unit = m.unit;
-  const value = m.value;
-
-  if (kind === "height") {
-    // show "ft" nicely as "ft" (your UI may treat ft as decimal feet; keep as-is)
-    return unit === "cm" ? `${value} cm` : `${value} ft`;
-  }
-  return unit === "kg" ? `${value} kg` : `${value} lb`;
+  return kind === "height"
+    ? m.unit === "cm"
+      ? `${m.value} cm`
+      : `${m.value} ft`
+    : m.unit === "kg"
+    ? `${m.value} kg`
+    : `${m.value} lb`;
 }
 
-function buildSystemPrompt(ch: {
-  name: string;
-  age: number;
-  gender: string;
-  language: string;
-  personality: string;
-  scenario: string;
-
-  nickname?: string;
-  mbti?: string;
-  height?: { unit: HeightUnit; value: number } | null;
-  weight?: { unit: WeightUnit; value: number } | null;
-}) {
+function buildSystemPrompt(ch: any) {
   const nicknameLine = ch.nickname?.trim()
-  ? `- What you call the user: ${ch.nickname.trim()} (always use this when addressing the user)`
-  : `- What you call the user: Not specified`;
+    ? `- What you call the user: ${ch.nickname.trim()} (always use this when addressing the user)`
+    : `- What you call the user: Not specified`;
 
   return [
     "You are an AI roleplay partner. Stay in-character and write immersive, story-forward replies.",
@@ -275,7 +267,6 @@ function buildSystemPrompt(ch: {
 }
 
 // ---------------- DeepSeek ----------------
-// POST https://api.deepseek.com/chat/completions (model: deepseek-chat)
 async function callDeepSeekChat(apiKey: string, messages: any[]) {
   if (!apiKey) throw new Error("Missing DEEPSEEK_API_KEY");
 
@@ -306,7 +297,6 @@ async function callDeepSeekChat(apiKey: string, messages: any[]) {
 }
 
 // ---------------- Venice ----------------
-// POST https://api.venice.ai/api/v1/chat/completions (model: venice-uncensored)
 async function callVeniceChat(apiKey: string, messages: any[]) {
   if (!apiKey) throw new Error("Missing VENICE_API_KEY");
 
@@ -322,8 +312,6 @@ async function callVeniceChat(apiKey: string, messages: any[]) {
       stream: false,
       temperature: 0.9,
       max_tokens: 1200,
-      // 원하면 추가로:
-      // venice_parameters: { enable_web_search: "off" }
     }),
   });
 
@@ -337,5 +325,3 @@ async function callVeniceChat(apiKey: string, messages: any[]) {
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
-
-
