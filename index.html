@@ -670,6 +670,53 @@ padding: 8px 12px;
       color: rgba(255,255,255,.45);
       padding: 10px 0 4px;
     }
+
+    /* ✅ 채팅 모드에서는 페이지(body) 스크롤 금지 */
+body.chatMode{
+  overflow: hidden;
+}
+
+/* ✅ 채팅 카드가 화면을 꽉 채우게 */
+#viewChat.active{
+  height: 100dvh;          /* 모바일 주소창 대응 */
+  min-height: 100dvh;
+}
+
+/* ✅ 카드 내부 레이아웃: 헤더+바+채팅영역+입력창 구조로 고정 */
+#viewChat.active .cardBody{
+  overflow: hidden;        /* 카드 바깥으로 스크롤 안 새게 */
+}
+
+/* ✅ chatShell이 정확히 남은 높이를 먹고 */
+#viewChat .chatShell{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ✅ chatBox만 스크롤 */
+#viewChat .chatBox{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding-bottom: 14px;    /* 아래에서 입력창이 따로 고정될 거라 과한 패딩 제거 */
+}
+
+/* ✅ 입력창: fixed 대신 sticky로 바꿔서 카드 안에서 하단 고정 */
+.chatControls{
+  position: sticky;        /* ✅ fixed -> sticky */
+  bottom: 0;
+  left: auto;
+  right: auto;
+
+  z-index: 999;
+  max-width: none;
+  margin: 0;
+
+  background: rgba(0,0,0,.92);
+  transform: none;
+}
+
   </style>
 </head>
 
@@ -1215,6 +1262,12 @@ clearAvatar();
       view.classList.add("active");
       window.scrollTo({ top: 0, behavior: "smooth" });
 
+      // ✅ 채팅 모드면 페이지 스크롤 막기
+  document.body.classList.toggle("chatMode", view === viewChat);
+
+  if (view === viewSetup) document.title = DEFAULT_TITLE;
+}
+
       // (3) ADDED: when returning to setup, restore default title
       if (view === viewSetup) document.title = DEFAULT_TITLE;
     }
@@ -1739,6 +1792,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
