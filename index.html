@@ -67,12 +67,12 @@
 
     a{ color:inherit; }
     .wrap{
-      min-height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 18px 14px 26px;
-    }
+  min-height:100vh;
+  display:flex;
+  align-items:flex-start;   /* ✅ center → flex-start */
+  justify-content:center;
+  padding: 18px 14px 26px;
+}
     .shell{
       width: min(860px, 100%);
       display:grid;
@@ -389,6 +389,11 @@ padding: 8px 12px;
   gap: 12px;
   min-height: 0; /* 중요: flex 안에서 overflow가 제대로 동작 */
 }
+
+    #viewChat{
+  min-height: calc(100vh - 140px); /* 헤더+서브+패딩 대충 제외 */
+}
+
     .chatTop{
       display:flex;
       align-items:center;
@@ -1224,6 +1229,41 @@ function enterChat(session){
     }
     box.scrollTop = box.scrollHeight;
   }
+  // ✅ 처음 입장 & 히스토리 없을 때만: TS에 첫 인사 요청
+  if (!chatHistory || chatHistory.length === 0){
+    (async () => {
+      try{
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            init: true,
+            tier: session.tier,
+            character: {
+              name: session.name,
+              nickname: session.nickname,
+              age: Number(session.age),
+              gender: session.gender,
+              language: session.language,
+              height: session.height,
+              weight: session.weight,
+              mbti: session.mbti,
+              personality: session.personality,
+              scenario: session.scenario
+            },
+            history: []
+          })
+        });
+
+        const data = await res.json();
+        appendMsg("assistant", data.reply);
+        chatHistory = [{ role: "assistant", content: data.reply }];
+        saveHistory(chatHistory);
+      }catch(e){
+        console.error(e);
+      }
+    })();
+  }
 }
 
 
@@ -1301,10 +1341,7 @@ function enterChat(session){
 
     function appendMsg(role, content){
       const currentSession = loadSession();
-const assistantName =
-  (chatName && chatName.textContent) ||
-  (currentSession && currentSession.name) ||
-  "Character";
+const assistantName = (currentSession && currentSession.name) || "Character";
       
       const msg = document.createElement("div");
       msg.className = "chatMsg";
@@ -1314,9 +1351,13 @@ const assistantName =
 
       const who = document.createElement("div");
       who.className = "who";
-      who.innerHTML = (role === "assistant")
-        ? (chatAvatar ? (chatAvatar.innerHTML || "🙂") : "🙂")
-        : "<span>YOU</span>";
+      const currentSession = loadSession();
+
+who.innerHTML = (role === "assistant")
+  ? (currentSession && currentSession.avatarDataUrl
+      ? `<img alt="Profile" src="${currentSession.avatarDataUrl}">`
+      : "🙂")
+  : "<span>YOU</span>";
 
       const bubble = document.createElement("div");
       bubble.className = "text";
@@ -1619,6 +1660,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
