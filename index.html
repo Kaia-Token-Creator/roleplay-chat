@@ -1082,6 +1082,8 @@ heightUnit.addEventListener("change", () => {
 
     // --------- Avatar preview
 let avatarDataUrl = "";
+// --------- Avatar preview
+let avatarDataUrl = "";
 
 function clearAvatar(){
   avatarDataUrl = "";
@@ -1128,7 +1130,7 @@ avatarInput.addEventListener("change", async () => {
       btn.style.display = "flex";
       btn.addEventListener("click", clearAvatar);
     }
-  } catch (e){
+  }catch(e){
     console.error(e);
     clearAvatar();
     alert("Couldn’t load this image.");
@@ -1660,6 +1662,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
