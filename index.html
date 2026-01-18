@@ -516,29 +516,7 @@ padding: 8px 12px;
       font-family: "Baloo 2", Inter, sans-serif;
       color: var(--chatColor);
     }
-  .chatControls{
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 999;
-
-  display: flex;
-  gap: 10px;
-  align-items: center;
-
-  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-  background: rgba(0,0,0,.92);
-
-  max-width: 860px;
-  margin: 0 auto;
-
-  transform: none;        /* ✅ 여기로 넣기 (떠돌이 말고) */
-  backdrop-filter: none;
-  flex-wrap: nowrap;
-}
-
- 
+   
     .chatInput{
   flex: 1 1 auto;
   min-width: 0;          /* 중요: 작은 화면에서 버튼 밀리지 않게 */
@@ -716,6 +694,63 @@ body.chatMode{
   background: rgba(0,0,0,.92);
   transform: none;
 }
+
+    /* =========================
+   CHAT LAYOUT FIX (FINAL)
+   ========================= */
+
+/* 채팅 카드 바디 상단 패딩 제거 -> 헤더와 메뉴가 거의 붙게 */
+#viewChat .cardBody{
+  padding: 0;
+}
+
+/* 메뉴 박스를 헤더 바로 아래에 붙이기 (둥근 테두리도 덜 튀게) */
+#viewChat .chatTop{
+  margin: 0;
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+
+/* 카드 내부를 “헤더/메뉴/채팅/입력창” 구조로 꽉 채우기 */
+#viewChat.active{
+  height: 100dvh;
+  min-height: 100dvh;
+}
+
+#viewChat .chatShell{
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 채팅창만 스크롤 */
+#viewChat .chatBox{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  /* 입력창 높이만큼 바닥 여백 확보 (중요) */
+  padding-bottom: calc(14px + 52px + 18px + env(safe-area-inset-bottom));
+}
+
+/* 입력창: 카드 내부 하단에 항상 보이게 */
+#viewChat .chatControls{
+  position: sticky;
+  bottom: 0;
+
+  width: 100%;
+  max-width: none;
+  margin: 0;
+
+  z-index: 999;
+  background: rgba(0,0,0,.92);
+  border-top: 1px solid rgba(255,255,255,.10);
+}
+
 
   </style>
 </head>
@@ -1791,6 +1826,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
