@@ -842,7 +842,7 @@ padding: 8px 12px;
       <!-- VIEW 2: Chat (placeholder) -->
       <section id="viewChat" class="card view" aria-label="Chat">
         <div class="cardHead">
-          <h2>Chat</h2>
+          <h2 id="chatTitle">Chat</h2>
         </div>
 
         <div class="cardBody">
@@ -1194,6 +1194,11 @@ function clearHistory(){
 
     // --------- Fill chat view (NULL-SAFE)
 function enterChat(session){
+  // ✅ 채팅 타이틀 변경
+  const chatTitle = document.getElementById("chatTitle");
+  if (chatTitle){
+    chatTitle.textContent = `Chat with ${session.name}`;
+  }
   // Basic display
   const tierLabel = session.tier === "uncensored" ? "+18 Uncensored ($2)" : "General";
   // const modelLabel = session.tier === "uncensored" ? "Venice Uncensored" : "DeepSeek"; // 필요 없으면 주석 유지
@@ -1662,6 +1667,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
