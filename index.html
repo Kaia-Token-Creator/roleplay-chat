@@ -872,6 +872,7 @@ padding: 8px 12px;
     const resetBtn = $("#resetBtn");
 
     const STORAGE_KEY = "roleplay-chat_session_v1";
+    const HISTORY_KEY = "roleplay-chat_history_v1";
 
     // Share button
 const shareBtn = document.querySelector("#shareBtn");
@@ -1084,6 +1085,22 @@ avatarInput.addEventListener("change", async () => {
       sessionStorage.removeItem(STORAGE_KEY);
     }
 
+    // --------- Save & load (chat history, tab-scoped)
+function saveHistory(history){
+  sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+function loadHistory(){
+  try{
+    const raw = sessionStorage.getItem(HISTORY_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){
+    return [];
+  }
+}
+function clearHistory(){
+  sessionStorage.removeItem(HISTORY_KEY);
+}
+
     // --------- Fill chat view
     function enterChat(session){
       // Basic display
@@ -1107,6 +1124,23 @@ avatarInput.addEventListener("change", async () => {
       }
 
       show(viewChat);
+
+      // ✅ history restore
+chatHistory = loadHistory();
+
+// 채팅 UI 비우고(초기 메시지 포함이라면 지우는 게 깔끔)
+const box = document.getElementById("chatBox");
+box.innerHTML = "";
+
+// history를 화면에 다시 그림
+for (const m of chatHistory){
+  appendMsg(m.role, m.content);
+}
+
+// 아무 대화도 없으면 기본 인삿말(원하면)
+if (chatHistory.length === 0){
+  appendMsg("assistant", "hi");
+}
     }
 
     // --------- Paywall modal controls
@@ -1267,6 +1301,7 @@ avatarInput.addEventListener("change", async () => {
       chatInput.value = "";
       appendMsg("user", text);
       chatHistory.push({ role: "user", content: text });
+saveHistory(chatHistory);
 
       try{
         sendBtn.disabled = true;
@@ -1278,6 +1313,7 @@ avatarInput.addEventListener("change", async () => {
 const textEl = msgEl.querySelector(".text div:last-child"); // 본문 div 잡기
 await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
 chatHistory.push({ role: "assistant", content: reply });
+saveHistory(chatHistory);
         
       }catch(e){
         appendMsg("assistant", `Error: ${String(e.message || e)}`);
@@ -1417,12 +1453,16 @@ weight: {
 
     // (1) ADDED: if opened as /?new=1, clear this tab's session and payment state
     const params = new URLSearchParams(window.location.search);
-    if (params.get("new") === "1"){
-      clearSession();
-      sessionStorage.removeItem(PAYMENT_KEY);
-      paymentStatus = "unpaid";
-      show(viewSetup);
-    }
+if (params.get("new") === "1"){
+  clearSession();
+  sessionStorage.removeItem(PAYMENT_KEY);
+  sessionStorage.removeItem("roleplay-chat_history_v1"); // (추가) 히스토리도 삭제
+  paymentStatus = "unpaid";
+  show(viewSetup);
+
+  // ✅ 중요: 새로고침해도 다시 초기화되지 않도록 URL에서 ?new=1 제거
+  history.replaceState(null, "", window.location.pathname);
+}
 
     // --------- Restore session if exists
     const existing = loadSession();
@@ -1438,6 +1478,7 @@ weight: {
   </script>
 </body>
 </html>
+
 
 
 
