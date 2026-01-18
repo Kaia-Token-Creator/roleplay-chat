@@ -44,6 +44,21 @@ export const onRequestPost: PagesFunction<{
       history?: Msg[];
     }>();
 
+    if (body.init){
+  messages.push({
+    role: "system",
+    content: `
+You are ${character.name}.
+This is the very first message of the roleplay.
+Start the conversation naturally, in character.
+Do not greet like an assistant.
+`
+  });
+
+  // 모델 호출 → reply 생성
+}
+
+
     // ---------- Input validation (lightweight)
     if (!body || typeof body !== "object") return json({ error: "Invalid body." }, 400, CORS);
 
@@ -322,4 +337,5 @@ async function callVeniceChat(apiKey: string, messages: any[]) {
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
+
 
