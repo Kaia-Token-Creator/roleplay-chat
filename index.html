@@ -1256,21 +1256,20 @@ clearAvatar();
 
 
     // --------- View switching
-    function show(view){
-      viewSetup.classList.remove("active");
-      viewChat.classList.remove("active");
-      view.classList.add("active");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+function show(view){
+  viewSetup.classList.remove("active");
+  viewChat.classList.remove("active");
+  view.classList.add("active");
 
-      // ✅ 채팅 모드면 페이지 스크롤 막기
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // ✅ 채팅 모드면 페이지 스크롤 막기
   document.body.classList.toggle("chatMode", view === viewChat);
 
+  // ✅ 셋업 화면으로 돌아오면 타이틀 원복
   if (view === viewSetup) document.title = DEFAULT_TITLE;
 }
 
-      // (3) ADDED: when returning to setup, restore default title
-      if (view === viewSetup) document.title = DEFAULT_TITLE;
-    }
 
     // --------- Save & load (tab-scoped)
     function saveSession(data){
@@ -1792,6 +1791,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
