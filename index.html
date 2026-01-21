@@ -686,8 +686,8 @@ body.chatMode #viewChat .chatBox{
 
     /* ✅ 키보드 올라옴: 여백 조금 줄이기 */
 body.chatMode.kbUp #viewChat .chatBox{
-  padding-bottom: calc(var(--controlsH) + 8px + env(safe-area-inset-bottom));
-  scroll-padding-bottom: calc(var(--controlsH) + 8px + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--controlsH) + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(var(--controlsH) + env(safe-area-inset-bottom));
 }
 
 /* ✅ 입력창: 진짜 하단 고정 + 키보드 올라오면 같이 상승 */
@@ -1752,5 +1752,6 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
