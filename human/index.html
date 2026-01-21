@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Community Chat | Roleplay-chat.com</title>
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Fonts (same as main) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.75);
+      --card:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.14);
+      --shadow: 0 14px 36px rgba(0,0,0,.55);
+      --radius2: 22px;
+
+      --accent:#ffcc00;      /* 너가 쓰는 다크 옐로우 */
+      --accent2:#e0b400;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background:
+        radial-gradient(900px 600px at 10% 0%, rgba(255,255,255,.06), transparent 55%),
+        radial-gradient(900px 600px at 90% 10%, rgba(255,255,255,.05), transparent 60%),
+        var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+    }
+
+    a{ color:inherit; }
+
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding: 18px 14px 26px;
+    }
+    .shell{
+      width: min(860px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 6px 0;
+      gap: 12px;
+    }
+
+    .logo{
+      text-decoration: none;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: clamp(16px, 3.6vw, 24px);
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      user-select:none;
+      display:inline-flex;
+      align-items:baseline;
+      gap: 0;
+      white-space:nowrap;
+    }
+    .logoRole{ color: var(--accent); }
+    .logoDot{
+      color: rgba(255,255,255,.95);
+      font-size: 0.5em;
+      vertical-align: baseline;
+    }
+
+    .shareWrap{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+    .bookmarkHint{
+      font-size: 10px;
+      line-height: 1.1;
+      text-align: right;
+      color: rgba(255,255,255,.55);
+      user-select: none;
+      white-space: nowrap;
+    }
+    .iconBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:.15s ease;
+      flex: 0 0 auto;
+    }
+    .iconBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+    .iconBtn:active{ transform: translateY(0px); }
+    .iconBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .cardHead h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.2px;
+    }
+    .badge{
+      font-size: 12px;
+      color: rgba(255,255,255,.75);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      white-space:nowrap;
+    }
+
+    /* 핵심: 카드 바디가 화면 남은 높이를 먹고, 안에서 채팅이 꽉 차게 */
+    .cardBody{
+      padding: 12px;
+      display:flex;
+      flex-direction:column;
+      min-height: 0;
+    }
+    .embedShell{
+      flex: 1 1 auto;
+      min-height: 0;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.35);
+      overflow: hidden;
+      /* 화면 높이: 헤더/여백 고려해서 꽉 차게 */
+      height: calc(100dvh - 140px);
+      min-height: 520px;
+    }
+
+    /* Chatango script가 style="width:100%;height:100%"라서, 부모가 높이를 가져야 함 */
+    .embedShell > .chatangoMount{
+      width: 100%;
+      height: 100%;
+    }
+
+    footer{
+      text-align:center;
+      font-size: 12px;
+      color: rgba(255,255,255,.45);
+      padding: 6px 0 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="shell">
+
+      <header>
+        <a href="https://roleplay-chat.com" class="logo" aria-label="Roleplay-chat home">
+          <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+        </a>
+
+        <div class="shareWrap">
+          <div class="bookmarkHint">Bookmark<br>&amp; Share</div>
+
+          <button class="iconBtn" id="shareBtn" type="button" aria-label="Share" title="Share">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <path d="M8.6 13.5l6.8 3.9"></path>
+              <path d="M15.4 6.6L8.6 10.5"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="card" aria-label="Community chat">
+        <div class="cardHead">
+          <h2>Community Chat</h2>
+          <div class="badge">Live • Chatango</div>
+        </div>
+
+        <div class="cardBody">
+          <div class="embedShell">
+            <div class="chatangoMount">
+              <!-- ✅ Chatango embed -->
+              <script id="cid0020000430000069988" data-cfasync="false" async
+                src="https://st.chatango.com/js/gz/emb.js"
+                style="width: 100%; height: 100%;">
+                {"handle":"roleplay-chat-com","arch":"js","styles":{"a":"000000","b":100,"c":"ffcd50","d":"ffcd50","e":"000000","g":"ffffff","h":"ffffff","k":"ffcd50","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"sbc":"ffcd50","sba":75,"surl":0}}
+              </script>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer>roleplay-chat.com</footer>
+
+    </div>
+  </div>
+
+  <script>
+    // Share button (same behavior as main)
+    const shareBtn = document.querySelector("#shareBtn");
+    if (shareBtn){
+      shareBtn.addEventListener("click", async () => {
+        const url = window.location.href;
+        try{
+          if (navigator.share){
+            await navigator.share({ title: document.title, url });
+          }else{
+            await navigator.clipboard.writeText(url);
+            shareBtn.title = "Copied!";
+            setTimeout(() => (shareBtn.title = "Share"), 900);
+          }
+        }catch(e){}
+      });
+    }
+  </script>
+</body>
+</html>
