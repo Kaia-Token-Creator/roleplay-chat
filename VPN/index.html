@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+  
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "VPN",
+  "url": "https://roleplay-chat.com/vpn/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Roleplay-chat.com",
+    "url": "https://roleplay-chat.com/"
+  },
+  "inLanguage": "en"
+}
+  </script>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>VPN | roleplay-chat.com</title>
+  <meta name="description" content="Unlock the world. Stream, browse, and explore without limits with a VPN." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="VPN | roleplay-chat.com" />
+  <meta property="og:description" content="Unlock the world. Stream, browse, and explore without limits with a VPN." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://roleplay-chat.com/vpn/" />
+  <meta property="og:image" content="https://roleplay-chat.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/jpeg" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="VPN | roleplay-chat.com" />
+  <meta name="twitter:description" content="Unlock the world. Stream, browse, and explore without limits with a VPN." />
+  <meta name="twitter:image" content="https://roleplay-chat.com/og-image.jpg" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.75);
+      --muted2:rgba(255,255,255,.55);
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.09);
+      --border:rgba(255,255,255,.14);
+      --shadow: 0 14px 36px rgba(0,0,0,.55);
+      --radius: 16px;
+      --radius2: 22px;
+
+      --accent:#e0b400;
+      --accentBorder:#c9a200;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background: radial-gradient(900px 600px at 10% 0%, rgba(255,255,255,.06), transparent 55%),
+                  radial-gradient(900px 600px at 90% 10%, rgba(255,255,255,.05), transparent 60%),
+                  var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+    }
+
+    a{ color:inherit; }
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding: 18px 14px 26px;
+    }
+    .shell{
+      width: min(860px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 6px 0;
+      gap: 12px;
+    }
+
+    .logo{
+      text-decoration: none;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: clamp(16px, 3.6vw, 24px);
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      user-select:none;
+      white-space:nowrap;
+    }
+    .logoRole{ color: #ffcc00; }
+    .logoDot{
+      color: rgba(255,255,255,.95);
+      font-size: 0.5em;
+      vertical-align: baseline;
+    }
+
+    .shareWrap{
+      display:flex;
+      align-items:center;
+      gap: 6px;
+      position:relative;
+      z-index: 99999;
+    }
+    .bookmarkHint{
+      font-size: 10px;
+      line-height: 1.1;
+      text-align: right;
+      color: rgba(255,255,255,.55);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .shareBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:.15s ease;
+      flex: 0 0 auto;
+    }
+    .shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+    .shareBtn:active{ transform: translateY(0px); }
+    .shareBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .infoMenu{
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 240px;
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display: none;
+      z-index: 99999;
+    }
+    .infoMenu.active{ display:block; }
+    .infoMenu a{
+      display:block;
+      padding: 10px 10px;
+      border-radius: 12px;
+      text-decoration:none;
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+    }
+    .infoMenu a:hover{ background: rgba(255,255,255,.08); }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .cardHead h1{
+      margin:0;
+      font-size: 18px;
+      letter-spacing:.2px;
+    }
+    .badge{
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      white-space:nowrap;
+    }
+    .cardBody{
+      padding: 14px 14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    .kicker{
+      display:inline-flex;
+      gap: 8px;
+      align-items:center;
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      padding: 6px 10px;
+      border-radius: 999px;
+      width: fit-content;
+    }
+
+    .lead{
+      margin:0;
+      color: rgba(255,255,255,.90);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 720px){
+      .grid2{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .block{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      border-radius: 16px;
+      padding: 12px 12px;
+    }
+    .block h2{
+      margin:0 0 6px;
+      font-size: 14px;
+      letter-spacing:.2px;
+      color: rgba(255,255,255,.95);
+    }
+    .block p{
+      margin:0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .block ul{
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .block li{ margin: 6px 0; }
+
+    .btnRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin-top: 6px;
+    }
+    .btn{
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      background: rgba(255,255,255,.10);
+      color: var(--fg);
+      font-weight: 800;
+      cursor:pointer;
+      transition:.15s ease;
+      font-size: 14px;
+      letter-spacing:.2px;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
+    .btn:hover{ background: rgba(255,255,255,.14); transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px); }
+
+    .btnPrimary{
+      background: var(--accent);
+      border: 1px solid var(--accentBorder);
+      color: #000;
+      font-weight: 900;
+    }
+
+    .accent{
+      color: var(--accent);
+      font-weight: 800;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      text-decoration-color: var(--accent);
+    }
+
+    .fineprint{
+      font-size: 11px;
+      color: rgba(255,255,255,.45);
+      margin: 2px 2px 0;
+      line-height: 1.45;
+    }
+
+    footer{
+      text-align:center;
+      font-size: 12px;
+      color: rgba(255,255,255,.45);
+      padding: 10px 0 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="shell">
+
+      <!-- ✅ roleplay-chat.com header -->
+      <header>
+        <a href="https://roleplay-chat.com" class="logo" aria-label="Roleplay-chat.com Home">
+          <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+        </a>
+
+        <div class="shareWrap">
+          <div class="bookmarkHint">
+            Bookmark<br>&amp; Share
+          </div>
+
+          <button class="shareBtn" id="shareBtn" type="button" aria-label="Share">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <path d="M8.6 13.5l6.8 3.9"></path>
+              <path d="M15.4 6.6L8.6 10.5"></path>
+            </svg>
+          </button>
+
+          <button class="shareBtn" id="infoBtn" type="button" aria-label="Info" title="Info">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 10.5v6"></path>
+              <circle cx="12" cy="7.5" r="1"></circle>
+            </svg>
+          </button>
+
+          <div class="infoMenu" id="infoMenu" role="menu" aria-label="Info menu">
+            <a href="https://roleplay-chat.com/about" rel="noopener noreferrer">About</a>
+            <a href="https://roleplay-chat.com/policy" rel="noopener noreferrer">Privacy Policy</a>
+            <a href="mailto:showmetheaitools@gmail.com">Contact</a>
+          </div>
+        </div>
+      </header>
+
+      <!-- ✅ VPN content in same card UI -->
+      <section class="card" aria-label="VPN">
+        <div class="cardHead">
+          <h1>VPN</h1>
+          <div class="badge">Unlock the world</div>
+        </div>
+
+        <div class="cardBody">
+          <div class="kicker">Streaming • Privacy • No borders</div>
+
+          <p class="lead">
+            Sometimes the internet feels like a theme park where half the rides are “not available in your region.”
+            A VPN flips the sign to <span class="accent">Open</span> and lets you explore freely.
+          </p>
+
+          <div class="btnRow">
+            <a class="btn btnPrimary" href="https://go.nordvpn.net/aff_c?offer_id=476&aff_id=86956" target="_blank" rel="noopener">
+              Get NordVPN (Instant Access)
+            </a>
+            <a class="btn" href="https://go.nordvpn.net/aff_c?offer_id=476&aff_id=86956" target="_blank" rel="noopener">
+              View Official Promo
+            </a>
+          </div>
+
+          <p class="fineprint">
+            Affiliate disclosure: This page contains affiliate links. If you purchase through them, we may earn a commission at no extra cost to you.
+          </p>
+
+          <div class="grid grid2">
+            <div class="block">
+              <h2>Why people use a VPN</h2>
+              <ul>
+                <li>Access region-limited sites and streaming libraries.</li>
+                <li>Browse more privately on public Wi-Fi.</li>
+                <li>Reduce tracking and block annoying ads (depending on features).</li>
+              </ul>
+            </div>
+
+            <div class="block">
+              <h2>Streaming example</h2>
+              <p>
+                Connect to another country and see different content catalogs.
+                Want a library that is only available abroad? A VPN is the usual key.
+              </p>
+            </div>
+
+            <div class="block">
+              <h2>Travel mode</h2>
+              <p>
+                Airports, hotels, cafes: convenient Wi-Fi, questionable security.
+                A VPN adds an extra layer so you are not broadcasting your data in a crowded room.
+              </p>
+            </div>
+
+            <div class="block">
+              <h2>Why NordVPN</h2>
+              <p>
+                Fast speeds, a polished app, strong security defaults, and extra features like threat blocking.
+                It is one of the most popular “set it and forget it” options.
+              </p>
+            </div>
+          </div>
+
+          <div class="block">
+            <h2>Special offer</h2>
+            <p>
+              Deals change, but NordVPN often runs big discounts. If you want the current promo, use the official link below.
+            </p>
+            <div class="btnRow">
+              <a class="btn btnPrimary" href="https://go.nordvpn.net/aff_c?offer_id=476&aff_id=86956" target="_blank" rel="noopener">
+                Claim Discount
+              </a>
+              <a class="btn" href="https://go.nordvpn.net/aff_c?offer_id=476&aff_id=86956" target="_blank" rel="noopener">
+                See Current Price
+              </a>
+            </div>
+            <p class="fineprint">
+              Try it risk-free: NordVPN typically offers a 30-day money-back guarantee (see their terms on checkout).
+            </p>
+          </div>
+
+          <p class="lead">
+            Want to go back to roleplay? Your adventure is waiting.
+          </p>
+          <div class="btnRow">
+            <a class="btn" href="https://roleplay-chat.com/">Back to Roleplay-chat.com</a>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        © <span id="year"></span> roleplay-chat.com
+      </footer>
+
+    </div>
+  </div>
+
+  <script>
+    // year
+    document.getElementById("year").textContent = String(new Date().getFullYear());
+
+    // Share button
+    const shareBtn = document.querySelector("#shareBtn");
+    if (shareBtn){
+      shareBtn.addEventListener("click", async () => {
+        const url = window.location.origin + "/";
+        try{
+          if (navigator.share){
+            await navigator.share({ title: document.title, url });
+          }else{
+            await navigator.clipboard.writeText(url);
+            shareBtn.title = "Copied!";
+            setTimeout(() => (shareBtn.title = "Share"), 900);
+          }
+        }catch(e){
+          // user cancelled or blocked
+        }
+      });
+    }
+
+    // Info button + menu (robust)
+    const infoBtn = document.querySelector("#infoBtn");
+    const infoMenu = document.querySelector("#infoMenu");
+
+    function isClickInside(el, target){
+      return el && (el === target || el.contains(target));
+    }
+    function closeInfoMenu(){
+      if (infoMenu) infoMenu.classList.remove("active");
+    }
+
+    if (infoBtn && infoMenu){
+      infoBtn.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        infoMenu.classList.toggle("active");
+      });
+
+      infoMenu.addEventListener("pointerdown", (e) => {
+        e.stopPropagation();
+      });
+
+      document.addEventListener("pointerdown", (e) => {
+        const t = e.target;
+        if (isClickInside(infoBtn, t) || isClickInside(infoMenu, t)) return;
+        closeInfoMenu();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeInfoMenu();
+      });
+    }
+  </script>
+</body>
+</html>
