@@ -410,16 +410,6 @@ padding: 8px 12px;
   min-height: 0; /* 중요: flex 안에서 overflow가 제대로 동작 */
 }
 
-    .chatTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.35);
-    }
     .chip{
       font-size: 12px;
       padding: 6px 10px;
@@ -943,19 +933,15 @@ body.chatMode #viewChat .chatFooter{
 
       <!-- VIEW 2: Chat (placeholder) -->
      <section id="viewChat" class="card view" aria-label="Chat">
-  <div class="cardHead chatHead">
-    <h2 id="chatTitle">Chat</h2>
+ <div class="cardHead chatHead">
+  <h2 id="chatTitle">Chat</h2>
 
-    <!-- ✅ 메뉴를 여기로 올림 (Chat with SB 아래) -->
-    <div class="chatTop">
-      <div class="row" style="gap:10px;">
-        <button class="xBtn" id="resetBtn" type="button" title="Create new character">New character</button>
-
-        <button class="xBtn" id="gameBtn" type="button" title="Open 2048 Game">Game</button>
-        <button class="xBtn" id="vpnBtn" type="button" title="Open VPN page">VPN</button>
-      </div>
-    </div>
+  <div class="row" style="gap:10px;">
+    <button class="xBtn" id="resetBtn" type="button">New character</button>
+    <button class="xBtn" id="gameBtn" type="button">Game</button>
+    <button class="xBtn" id="vpnBtn" type="button">VPN</button>
   </div>
+</div>
 
   <div class="cardBody">
     <div class="chatShell">
@@ -1752,6 +1738,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
