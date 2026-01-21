@@ -1141,6 +1141,31 @@ if (shareBtn){
   });
 }
 
+    // Info button dropdown ✅ (여기!)
+const infoBtn = document.querySelector("#infoBtn");
+const infoMenu = document.querySelector("#infoMenu");
+
+function closeInfoMenu(){
+  if (infoMenu) infoMenu.classList.remove("active");
+}
+
+if (infoBtn && infoMenu){
+  infoBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    infoMenu.classList.toggle("active");
+  });
+
+  infoMenu.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  document.addEventListener("click", closeInfoMenu);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeInfoMenu();
+  });
+}
+    
     // Colors: bright & readable colors
     const colorOptions = [
       { name: "White", value: "#ffffff" },
@@ -1860,6 +1885,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
