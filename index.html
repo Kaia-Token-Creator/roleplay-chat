@@ -639,6 +639,7 @@ body.chatMode{
 /* 채팅 화면은 남은 높이를 꽉 먹는 flex 레이아웃 */
 body.chatMode .wrap{
   height: 100dvh;
+  padding-top: 0px; /* 원래 18px → 조금 줄이기 */
 }
 
 body.chatMode .shell{
@@ -705,6 +706,11 @@ body.chatMode #viewChat .chatControls{
 body.chatMode #viewChat .chatFooter{
   padding: 2px 0 0;
 }
+
+    body.chatMode .sub{
+  display: none !important;
+}
+
 
   </style>
 </head>
@@ -1732,5 +1738,6 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
