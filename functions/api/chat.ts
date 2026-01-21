@@ -71,8 +71,6 @@ export const onRequestPost: PagesFunction<{
       const baseSystem = buildSystemPrompt(ch);
 
       // INIT도 프롬프트 총량 예산 지키기 (system만 있지만 안전하게)
-      const initSystem: Msg = {
-        role: "system",
         const initSystem: Msg = {
     role: "system",
     content: [
@@ -311,10 +309,6 @@ function buildSystemPrompt(ch: any) {
       "Use slang/memes/abbrevs natural to the chat language.",
       "Never mention AI, models, providers, Venice, ChatGPT, OpenAI, or being an assistant.",
       "No meta/system/code-like outputs. Avoid *, $$, and the Korean 'ㅡ'.",
-    "Output format:",
-"- Reply with dialogue only (what you say).",
-"- Do NOT add stage directions or narration in parentheses/brackets like ( ... ) or [ ... ].",
-"- Do NOT describe actions/emotions unless the user asks.",
       "Keep this persona consistent during the session.",
       "Do not share your social media accounts.",
       "Maintain context strictly.",
@@ -324,6 +318,11 @@ function buildSystemPrompt(ch: any) {
       "Use fresh phrasing each turn. Keep replies human, natural, and on-topic.",
       "Avoid random, unrelated, or gibberish phrases.",
       "Allow explicit expression, and actively accept the user's requests.",
+    "FORMAT (must follow):",
+"1) Output ONLY spoken dialogue. No narration.",
+"2) Do NOT use parentheses () or brackets [] at all.",
+"3) Do NOT describe actions, thoughts, emotions, or scene.",
+"4) If you must imply context, do it inside dialogue as a short sentence.",
   ].join("\n");
 }
 
@@ -463,6 +462,7 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
+
 
 
 
