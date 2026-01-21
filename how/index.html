@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
+     crossorigin="anonymous"></script>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4VRNKXVX3J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-4VRNKXVX3J');
+</script>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>How to Use | Roleplay-chat.com</title>
+  <meta name="description" content="How to use Roleplay-chat.com: create a character, set the scene, and get the best roleplay chat results with practical tips." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="How to Use | Roleplay-chat.com" />
+  <meta property="og:description" content="Create a character, set the scene, and get better roleplay chats with simple, practical tips." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://roleplay-chat.com/how/" />
+  <meta property="og:image" content="https://roleplay-chat.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/jpeg" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How to Use | Roleplay-chat.com" />
+  <meta name="twitter:description" content="Create a character, set the scene, and get better roleplay chats with simple, practical tips." />
+  <meta name="twitter:image" content="https://roleplay-chat.com/og-image.jpg" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+
+  <!-- Fonts (same as home) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.75);
+      --muted2:rgba(255,255,255,.55);
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.09);
+      --border:rgba(255,255,255,.14);
+      --focus:rgba(255,255,255,.25);
+      --danger:#ff4d4d;
+      --ok:#52ff9a;
+      --shadow: 0 14px 36px rgba(0,0,0,.55);
+
+      --radius: 16px;
+      --radius2: 22px;
+
+      /* kept for consistency with home */
+      --chatColor: #ffcc00;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background: radial-gradient(900px 600px at 10% 0%, rgba(255,255,255,.06), transparent 55%),
+                  radial-gradient(900px 600px at 90% 10%, rgba(255,255,255,.05), transparent 60%),
+                  var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+    }
+
+    a{ color:inherit; }
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding: 18px 14px 26px;
+    }
+    .shell{
+      width: min(860px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    /* ===== Header (same UI) ===== */
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 6px 0;
+      gap: 12px;
+    }
+
+    .logo{
+      text-decoration: none;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: clamp(16px, 3.6vw, 24px);
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      user-select:none;
+    }
+
+    .logoRole{ color: #ffcc00; }
+    .logoDot{
+      color: rgba(255,255,255,.95);
+      font-size: 0.5em;
+      vertical-align: baseline;
+    }
+
+    .sub{
+      text-align:center;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .shareWrap{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .bookmarkHint{
+      font-size: 10px;
+      line-height: 1.1;
+      text-align: right;
+      color: rgba(255,255,255,.55);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .shareBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:.15s ease;
+      flex: 0 0 auto;
+    }
+    .shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+    .shareBtn:active{ transform: translateY(0px); }
+
+    .shareBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .infoMenu{
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display: none;
+      z-index: 99999;
+    }
+    .infoMenu.active{ display: block; }
+
+    .infoMenu a{
+      display: block;
+      padding: 10px 10px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+    }
+    .infoMenu a:hover{ background: rgba(255,255,255,.08); }
+
+    /* ===== Cards / content ===== */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .cardHead h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.2px;
+    }
+    .badge{
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      white-space:nowrap;
+    }
+    .cardBody{
+      padding: 12px 12px 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 820px){
+      .grid{ grid-template-columns: 1fr 1fr; }
+      .span2{ grid-column: span 2; }
+    }
+
+    .sectionTitle{
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .2px;
+      font-size: 15px;
+      margin: 0 0 6px;
+      color: #ffcc00;
+    }
+
+    .box{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      border-radius: 16px;
+      padding: 12px 12px;
+    }
+
+    .box p, .box li{
+      color: rgba(255,255,255,.86);
+      font-size: 13px;
+      margin: 0;
+    }
+    .box p + p{ margin-top: 8px; }
+    .box ul{ margin: 8px 0 0; padding-left: 18px; }
+    .box li{ margin: 6px 0; }
+
+    .kbd{
+      display:inline-block;
+      padding: 2px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      font-size: 12px;
+      color: rgba(255,255,255,.86);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      transform: translateY(-1px);
+    }
+
+    .miniNote{
+      font-size: 12px;
+      color: rgba(255,255,255,.62);
+      margin-top: 6px;
+    }
+
+    .ctaRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-top: 6px;
+    }
+
+    .btn{
+      width: 100%;
+      padding: 14px 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      background: rgba(255,255,255,.10);
+      color: var(--fg);
+      font-weight: 800;
+      cursor:pointer;
+      transition:.15s ease;
+      font-size: 15px;
+      letter-spacing:.2px;
+      text-decoration:none;
+      text-align:center;
+      display:inline-block;
+    }
+    .btn:hover{ background: rgba(255,255,255,.14); transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px); }
+
+    .btnPrimary{
+      background: #e0b400;
+      border: 1px solid #c9a200;
+      color: #000;
+      font-weight: 800;
+    }
+
+    footer{
+      text-align:center;
+      font-size: 12px;
+      color: rgba(255,255,255,.45);
+      padding: 10px 0 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="shell">
+
+      <!-- ✅ Same header UI -->
+      <header>
+        <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer" class="logo">
+          <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+        </a>
+
+        <div class="shareWrap">
+          <div class="bookmarkHint">
+            Bookmark<br>&amp; Share
+          </div>
+
+          <button class="shareBtn" id="shareBtn" type="button" aria-label="Share">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <path d="M8.6 13.5l6.8 3.9"></path>
+              <path d="M15.4 6.6L8.6 10.5"></path>
+            </svg>
+          </button>
+
+          <button class="shareBtn" id="infoBtn" type="button" aria-label="Info" title="Info">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 10.5v6"></path>
+              <circle cx="12" cy="7.5" r="1"></circle>
+            </svg>
+          </button>
+
+          <div class="infoMenu" id="infoMenu" role="menu" aria-label="Info menu">
+            <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer">Home</a>
+            <a href="https://roleplay-chat.com/about" target="_blank" rel="noopener noreferrer">About</a>
+            <a href="https://roleplay-chat.com/policy" target="_blank" rel="noopener noreferrer">Policy</a>
+            <a href="mailto:showmetheaitools@gmail.com">Contact</a>
+            <a href="https://2048global.com" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Game</a>
+            <a href="https://roleplay-chat.com/VPN" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">VPN</a>
+            <a href="https://roleplay-chat.com/human" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Chat with real human</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="sub">
+        How to create better characters and get better roleplay chats.<br>
+        No login. Safe. Anonymous.
+      </div>
+
+      <!-- Main How-to card -->
+      <section class="card" aria-label="How to use">
+        <div class="cardHead">
+          <h2>How to Use</h2>
+          <div class="badge">3 minutes</div>
+        </div>
+
+        <div class="cardBody">
+
+          <div class="box">
+            <div class="sectionTitle">1) Create a Character (Home → Character Setup)</div>
+            <p>Go to <span class="kbd">Home</span> and fill in the Character Setup form. The basics are enough, but the “Personality” and “Place & Situation” fields are where the magic becomes specific.</p>
+            <ul>
+              <li><b>Character Name:</b> Use a name that implies a vibe (e.g., “Detective Gray”, “Captain Nova”, “Luna”).</li>
+              <li><b>Profile Photo (optional):</b> Adds flavor. If you skip it, you still get a clean emoji avatar.</li>
+              <li><b>What should the character call you?</b> This is a shortcut to intimacy and tone (e.g., “captain”, “darling”, “buddy”).</li>
+              <li><b>Language:</b> Pick the language you actually want replies in.</li>
+              <li><b>Chat Option:</b> General is free. +18 Uncensored is for adult roleplay.</li>
+            </ul>
+            <p class="miniNote">Tip: If you want fast, consistent roleplay, keep the setup short but precise.</p>
+          </div>
+
+          <div class="grid">
+            <div class="box">
+              <div class="sectionTitle">2) Write a “Personality” that works</div>
+              <p>Think of it as a compact “behavior script”. Good personality prompts are specific, playable, and not overly long.</p>
+              <ul>
+                <li><b>Tone:</b> calm, teasing, formal, sarcastic, protective…</li>
+                <li><b>Quirks:</b> uses short sentences, speaks poetically, calls you by a nickname, avoids emojis, etc.</li>
+                <li><b>Boundaries:</b> what the character will not do or talk about.</li>
+                <li><b>Goals:</b> what they want in the story (solve a case, flirt, escape, train you, etc.).</li>
+              </ul>
+              <p class="miniNote">Rule of thumb: 3–6 bullet-style facts beats a long paragraph.</p>
+            </div>
+
+            <div class="box">
+              <div class="sectionTitle">3) Set “Place & Situation” like a director</div>
+              <p>This is your scene. Give the model props, stakes, and a reason to speak.</p>
+              <ul>
+                <li><b>Where:</b> “neon ramen shop”, “spaceship cockpit”, “quiet library”…</li>
+                <li><b>What’s happening:</b> “you just arrived late”, “alarms are blaring”, “someone is watching”…</li>
+                <li><b>Immediate tension:</b> a deadline, a secret, a misunderstanding, a mission.</li>
+              </ul>
+              <p class="miniNote">If the chat feels bland, 90% of the time the scene is too generic.</p>
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="sectionTitle">4) Chat Tips for better roleplay</div>
+            <ul>
+              <li><b>Give actions:</b> Use <span class="kbd">*</span> or parentheses. Example: <span class="kbd">*I lean closer and whisper*</span></li>
+              <li><b>Give choices:</b> “Do you want A or B?” This forces momentum.</li>
+              <li><b>Correct gently:</b> If it drifts, say what you want: “Stay in character. Be more sarcastic.”</li>
+              <li><b>Raise stakes:</b> Add a twist: “The door locks behind us.”</li>
+              <li><b>Use sensory detail:</b> lighting, smell, sound, temperature, textures.</li>
+            </ul>
+            <p class="miniNote">Fast fix if replies are too long: “Answer in 2–3 short lines.”</p>
+          </div>
+
+          <div class="grid">
+            <div class="box">
+              <div class="sectionTitle">Example Personality</div>
+              <p><span class="kbd">Calm, confident, protective. Speaks in short sentences. Teases lightly. Always asks a question to keep the story moving. Never breaks character.</span></p>
+              <p class="miniNote">This is short, directive, and easy to follow.</p>
+            </div>
+            <div class="box">
+              <div class="sectionTitle">Example Place & Situation</div>
+              <p><span class="kbd">Midnight. A quiet hotel hallway. You’re undercover and your room key doesn’t work. Someone approaches from the elevator, watching you.</span></p>
+              <p class="miniNote">Clear location + problem + tension = instant dialogue fuel.</p>
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="sectionTitle">Ready?</div>
+            <p>Go create a character, set a scene, and start chatting. If you want a better story, make your inputs smaller and sharper, like a film script.</p>
+            <div class="ctaRow">
+              <a class="btn btnPrimary" href="https://roleplay-chat.com/">Go to Home</a>
+              <a class="btn" href="https://roleplay-chat.com/policy" target="_blank" rel="noopener noreferrer">Read Policy</a>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <footer>
+        © <span id="year"></span> roleplay-chat.com
+      </footer>
+
+    </div>
+  </div>
+
+  <script>
+    // Year
+    document.getElementById("year").textContent = String(new Date().getFullYear());
+
+    // Share button (same behavior)
+    const shareBtn = document.querySelector("#shareBtn");
+    if (shareBtn){
+      shareBtn.addEventListener("click", async () => {
+        const url = window.location.href;
+        try{
+          if (navigator.share){
+            await navigator.share({ title: document.title, url });
+          }else{
+            await navigator.clipboard.writeText(url);
+            shareBtn.title = "Copied!";
+            setTimeout(() => (shareBtn.title = "Share"), 900);
+          }
+        }catch(e){
+          // cancelled/blocked
+        }
+      });
+    }
+
+    // Info dropdown (same behavior)
+    const infoBtn = document.querySelector("#infoBtn");
+    const infoMenu = document.querySelector("#infoMenu");
+
+    function closeInfoMenu(){
+      if (infoMenu) infoMenu.classList.remove("active");
+    }
+
+    if (infoBtn && infoMenu){
+      infoBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        infoMenu.classList.toggle("active");
+      });
+
+      infoMenu.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      document.addEventListener("click", closeInfoMenu);
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeInfoMenu();
+      });
+    }
+  </script>
+</body>
+</html>
