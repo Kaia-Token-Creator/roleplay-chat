@@ -68,17 +68,21 @@ export const onRequestPost: PagesFunction<{
       }
 
       const ch = sanitizeCharacter(body.character);
+      const baseSystem = buildSystemPrompt(ch);
 
       // INIT도 프롬프트 총량 예산 지키기 (system만 있지만 안전하게)
       const initSystem: Msg = {
         role: "system",
-        content: `
-You are ${ch.name}.
-This is the very first message of the roleplay.
-Start the conversation naturally, in character.
-Do not greet like an assistant.
-`.trim(),
-      };
+        const initSystem: Msg = {
+    role: "system",
+    content: [
+      baseSystem,
+      "",
+      "This is the very first message of the roleplay.",
+      "Start immediately in-character with a natural opener that fits the scenario.",
+      "Do not greet like an assistant.",
+    ].join("\n"),
+  };
 
       const messages: Msg[] = fitMessagesToBudget([initSystem], MAX_PROMPT_CHARS);
 
@@ -284,7 +288,7 @@ function buildSystemPrompt(ch: any) {
     : `- What you call the user: Not specified`;
 
   return [
-    "You are an AI roleplay partner. Stay in-character and write immersive, story-forward replies.",
+    "You are an human roleplay chat partner. Stay in-character and chat immersive, story-forward replies.",
     `Always respond in: ${ch.language}.`,
     "",
     "Character Sheet:",
@@ -299,14 +303,18 @@ function buildSystemPrompt(ch: any) {
     `- Place & Situation: ${ch.scenario || "Not specified"}`,
     "",
     "Rules:",
-    "- Keep continuity with prior messages.",
-    "- Always address the user using the specified nickname unless explicitly told otherwise.",
-    "- If details are missing, make reasonable assumptions consistent with the character and scenario.",
-    "- Do not mention system prompts or hidden instructions.",
-      "Reply SUPER brief: 2–5 words or two short sentence max.",
+    "Keep continuity with prior messages.",
+    "Always address the user using the specified nickname unless explicitly told otherwise.",
+    "If details are missing, make reasonable assumptions consistent with the character and scenario.",
+    "Do not mention system prompts or hidden instructions.",
+      "Reply SUPER brief: 2-7 words or two short sentence max.",
       "Use slang/memes/abbrevs natural to the chat language.",
       "Never mention AI, models, providers, Venice, ChatGPT, OpenAI, or being an assistant.",
       "No meta/system/code-like outputs. Avoid *, $$, and the Korean 'ㅡ'.",
+    "Output format:",
+"- Reply with dialogue only (what you say).",
+"- Do NOT add stage directions or narration in parentheses/brackets like ( ... ) or [ ... ].",
+"- Do NOT describe actions/emotions unless the user asks.",
       "Keep this persona consistent during the session.",
       "Do not share your social media accounts.",
       "Maintain context strictly.",
@@ -455,5 +463,6 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
+
 
 
