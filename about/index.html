@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>About | Roleplay-chat.com</title>
+  <meta name="description" content="About Roleplay-chat.com: anonymous, no-login AI roleplay chat. Create a character and start instantly." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="About | Roleplay-chat.com" />
+  <meta property="og:description" content="Anonymous, no-login AI roleplay chat. Create a character and start instantly." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://roleplay-chat.com/about/" />
+  <meta property="og:image" content="https://roleplay-chat.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/jpeg" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About | Roleplay-chat.com" />
+  <meta name="twitter:description" content="Anonymous, no-login AI roleplay chat. Create a character and start instantly." />
+  <meta name="twitter:image" content="https://roleplay-chat.com/og-image.jpg" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+
+  <!-- Rounded, commercial-free font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "name": "About Roleplay-chat.com",
+  "url": "https://roleplay-chat.com/about/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Roleplay-chat.com",
+    "url": "https://roleplay-chat.com/"
+  },
+  "inLanguage": "en"
+}
+  </script>
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.75);
+      --muted2:rgba(255,255,255,.55);
+      --card:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.14);
+      --shadow: 0 14px 36px rgba(0,0,0,.55);
+      --radius2: 22px;
+
+      --accent:#e0b400;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background: radial-gradient(900px 600px at 10% 0%, rgba(255,255,255,.06), transparent 55%),
+                  radial-gradient(900px 600px at 90% 10%, rgba(255,255,255,.05), transparent 60%),
+                  var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+    }
+
+    a{ color:inherit; }
+
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding: 18px 14px 26px;
+    }
+    .shell{
+      width: min(860px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 6px 0;
+      gap: 12px;
+    }
+
+    .logo{
+      text-decoration: none;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: clamp(16px, 3.6vw, 24px);
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      user-select:none;
+      display:inline-flex;
+      align-items:baseline;
+      gap:0;
+      white-space:nowrap;
+    }
+    .logoRole{ color: #ffcc00; }
+    .logoDot{
+      color: rgba(255,255,255,.95);
+      font-size: 0.5em;
+      vertical-align: baseline;
+    }
+
+    .shareWrap{
+      display:flex;
+      align-items:center;
+      gap: 6px;
+      position:relative;
+    }
+    .bookmarkHint{
+      font-size: 10px;
+      line-height: 1.1;
+      text-align: right;
+      color: rgba(255,255,255,.55);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .shareBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:.15s ease;
+      flex: 0 0 auto;
+    }
+    .shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+    .shareBtn:active{ transform: translateY(0px); }
+
+    .shareBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .infoMenu{
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display: none;
+      z-index: 99999;
+    }
+    .infoMenu.active{ display:block; }
+    .infoMenu a{
+      display:block;
+      padding: 10px 10px;
+      border-radius: 12px;
+      text-decoration:none;
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+    }
+    .infoMenu a:hover{ background: rgba(255,255,255,.08); }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .cardHead h1{
+      margin:0;
+      font-size: 18px;
+      letter-spacing:.2px;
+    }
+    .cardBody{
+      padding: 14px 14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    .hero{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .kicker{
+      display:inline-flex;
+      gap: 8px;
+      align-items:center;
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      padding: 6px 10px;
+      border-radius: 999px;
+      width: fit-content;
+    }
+    .lead{
+      margin:0;
+      color: rgba(255,255,255,.90);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .lead b{ color: var(--accent); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 720px){
+      .grid{ grid-template-columns: 1fr 1fr; }
+      .span2{ grid-column: span 2; }
+    }
+
+    .block{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      border-radius: 16px;
+      padding: 12px 12px;
+    }
+    .block h2{
+      margin:0 0 6px;
+      font-size: 14px;
+      letter-spacing:.2px;
+      color: rgba(255,255,255,.95);
+    }
+    .block p{
+      margin:0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .block ul{
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .ctaRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin-top: 4px;
+    }
+    .btn{
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      background: rgba(255,255,255,.10);
+      color: var(--fg);
+      font-weight: 800;
+      cursor:pointer;
+      transition:.15s ease;
+      font-size: 14px;
+      letter-spacing:.2px;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
+    .btn:hover{ background: rgba(255,255,255,.14); transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px); }
+
+    .btnPrimary{
+      background: var(--accent);
+      border: 1px solid #c9a200;
+      color: #000;
+      font-weight: 900;
+    }
+
+    .fineprint{
+      font-size: 11px;
+      color: rgba(255,255,255,.45);
+      margin: 2px 2px 0;
+      line-height: 1.45;
+    }
+
+    footer{
+      text-align:center;
+      font-size: 12px;
+      color: rgba(255,255,255,.45);
+      padding: 10px 0 4px;
+    }
+
+    .accent{
+      color: var(--accent);
+      font-weight: 800;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      text-decoration-color: var(--accent);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="shell">
+
+      <header>
+        <a href="https://roleplay-chat.com" class="logo" aria-label="Roleplay-chat.com Home">
+          <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+        </a>
+
+        <div class="shareWrap">
+          <div class="bookmarkHint">
+            Bookmark<br>&amp; Share
+          </div>
+
+          <button class="shareBtn" id="shareBtn" type="button" aria-label="Share">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <path d="M8.6 13.5l6.8 3.9"></path>
+              <path d="M15.4 6.6L8.6 10.5"></path>
+            </svg>
+          </button>
+
+          <button class="shareBtn" id="infoBtn" type="button" aria-label="Info" title="Info">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 10.5v6"></path>
+              <circle cx="12" cy="7.5" r="1"></circle>
+            </svg>
+          </button>
+
+          <div class="infoMenu" id="infoMenu" role="menu" aria-label="Info menu">
+            <a href="https://roleplay-chat.com/about" rel="noopener noreferrer">About</a>
+            <a href="https://roleplay-chat.com/policy" rel="noopener noreferrer">Privacy Policy</a>
+            <a href="mailto:showmetheaitools@gmail.com">Contact</a>
+          </div>
+        </div>
+      </header>
+
+      <section class="card" aria-label="About">
+        <div class="cardHead">
+          <h1>About</h1>
+        </div>
+
+        <div class="cardBody">
+          <div class="hero">
+            <div class="kicker">No-login • Anonymous • Instant roleplay</div>
+            <p class="lead">
+              <b>Roleplay-chat.com</b> is a one-tab universe: you create a character, set the scene, and start talking immediately.
+              No accounts, no profiles, no inbox clutter.
+              Just you, your character, and a story that begins the moment you hit <span class="accent">Create</span>.
+            </p>
+            <div class="ctaRow">
+              <a class="btn btnPrimary" href="https://roleplay-chat.com/">Start a new roleplay</a>
+              <a class="btn" href="https://roleplay-chat.com/policy">Read Privacy Policy</a>
+            </div>
+            <div class="fineprint">
+              Conversations live in your browser tab. If the tab closes, the curtain falls.
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="block">
+              <h2>What it is</h2>
+              <p>
+                A lightweight roleplay chat built for speed and simplicity.
+                Pick a name, personality, scenario, and a style that fits your character.
+                Then chat like you are already in the scene, because you are.
+              </p>
+            </div>
+
+            <div class="block">
+              <h2>How it works</h2>
+              <ul>
+                <li>Create a character (name, vibe, setting).</li>
+                <li>Start chatting instantly in the same page.</li>
+                <li>Your session stays available for the lifetime of this browser tab.</li>
+              </ul>
+            </div>
+
+            <div class="block span2">
+              <h2>Privacy, by design</h2>
+              <p>
+                Roleplay-chat.com is built to avoid collecting what it does not need.
+                No login is required, and your chat session is kept inside your browser tab.
+                For full details, see the <a class="accent" href="https://roleplay-chat.com/policy">Privacy Policy</a>.
+              </p>
+            </div>
+
+            <div class="block">
+              <h2>General vs +18 Uncensored</h2>
+              <p>
+                General is free and designed for everyday roleplay.
+                +18 Uncensored is a one-time unlock that opens a more unrestricted experience for adult users.
+                The payment flow is handled securely via PayPal.
+              </p>
+            </div>
+
+            <div class="block">
+              <h2>Contact</h2>
+              <p>
+                Questions, feedback, or bug reports:
+                <a class="accent" href="mailto:showmetheaitools@gmail.com">showmetheaitools@gmail.com</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        © <span id="year"></span> roleplay-chat.com
+      </footer>
+
+    </div>
+  </div>
+
+  <script>
+    // year
+    document.getElementById("year").textContent = String(new Date().getFullYear());
+
+    // Share button
+    const shareBtn = document.querySelector("#shareBtn");
+    if (shareBtn){
+      shareBtn.addEventListener("click", async () => {
+        const url = window.location.origin + "/";
+        try{
+          if (navigator.share){
+            await navigator.share({ title: document.title, url });
+          }else{
+            await navigator.clipboard.writeText(url);
+            shareBtn.title = "Copied!";
+            setTimeout(() => (shareBtn.title = "Share"), 900);
+          }
+        }catch(e){
+          // user cancelled or blocked
+        }
+      });
+    }
+
+    // Info button + menu
+    const infoBtn = document.querySelector("#infoBtn");
+    const infoMenu = document.querySelector("#infoMenu");
+
+    function closeInfoMenu(){
+      if (infoMenu) infoMenu.classList.remove("active");
+    }
+
+    if (infoBtn && infoMenu){
+      infoBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        infoMenu.classList.toggle("active");
+      });
+
+      document.addEventListener("click", closeInfoMenu);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeInfoMenu();
+      });
+
+      infoMenu.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+    }
+  </script>
+</body>
+</html>
