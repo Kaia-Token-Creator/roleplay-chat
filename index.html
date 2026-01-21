@@ -674,6 +674,21 @@ body.chatMode #viewChat .chatTop{
   z-index: 280;
 }
 
+    /* ✅ Chat title(cardHead) ↔ 메뉴(chatTop) 간격만 붙이기 */
+body.chatMode #viewChat .cardBody{
+  padding-top: 0;            /* 기존 8px 제거 */
+}
+
+body.chatMode #viewChat .chatShell{
+  gap: 0;                    /* chatTop ↔ chatBox 사이 간격 제거 */
+}
+
+/* (선택) 제목 아래 여백도 아주 살짝만 줄이고 싶으면 */
+body.chatMode #viewChat .cardHead{
+  padding-bottom: 4px;       /* 기본 8px에서 살짝만 압축 */
+}
+
+
     
   </style>
 </head>
@@ -1764,4 +1779,5 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
