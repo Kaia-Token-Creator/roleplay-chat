@@ -55,25 +55,35 @@ export const onRequestPost: PagesFunction<{
       history?: Msg[];
     }>();
 
-    const bodyAny: any = body as any;
-const character = bodyAny.character || bodyAny.session; // ✅ session도 허용
+    const bodyAny = await request.json<any>().catch(() => null);
 
-if (!character) return json({ error: "Missing character." }, 400, CORS);
+if (!bodyAny || typeof bodyAny !== "object") {
+  return json({ error: "Invalid body." }, 400, CORS);
+}
 
-    if (!body || typeof body !== "object") return json({ error: "Invalid body." }, 400, CORS);
-    if (!body.character) return json({ error: "Missing character." }, 400, CORS);
-    if (typeof body.message !== "string" || !body.message.trim()) return json({ error: "Missing message." }, 400, CORS);
+const character = bodyAny.character || bodyAny.session; // ✅ character 또는 session 허용
+if (!character) {
+  return json({ error: "Missing character." }, 400, CORS);
+}
 
-    // ✅ 여기서 유료 전용으로 잠글지 여부는 네 정책에 맞게 조절해.
-    // 지금은 imagechat을 "paid only"로 가정
-    if (body.paymentStatus !== "paid") {
-      return json({ error: "Payment not completed. Image chat is locked.", code: "PAYMENT_REQUIRED" }, 402, CORS);
-    }
+const message = typeof bodyAny.message === "string" ? bodyAny.message.trim() : "";
+if (!message) {
+  return json({ error: "Missing message." }, 400, CORS);
+}
 
-    const userMsg = body.message.trim();
-    if (userMsg.length > MAX_MESSAGE_CHARS) {
-      return json({ error: "Message too long.", detail: `Max ${MAX_MESSAGE_CHARS} characters.` }, 400, CORS);
-    }
+// history도 bodyAny 기준으로
+const rawHistory = Array.isArray(bodyAny.history) ? bodyAny.history : [];
+const history = rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
+
+// paymentStatus도 bodyAny 기준으로
+const paymentStatus = bodyAny.paymentStatus;
+if (paymentStatus !== "paid") {
+  return json(
+    { error: "Payment not completed. Image chat is locked.", code: "PAYMENT_REQUIRED" },
+    402,
+    CORS
+  );
+}
 
     const ch = sanitizeCharacter(character);
 
@@ -578,4 +588,5 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("Venice image: empty response");
   return images[0]; // base64 only (no data: prefix)
 }
+
 
