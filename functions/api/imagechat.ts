@@ -55,6 +55,11 @@ export const onRequestPost: PagesFunction<{
       history?: Msg[];
     }>();
 
+    const bodyAny: any = body as any;
+const character = bodyAny.character || bodyAny.session; // ✅ session도 허용
+
+if (!character) return json({ error: "Missing character." }, 400, CORS);
+
     if (!body || typeof body !== "object") return json({ error: "Invalid body." }, 400, CORS);
     if (!body.character) return json({ error: "Missing character." }, 400, CORS);
     if (typeof body.message !== "string" || !body.message.trim()) return json({ error: "Missing message." }, 400, CORS);
@@ -70,7 +75,7 @@ export const onRequestPost: PagesFunction<{
       return json({ error: "Message too long.", detail: `Max ${MAX_MESSAGE_CHARS} characters.` }, 400, CORS);
     }
 
-    const ch = sanitizeCharacter(body.character);
+    const ch = sanitizeCharacter(character);
 
     const rawHistory = Array.isArray(body.history) ? body.history : [];
     const history = rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
@@ -573,3 +578,4 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("Venice image: empty response");
   return images[0]; // base64 only (no data: prefix)
 }
+
