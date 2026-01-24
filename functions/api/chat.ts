@@ -36,14 +36,14 @@ export const onRequestPost: PagesFunction<{
     // ---------------- LIMITS (3~4 lines-ish) ----------------
     // 모바일 기준으로 "정상 입력"만 허용하고 싶다면 문자 제한이 가장 안정적임.
     const MAX_MESSAGE_CHARS = 600;     // ✅ 유저 입력 3~4줄 정도
-    const MAX_REPLY_CHARS = 300;       // ✅ 모델 출력 3~4줄 정도
+    const MAX_REPLY_CHARS = 400;       // ✅ 모델 출력 3~4줄 정도
     const MAX_PROMPT_CHARS = 6000;     // ✅ system + history + user 합산 예산
     const MAX_HISTORY_MSGS = 20;       // ✅ 히스토리 메시지 개수 상한 (추가 안전장치)
 
     // 모델 출력 토큰 제한 (토큰은 언어/문장에 따라 흔들리므로 낮게 잡고,
     // 마지막에 MAX_REPLY_CHARS로 한 번 더 컷)
     const MAX_TOKENS_DEEPSEEK = 250;
-    const MAX_TOKENS_VENICE = 250;
+    const MAX_TOKENS_VENICE = 380;
     // ---------------------------------------------------------
 
     const body = await request.json<{
@@ -425,8 +425,8 @@ async function callDeepSeekChat(apiKey: string, messages: any[], maxTokens: numb
       messages,
       stream: false,
       temperature: 0.8,
-      presence_penalty: 0.3,
-      frequency_penalty: 0.4,
+      presence_penalty: 0.2,
+      frequency_penalty: 0.5,
       max_tokens: maxTokens, // ✅ 출력 토큰 제한
     }),
   });
@@ -456,9 +456,9 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
       model: "venice-uncensored",
       messages,
       stream: false,
-      temperature: 0.9,
-      presence_penalty: 0.3,
-      frequency_penalty: 0.4,
+      temperature: 0.95,
+      presence_penalty: 0.6,
+      frequency_penalty: 0.2,
       max_tokens: maxTokens, // ✅ 출력 토큰 제한
     }),
   });
@@ -473,6 +473,7 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
+
 
 
 
