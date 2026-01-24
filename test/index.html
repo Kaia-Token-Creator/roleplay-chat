@@ -2013,6 +2013,8 @@ weight: {
     clearPending();
 
     // ✅ 2) 결제 완료 후 /imagechat 이동
+    const handoffKey = "roleplay-chat_handoff_imagechat_v1";
+localStorage.setItem(handoffKey, JSON.stringify(session));
     window.location.href = "/imagechat/";
   }, "6.90", "Upgrade game");
 }
@@ -2173,4 +2175,5 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
