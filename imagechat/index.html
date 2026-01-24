@@ -195,14 +195,12 @@ const paid = sessionStorage.getItem(IMAGECHAT_PAID_KEY) === "paid";
 if (!paid){
   alert("Image chat is locked. Please complete payment first.");
   location.href = "https://roleplay-chat.com/";
-  return;
 }
 
 
 if (!session || !session.name){
   alert("No character session found. Please create a character first.");
   location.href = "https://roleplay-chat.com/";
-  return;
 }
 
 
@@ -355,6 +353,7 @@ input.onkeydown = (e) => {
 
 </body>
 </html>
+
 
 
 
