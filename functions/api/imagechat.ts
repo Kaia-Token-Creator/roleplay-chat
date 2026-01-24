@@ -91,14 +91,23 @@ export const onRequestPost: PagesFunction<{
     const replyRaw = await callVeniceChat(env.VENICE_API_KEY, fitted, MAX_TOKENS_TEXT);
     const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
 
-    // 2) 이미지 트리거 판단 (✅ response_format 제거하고 JSON 강제 파싱)
-    const plan = await decideImagePlan(env.VENICE_API_KEY, {
+    // 2) 이미지 트리거 판단 (✅ JSON 강제 파싱)
+    let plan = await decideImagePlan(env.VENICE_API_KEY, {
       character: ch,
       userMessage: userMsg,
       lastAssistant: reply,
       history,
       maxTokens: MAX_TOKENS_PLAN,
     });
+
+    // ✅ 유저가 "사진/셀카" 요청하면 planner 판단과 무관하게 이미지 생성 강제
+    if (wantsImage(userMsg)) {
+      plan = {
+        generate: true,
+        prompt: buildForcedImagePrompt(ch, userMsg),
+        negativePrompt: plan?.negativePrompt || "",
+      };
+    }
 
     // 3) 이미지 생성
     let image: null | { mime: "image/webp" | "image/png" | "image/jpeg"; b64: string } = null;
@@ -147,11 +156,7 @@ export const onRequestPost: PagesFunction<{
     );
   } catch (err: any) {
     // ✅ 디버깅 위해 detail은 최대한 살려서 내려줌
-    return json(
-      { error: "Server error.", detail: String(err?.message || err) },
-      500,
-      CORS
-    );
+    return json({ error: "Server error.", detail: String(err?.message || err) }, 500, CORS);
   }
 };
 
@@ -347,7 +352,6 @@ async function decideImagePlan(
 
   const raw = await callVeniceChat(apiKey, [plannerSystem, plannerUser], maxTokens);
 
-  // JSON 파싱 (실패하면 generate=false)
   try {
     const parsed = JSON.parse(raw);
     const generate = !!parsed?.generate;
@@ -435,6 +439,40 @@ function buildImagePromptWithAvatarHint(basePrompt: string, ch: any) {
     "Important: Use the user's provided profile photo as the identity reference for face/features.",
     "Keep the same identity consistently.",
   ].join("\n");
+}
+
+// ✅ 사진 요청 감지
+function wantsImage(userMsg: string) {
+  const s = (userMsg || "").toLowerCase();
+
+  const hit =
+    /\b(selfie|photo|picture|pic|image|portrait|snapshot)\b/.test(s) ||
+    /\b(show me|can i see|let me see|send me)\b/.test(s);
+
+  // 흔한 오타도 잡기
+  const typo = /\b(a\s*pic|apic|picutre|pictur|piture)\b/.test(s);
+
+  return hit || typo;
+}
+
+// ✅ 사진 요청이면 이 프롬프트로 바로 생성
+function buildForcedImagePrompt(ch: any, userMsg: string) {
+  // "selfie" 류면 셀카 느낌
+  const wantsSelfie = /\b(selfie|front camera|self\s*shot)\b/.test((userMsg || "").toLowerCase());
+
+  const base = [
+    wantsSelfie ? `A selfie-style portrait of ${ch.name}.` : `A portrait photo of ${ch.name}.`,
+    `Age ${ch.age}, ${ch.gender || "unspecified gender"}.`,
+    `Scene: ${ch.scenario || "neutral simple background"}.`,
+    `Mood: friendly, natural, candid.`,
+    wantsSelfie
+      ? `Camera: front-facing camera selfie, head-and-shoulders framing, eye contact.`
+      : `Camera: portrait framing, head-and-shoulders, eye contact.`,
+    `Lighting: soft natural light, sharp focus, high quality.`,
+    `Style: realistic photo, no text, no watermark.`,
+  ].join(" ");
+
+  return base;
 }
 
 // ---------------- Venice: chat (text) ----------------
