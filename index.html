@@ -1056,7 +1056,11 @@ body.chatMode #viewChat .chatFooter{
                 <label class="pill">
                   <input type="radio" name="tier" value="uncensored" />
                   <div>
-                    <div><b>+18 Uncensored</b> <small>($2)</small></div>
+                    <div>
+      <b>+18 Uncensored</b>
+      <small style="opacity:.65; font-size:11px; margin:0 4px;"> + premium performance</small>
+      <small>($2)</small>
+    </div>
                   </div>
                 </label>
               </div>
@@ -1121,9 +1125,9 @@ body.chatMode #viewChat .chatFooter{
       </div>
       <div class="modalBody">
         <p class="warn">
-          - Unlock <b id="payCharName">your character</b>.<br>
-          - Unleash yourself.<br>
-          - Fully uncensored experience.<br>
+          - <span class="highlightCTA">Unlock <b id="payCharName">your character</b></span> and unleash yourself.<br>
+          - <span class="highlightCTA">Fully uncensored</span> experience.<br>
+          - <span class="highlightCTA">Longer replies. More detail. More tension. Richer memory.</span><br>
           - Secure one-time payment.<br>
           - Unlimited access as long as this tab stays open.<br>
           - No-login. Private and anonymous.<br>
@@ -2005,6 +2009,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
