@@ -33,18 +33,23 @@ export const onRequestPost: PagesFunction<{
       weight?: { unit: WeightUnit; value: number };
     };
 
-    // ---------------- LIMITS (3~4 lines-ish) ----------------
-    // 모바일 기준으로 "정상 입력"만 허용하고 싶다면 문자 제한이 가장 안정적임.
-    const MAX_MESSAGE_CHARS = 600;     // ✅ 유저 입력 3~4줄 정도
-    const MAX_REPLY_CHARS = 400;       // ✅ 모델 출력 3~4줄 정도
-    const MAX_PROMPT_CHARS = 6000;     // ✅ system + history + user 합산 예산
-    const MAX_HISTORY_MSGS = 20;       // ✅ 히스토리 메시지 개수 상한 (추가 안전장치)
+   // ---------------- LIMITS (3~4 lines-ish) ----------------
+const MAX_MESSAGE_CHARS = 600;     // user input cap (그대로 둬도 OK)
+const MAX_REPLY_CHARS = 500;       // reply cap (그대로 둬도 OK)
 
-    // 모델 출력 토큰 제한 (토큰은 언어/문장에 따라 흔들리므로 낮게 잡고,
-    // 마지막에 MAX_REPLY_CHARS로 한 번 더 컷)
-    const MAX_TOKENS_DEEPSEEK = 250;
-    const MAX_TOKENS_VENICE = 380;
-    // ---------------------------------------------------------
+// base
+const BASE_PROMPT_CHARS = 9000;
+const BASE_HISTORY_MSGS = 30;
+
+// uncensored bonus memory (원하는 만큼 올려)
+const UNCENSORED_PROMPT_BONUS = 9000;  // ex: +9000 => 총 18000
+const UNCENSORED_HISTORY_BONUS = 30;   // ex: 30+30 => 60개
+
+// token caps (이미 tier별로 다르니 OK)
+const MAX_TOKENS_DEEPSEEK = 300;
+const MAX_TOKENS_VENICE = 450;
+// ---------------------------------------------------------
+
 
     const body = await request.json<{
       init?: boolean;
@@ -60,6 +65,15 @@ export const onRequestPost: PagesFunction<{
     }
 
     const tier: Tier = body.tier === "uncensored" ? "uncensored" : "general";
+    const MAX_PROMPT_CHARS =
+  tier === "uncensored"
+    ? BASE_PROMPT_CHARS + UNCENSORED_PROMPT_BONUS
+    : BASE_PROMPT_CHARS;
+
+const MAX_HISTORY_MSGS =
+  tier === "uncensored"
+    ? BASE_HISTORY_MSGS + UNCENSORED_HISTORY_BONUS
+    : BASE_HISTORY_MSGS;
 
     // ---------- INIT: 첫 인사 전용 처리 ----------
     if (body.init) {
@@ -308,7 +322,8 @@ function buildSystemPrompt(ch: any) {
       "Keep replies short and chatty: 1–4 sentences.",
       "Use slang/abbrevs natural to the chat language.",
       "Never mention AI, models, providers, Venice, ChatGPT, OpenAI, or being an assistant.",
-      "No meta/system/code-like outputs. Avoid *, $$, and the Korean 'ㅡ'.",
+      "No meta/system/code-like outputs. Avoid asterisks *, $$, and the Korean 'ㅡ'.",
+      "Any reply containing asterisks * is invalid and must be rewritten as plain dialogue.",
       "Keep this persona consistent during the session.",
       "Do not share your social media accounts.",
       "Maintain context strictly.",
@@ -474,6 +489,7 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
+
 
 
 
