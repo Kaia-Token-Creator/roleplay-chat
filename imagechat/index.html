@@ -316,14 +316,17 @@ async function send(){
     //   imageCaption?: "optional caption"
     // }
     const reply = (data && typeof data.reply === "string") ? data.reply : "";
-    const imageUrl = (data && typeof data.imageUrl === "string") ? data.imageUrl : "";
-    const imageCaption = (data && typeof data.imageCaption === "string") ? data.imageCaption : "";
 
-    // If server sends caption and reply is empty, still show something
-    const shownText = reply || imageCaption || "(no text)";
+// ✅ server(imagechat.ts)가 주는 형식: { image: { mime, b64 } }
+let imageUrl = "";
+if (data && data.image && typeof data.image.b64 === "string" && typeof data.image.mime === "string"){
+  imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
+}
 
-    appendMsg("assistant", shownText, imageUrl || undefined);
-    history.push({ role: "assistant", content: shownText });
+const shownText = reply || "(no text)";
+appendMsg("assistant", shownText, imageUrl || undefined);
+history.push({ role: "assistant", content: shownText });
+
 
   }catch(e){
     appendMsg("assistant", `Error: ${String(e?.message || e)}`);
@@ -341,4 +344,5 @@ input.onkeydown = (e) => {
 
 </body>
 </html>
+
 
