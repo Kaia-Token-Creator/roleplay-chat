@@ -188,6 +188,16 @@ function readSession(){
 
 const session = readSession();
 
+/* 🔒 Image chat paywall gate */
+const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
+const paid = sessionStorage.getItem(IMAGECHAT_PAID_KEY) === "paid";
+
+if (!paid){
+  alert("Image chat is locked. Please complete payment first.");
+  location.href = "https://roleplay-chat.com/";
+}
+
+
 if (!session || !session.name){
   alert("No character session found. Please create a character first.");
   location.href = "https://roleplay-chat.com/";
@@ -345,5 +355,6 @@ input.onkeydown = (e) => {
 
 </body>
 </html>
+
 
 
