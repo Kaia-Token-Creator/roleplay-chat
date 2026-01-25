@@ -234,6 +234,17 @@ padding: 5px 8px;
       font-weight:800;
       cursor:pointer;
     }
+
+    /* assistant text color should follow character color */
+.bubble .asstText{
+  color: var(--chatColor);
+}
+
+/* user text stays white */
+.bubble .userText{
+  color: #fff;
+}
+
   </style>
 </head>
 
@@ -374,23 +385,81 @@ const sendBtn = document.getElementById("sendBtn");
 
 let history = loadHistory(); // ✅ refresh에도 남음
 
-function appendMsg(role, text, imageUrl){
+function escapeText(s){
+  return (s ?? "").toString();
+}
+
+async function typewriter(el, text, speed=14){
+  el.textContent = "";
+  const cursor = document.createElement("span");
+  cursor.className = "typeCursor";
+  cursor.textContent = "▍";
+  el.appendChild(cursor);
+
+  for (let i = 0; i < text.length; i++){
+    cursor.remove();
+    el.append(text[i]);
+    el.appendChild(cursor);
+    await new Promise(r => setTimeout(r, speed));
+  }
+  cursor.remove();
+}
+
+function appendMsg(role, text, imageUrl, opts = {}){
+  const { animate = false } = opts;
+
   const msg = document.createElement("div");
   msg.className = "chatMsg" + (role === "user" ? " me" : "");
 
   const who = document.createElement("div");
   who.className = "who";
-  who.innerHTML = role === "assistant"
-    ? (session.avatarDataUrl ? `<img src="${session.avatarDataUrl}">` : "🙂")
-    : "YOU";
+
+  if (role === "assistant"){
+    if (session.avatarDataUrl){
+      const img = document.createElement("img");
+      img.src = session.avatarDataUrl;
+      who.appendChild(img);
+    } else {
+      who.textContent = "🙂";
+    }
+  } else {
+    const lab = document.createElement("span");
+    lab.className = "whoLabel";
+    lab.textContent = "You";
+    who.appendChild(lab);
+  }
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
 
   if (role === "assistant"){
-    bubble.innerHTML = `<div class="name">${session.name}</div><div>${text}</div>`;
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = session.name || "Assistant";
+
+    const body = document.createElement("div");
+    body.className = "asstText";
+
+    bubble.appendChild(name);
+    bubble.appendChild(body);
+
+    const safe = escapeText(text);
+
+    if (animate){
+      typewriter(body, safe, 14);
+    } else {
+      body.textContent = safe;
+    }
   } else {
-    bubble.innerHTML = `<div><b>You</b></div><div>${text}</div>`;
+    const name = document.createElement("div");
+    name.innerHTML = "<b>You</b>";
+
+    const body = document.createElement("div");
+    body.className = "userText";
+    body.textContent = escapeText(text);
+
+    bubble.appendChild(name);
+    bubble.appendChild(body);
   }
 
   if (imageUrl){
@@ -405,6 +474,7 @@ function appendMsg(role, text, imageUrl){
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+
 function renderHistory(){
   if (!Array.isArray(history)) history = [];
   for (const m of history){
@@ -412,7 +482,8 @@ function renderHistory(){
     appendMsg(
   m.role === "assistant" ? "assistant" : "user",
   m.content,
-  m.imageUrl // ✅ 없으면 undefined라 자동으로 이미지 안 붙음
+  m.imageUrl,
+  { animate: false } // ✅ 히스토리는 그냥 즉시 표시
 );
   }
 }
@@ -467,7 +538,7 @@ async function bootstrapFirstMessage(){
       imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
     }
 
-    appendMsg("assistant", reply, imageUrl || undefined);
+    appendMsg("assistant", reply, imageUrl || undefined, { animate: true });
     history.push({ role: "assistant", content: reply, imageUrl });
     saveHistory(history);
 
@@ -568,7 +639,7 @@ if (data && data.image && typeof data.image.b64 === "string" && typeof data.imag
 }
 
 const shownText = reply || "(no text)";
-appendMsg("assistant", shownText, imageUrl || undefined);
+appendMsg("assistant", shownText, imageUrl || undefined, { animate: true });
 history.push({ role: "assistant", content: shownText, imageUrl }); // ✅ imageUrl 추가
 saveHistory(history);
 
@@ -636,6 +707,7 @@ if (infoBtn && infoMenu){
 
 </body>
 </html>
+
 
 
 
