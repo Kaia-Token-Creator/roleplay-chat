@@ -88,8 +88,14 @@ const userMsg = isInit ? "" : truncateString(message, MAX_MESSAGE_CHARS);
     const systemPrompt = buildSystemPrompt_Text(ch);
 
     const initUserMsg =
-  "Start the conversation now. Greet the user in-character and ask one short question to begin. " +
-  "Follow the FORMAT rules.";
+  "Generate the first assistant message to start this roleplay. " +
+  "Use the Character Sheet (personality, scenario, nickname, language) to decide how to open. " +
+  "Do NOT write a generic greeting unless it naturally fits the scenario. " +
+  "Begin in the middle of the moment with immediate context or tension appropriate to the character. " +
+  "If you need to convey setting, do it through natural spoken words, not narration." +
+  "Ask at most one short question only if it helps the scene move forward. " +
+  "Follow the FORMAT rules exactly: spoken dialogue only, no narration, no parentheses or brackets.";
+
 
 const messagesBeforeFit: Msg[] = [
   { role: "system", content: systemPrompt },
@@ -563,4 +569,5 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("Venice image: empty response");
   return images[0];
 }
+
 
