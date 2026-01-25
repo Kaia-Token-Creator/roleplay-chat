@@ -166,6 +166,7 @@
    ========================= */
 
 const STORAGE_KEY = "roleplay-chat_session_v1";
+const IMAGECHAT_HISTORY_KEY = "roleplay-chat_imagechat_history_v1";
 const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
 
 function readSession(){
@@ -174,8 +175,20 @@ function readSession(){
   catch { return null; }
 }
 
+
 const session = readSession();
 const paid = sessionStorage.getItem(IMAGECHAT_PAID_KEY) === "paid";
+
+function loadHistory(){
+  const raw = sessionStorage.getItem(IMAGECHAT_HISTORY_KEY);
+  try { return raw ? JSON.parse(raw) : []; }
+  catch { return []; }
+}
+
+function saveHistory(list){
+  try { sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, JSON.stringify(list)); }
+  catch(e){ console.error(e); }
+}
 
 
 if (!paid){
@@ -234,11 +247,25 @@ function appendMsg(role, text, imageUrl){
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+function renderHistory(){
+  if (!Array.isArray(history)) history = [];
+  for (const m of history){
+    // 지금 history에는 text만 있음 (content)
+    appendMsg(
+  m.role === "assistant" ? "assistant" : "user",
+  m.content,
+  m.imageUrl // ✅ 없으면 undefined라 자동으로 이미지 안 붙음
+);
+  }
+}
+renderHistory();
+
+
 /* =========================
    Send flow (REAL API)
    ========================= */
 
-let history = []; // { role: "user"|"assistant", content: string }[]  (tab memory only)
+let history = loadHistory(); // ✅ refresh에도 남음
 
 function setBusy(isBusy){
   sendBtn.disabled = isBusy;
@@ -253,6 +280,7 @@ async function send(){
   input.value = "";
   appendMsg("user", text);
   history.push({ role: "user", content: text });
+  saveHistory(history);
 
   // Basic session hardening
   if (!session || !session.name){
@@ -320,12 +348,14 @@ if (data && data.image && typeof data.image.b64 === "string" && typeof data.imag
 
 const shownText = reply || "(no text)";
 appendMsg("assistant", shownText, imageUrl || undefined);
-history.push({ role: "assistant", content: shownText });
+history.push({ role: "assistant", content: shownText, imageUrl }); // ✅ imageUrl 추가
+saveHistory(history);
 
 
   }catch(e){
     appendMsg("assistant", `Error: ${String(e?.message || e)}`);
     history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
+    saveHistory(history);
   }finally{
     setBusy(false);
   }
@@ -339,6 +369,7 @@ input.onkeydown = (e) => {
 
 </body>
 </html>
+
 
 
 
