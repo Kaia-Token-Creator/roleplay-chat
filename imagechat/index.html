@@ -216,6 +216,8 @@ const chatBox = document.getElementById("chatBox");
 const input = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 
+let history = loadHistory(); // ✅ refresh에도 남음
+
 function appendMsg(role, text, imageUrl){
   const msg = document.createElement("div");
   msg.className = "chatMsg" + (role === "user" ? " me" : "");
@@ -260,12 +262,75 @@ function renderHistory(){
 }
 renderHistory();
 
+async function bootstrapFirstMessage(){
+  // 이미 대화가 있으면(새로고침 등) 첫 인사 다시 안 함
+  if (history.length > 0) return;
+
+  const payload = {
+    paymentStatus: paid ? "paid" : "unpaid",
+    // ✅ 서버가 "첫 인사 요청"임을 알 수 있게 특수 플래그/메시지
+    message: "__INIT__",
+    session: {
+      name: session.name,
+      nickname: session.nickname || "",
+      age: session.age,
+      gender: session.gender,
+      language: session.language,
+      height: session.height,
+      weight: session.weight,
+      mbti: session.mbti,
+      personality: session.personality || "",
+      scenario: session.scenario || "",
+      fontColor: session.fontColor || "#ffffff",
+      avatarDataUrl: session.avatarDataUrl || "",
+      tier: "uncensored"
+    },
+    history: [],
+    models: {
+      text: "venice-uncensored",
+      image: "lustify-sdxl"
+    }
+  };
+
+  try{
+    setBusy(true);
+
+    const res = await fetch("/api/imagechat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || data.error || `HTTP ${res.status}`);
+
+    const reply = (data && typeof data.reply === "string") ? data.reply : "(no text)";
+
+    let imageUrl = "";
+    if (data && data.image && typeof data.image.b64 === "string" && typeof data.image.mime === "string"){
+      imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
+    }
+
+    appendMsg("assistant", reply, imageUrl || undefined);
+    history.push({ role: "assistant", content: reply, imageUrl });
+    saveHistory(history);
+
+  } catch(e){
+    appendMsg("assistant", `Error: ${String(e?.message || e)}`);
+    history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
+    saveHistory(history);
+  } finally {
+    setBusy(false);
+  }
+}
+
+// ✅ 렌더 후 첫 인사 요청
+bootstrapFirstMessage();
+
 
 /* =========================
    Send flow (REAL API)
    ========================= */
-
-let history = loadHistory(); // ✅ refresh에도 남음
 
 function setBusy(isBusy){
   sendBtn.disabled = isBusy;
@@ -369,6 +434,7 @@ input.onkeydown = (e) => {
 
 </body>
 </html>
+
 
 
 
