@@ -294,14 +294,17 @@ padding: 5px 8px;
 
 /* ===== Image chat top bar ===== */
 .imgChatTop{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  display: flex;
+  flex-direction: column;     /* ✅ 가로 → 세로 */
+  align-items: flex-start;    /* 왼쪽 정렬 */
+  gap: 6px;                   /* 제목과 버튼 사이 간격 */
+
   padding: 8px 14px;
   border-bottom: 1px solid rgba(255,255,255,.14);
   background: rgba(0,0,0,.65);
   backdrop-filter: blur(8px);
 }
+
 
 .imgChatTitle{
   font-family: "Baloo 2", Inter, sans-serif;
@@ -879,6 +882,7 @@ if (infoBtn && infoMenu){
 
 </body>
 </html>
+
 
 
 
