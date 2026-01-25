@@ -307,7 +307,7 @@ padding: 5px 8px;
   font-family: "Baloo 2", Inter, sans-serif;
   font-weight: 700;
   font-size: 14px;
-  color: #ffcc00;
+  color: #FFFFFF;
 }
 
  .xBtn{
@@ -319,6 +319,23 @@ padding: 5px 8px;
       cursor:pointer;
       border: 1px solid rgba(255,255,255,.14);
     }
+
+/* ===== Image chat: New character button highlight ===== */
+#imgResetBtn{
+  background: #e0b400;          /* 노란 배경 */
+  border: 1px solid #c9a200;    /* 노란 테두리 */
+  color: #000;                  /* 검은 글씨 */
+  font-weight: 800;
+}
+
+#imgResetBtn:hover{
+  background: #f0c800;
+}
+
+#imgResetBtn:active{
+  background: #cfa600;
+}
+
 
 /* 말풍선 공통: 유리 느낌 + 테두리 선명 */
 .chatMsg .text{
@@ -441,6 +458,15 @@ function readSession(){
 
 
 const session = readSession();
+
+  // ✅ Page title (browser tab)
+if (session?.name){
+  document.title = `Image chat with ${session.name} | roleplay-chat.com`;
+} else {
+  document.title = "Image chat | roleplay-chat.com";
+}
+
+  
 const paid = sessionStorage.getItem(IMAGECHAT_PAID_KEY) === "paid";
 
   // ✅ Top bar title + New character button
@@ -853,6 +879,7 @@ if (infoBtn && infoMenu){
 
 </body>
 </html>
+
 
 
 
