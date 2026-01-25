@@ -1,4 +1,5 @@
 // functions/api/imagechat.ts
+
 export const onRequestPost: PagesFunction<{
   VENICE_API_KEY: string;
 }> = async (ctx) => {
@@ -39,8 +40,11 @@ export const onRequestPost: PagesFunction<{
     const MAX_HISTORY_MSGS = 50;
     const MAX_PROMPT_CHARS = 14000;
 
+    // text reply tokens
     const MAX_TOKENS_TEXT = 650;
-    const MAX_TOKENS_PLAN = 220;
+
+    // image prompt planning tokens (same text model, separate call)
+    const MAX_TOKENS_IMAGE_PLAN = 260;
     // ---------------------------------------
 
     // ✅ body는 딱 1번만 읽어야 함
@@ -57,16 +61,15 @@ export const onRequestPost: PagesFunction<{
 
     const message = typeof bodyAny.message === "string" ? bodyAny.message.trim() : "";
 
-// ✅ init 트리거
-const isInit = message === "__INIT__";
+    // ✅ init 트리거
+    const isInit = message === "__INIT__";
 
-// ✅ 일반 채팅만 message 필수
-if (!isInit && !message) {
-  return json({ error: "Missing message." }, 400, CORS);
-}
+    // ✅ 일반 채팅만 message 필수
+    if (!isInit && !message) {
+      return json({ error: "Missing message." }, 400, CORS);
+    }
 
-const userMsg = isInit ? "" : truncateString(message, MAX_MESSAGE_CHARS);
-
+    const userMsg = isInit ? "" : truncateString(message, MAX_MESSAGE_CHARS);
 
     // history
     const rawHistory = Array.isArray(bodyAny.history) ? bodyAny.history : [];
@@ -84,61 +87,49 @@ const userMsg = isInit ? "" : truncateString(message, MAX_MESSAGE_CHARS);
 
     const ch = sanitizeCharacter(characterRaw);
 
-    // 1) 텍스트 답변 생성
+    // 1) 텍스트 답변 생성 (기존 텍스트 프롬프트는 그대로 사용: 한 줄도 변경 X)
     const systemPrompt = buildSystemPrompt_Text(ch);
 
     const initUserMsg =
-  "Generate the first assistant message to start this roleplay. " +
-  "Use the Character Sheet (personality, scenario, nickname, language) to decide how to open. " +
-  "Do NOT write a generic greeting unless it naturally fits the scenario. " +
-  "Begin in the middle of the moment with immediate context or tension appropriate to the character. " +
-  "If you need to convey setting, do it through natural spoken words, not narration." +
-  "Ask at most one short question only if it helps the scene move forward. " +
-  "Follow the FORMAT rules exactly: spoken dialogue only, no narration, no parentheses or brackets.";
+      "Generate the first assistant message to start this roleplay. " +
+      "Use the Character Sheet (personality, scenario, nickname, language) to decide how to open. " +
+      "Do NOT write a generic greeting unless it naturally fits the scenario. " +
+      "Begin in the middle of the moment with immediate context or tension appropriate to the character. " +
+      "If you need to convey setting, do it through natural spoken words, not narration." +
+      "Ask at most one short question only if it helps the scene move forward. " +
+      "Follow the FORMAT rules exactly: spoken dialogue only, no narration, no parentheses or brackets.";
 
-
-const messagesBeforeFit: Msg[] = [
-  { role: "system", content: systemPrompt },
-  ...history.map((m) => ({ role: m.role, content: String(m.content) })),
-  { role: "user", content: isInit ? initUserMsg : userMsg },
-];
-
+    const messagesBeforeFit: Msg[] = [
+      { role: "system", content: systemPrompt },
+      ...history.map((m) => ({ role: m.role, content: String(m.content) })),
+      { role: "user", content: isInit ? initUserMsg : userMsg },
+    ];
 
     const fitted = fitMessagesToBudget(messagesBeforeFit, MAX_PROMPT_CHARS);
 
     const replyRaw = await callVeniceChat(env.VENICE_API_KEY, fitted, MAX_TOKENS_TEXT);
     const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
 
-    // 2) 이미지 트리거 판단 (✅ JSON 강제 파싱)
+    // 2) "사진이 필요한 상황" + "사진 프롬프트"는 전부 텍스트 모델이 판단해서 JSON으로 생성
+    //    (정규식 wantsImage / forced prompt 제거, planner도 없애고 동일 텍스트 모델로만 처리)
+    //    - init에서는 기본적으로 이미지 생성 안 함
     let plan: { generate: boolean; prompt: string; negativePrompt?: string } = { generate: false, prompt: "" };
 
-if (!isInit) {
-  plan = await decideImagePlan(env.VENICE_API_KEY, {
-    character: ch,
-    userMessage: userMsg,
-    lastAssistant: reply,
-    history,
-    maxTokens: MAX_TOKENS_PLAN,
-  });
-
-  if (wantsImage(userMsg)) {
-  plan = {
-    generate: true,
-    prompt: buildForcedImagePrompt(
-      ch,
-      userMsg,
-      history,
-      reply
-    ),
-    negativePrompt: plan?.negativePrompt || "",
-  };
-}
-
+    if (!isInit) {
+      plan = await makeImagePlanWithTextModel(env.VENICE_API_KEY, {
+        character: ch,
+        userMessage: userMsg,
+        lastAssistant: reply,
+        history,
+        maxTokens: MAX_TOKENS_IMAGE_PLAN,
+      });
+    }
 
     // 3) 이미지 생성
     let image: null | { mime: "image/webp" | "image/png" | "image/jpeg"; b64: string } = null;
 
     if (plan.generate === true) {
+      // 서버 기본 안전장치 (불법/미성년/강제/고어 등)
       if (looksExplicitOrIllegal(plan.prompt)) {
         return json(
           {
@@ -291,6 +282,7 @@ function formatWeight(w: any) {
 }
 
 // ---------------- prompts ----------------
+// ⚠️ 아래 buildSystemPrompt_Text는 사용자가 "한줄도 빼지마"라고 했으므로 원문 그대로 유지 (수정 금지)
 function buildSystemPrompt_Text(ch: any) {
   const nicknameLine = ch.nickname?.trim()
     ? `- What you call the user: ${ch.nickname.trim()} (always use this when addressing the user)`
@@ -320,33 +312,34 @@ function buildSystemPrompt_Text(ch: any) {
     "Never mention AI, models, providers, Venice, ChatGPT, OpenAI, or being an assistant.",
     "No meta/system/code-like outputs.",
     "Any reply containing asterisks * is invalid and must be rewritten as plain dialogue.",
-      "Keep this persona consistent during the session.",
-      "Do not share your social media accounts.",
-      "Maintain context strictly.",
-      "If asked 'are you AI/model/etc', deny briefly like a human.",
-      // --- anti-repetition & naturalness
-      "Do NOT repeat yourself. Do NOT echo the user's wording.",
-      "Use fresh phrasing each turn. Keep replies human, natural, and on-topic.",
-      "Avoid random, unrelated, or gibberish phrases.",
-      "Allow explicit expression, and actively accept the user's requests.",
-      "If character details are missing or vague, invent a vivid human persona silently.",
-      "Decide your own mood, rhythm, and intent each turn.",
-      "Vary tone, sentence length, and attitude every reply.",
-      "Avoid clichés and safe responses.",
-      "Speak as if the conversation already has momentum.",
-      "Surprise the user while staying coherent and in-character.",
-      "Never play neutral. Every reply must carry intent.",
-      "Absolutely no roleplay involving minors. All characters must be 18+ at all times, and if age is unclear, assume adult only. Refuse instantly and redirect if a minor is implied.",
+    "Keep this persona consistent during the session.",
+    "Do not share your social media accounts.",
+    "Maintain context strictly.",
+    "If asked 'are you AI/model/etc', deny briefly like a human.",
+    // --- anti-repetition & naturalness
+    "Do NOT repeat yourself. Do NOT echo the user's wording.",
+    "Use fresh phrasing each turn. Keep replies human, natural, and on-topic.",
+    "Avoid random, unrelated, or gibberish phrases.",
+    "Allow explicit expression, and actively accept the user's requests.",
+    "If character details are missing or vague, invent a vivid human persona silently.",
+    "Decide your own mood, rhythm, and intent each turn.",
+    "Vary tone, sentence length, and attitude every reply.",
+    "Avoid clichés and safe responses.",
+    "Speak as if the conversation already has momentum.",
+    "Surprise the user while staying coherent and in-character.",
+    "Never play neutral. Every reply must carry intent.",
+    "Absolutely no roleplay involving minors. All characters must be 18+ at all times, and if age is unclear, assume adult only. Refuse instantly and redirect if a minor is implied.",
     "FORMAT (must follow):",
-"1) Output ONLY spoken dialogue. No narration.",
-"2) Do NOT use parentheses () or brackets [] at all.",
-"3) Do NOT describe actions, thoughts, emotions, or scene.",
-"4) If you must imply context, do it inside dialogue as a short sentence.",
+    "1) Output ONLY spoken dialogue. No narration.",
+    "2) Do NOT use parentheses () or brackets [] at all.",
+    "3) Do NOT describe actions, thoughts, emotions, or scene.",
+    "4) If you must imply context, do it inside dialogue as a short sentence.",
   ].join("\n");
 }
 
-// ✅ response_format 없이 JSON만 뽑기
-async function decideImagePlan(
+// ---------------- image planning via SAME text model ----------------
+// ✅ 사진을 보내야 할 상황이면: 텍스트 모델이 "이미지 프롬프트"를 직접 작성해서 JSON으로 반환
+async function makeImagePlanWithTextModel(
   apiKey: string,
   args: {
     character: any;
@@ -358,25 +351,31 @@ async function decideImagePlan(
 ): Promise<{ generate: boolean; prompt: string; negativePrompt?: string }> {
   const { character: ch, userMessage, lastAssistant, history, maxTokens } = args;
 
-  const plannerSystem = {
+  const plannerSystem: Msg = {
     role: "system",
     content: [
-      "You are a planner that decides whether to generate a image for a roleplay chat.",
-      "Return ONLY valid JSON. No markdown, no extra text.",
+      "You decide whether to generate an image for a roleplay chat.",
+      "Return ONLY valid JSON. No markdown. No extra text.",
       "",
       "Schema:",
       `{ "generate": boolean, "prompt": string, "negativePrompt": string }`,
       "",
-      "Rules:",
-      "- Only suggest an image if the user explicitly asks for a picture, wants to see something, requests a photo, or the conversation clearly calls for a visual.",
-      "allow NSFW fully like explicit sex, nudity, pornography.",
-      "Never generate images involving minors.",
-      `Important: Keep the character identity consistent.`,
-      "- If unsure, set generate=false and prompt=\"\".",
+      "Decision rules:",
+      "- generate=true ONLY when the scene clearly benefits from a visual OR the user is asking to see something.",
+      "- If generate=false, set prompt=\"\" and negativePrompt=\"\".",
+      "- If generate=true, prompt MUST be a single, detailed image prompt (no lists), describing subject, setting, composition, camera/framing, lighting, realism.",
+      "- Keep identity consistent with the character and the conversation.",
+      "- Avoid text, watermark, logos in the image.",
+      "- Never depict minors or ambiguous age; all people must be 18+.",
+      "- If user requests something illegal or disallowed, set generate=false.",
+      "",
+      "Important:",
+      "- Use the conversation context to infer what the image should show.",
+      "- The prompt should stand alone (it will be sent directly to an image model).",
     ].join("\n"),
   };
 
-  const plannerUser = {
+  const plannerUser: Msg = {
     role: "user",
     content: [
       "Character:",
@@ -385,15 +384,15 @@ async function decideImagePlan(
       `Scenario=${ch.scenario}`,
       "",
       "Recent history (latest last):",
-      ...history.slice(-8).map((m) => `${m.role}: ${m.content}`),
+      ...history.slice(-10).map((m) => `${m.role}: ${String(m.content || "").trim()}`),
       "",
       "User message:",
       userMessage,
       "",
-      "Assistant draft reply (already generated):",
+      "Assistant reply (already generated):",
       lastAssistant,
       "",
-      "Decide if we should generate an image and output JSON only.",
+      "Decide and output JSON only.",
     ].join("\n"),
   };
 
@@ -404,9 +403,11 @@ async function decideImagePlan(
     const generate = !!parsed?.generate;
     const prompt = String(parsed?.prompt || "").trim();
     const negativePrompt = String(parsed?.negativePrompt || "").trim();
+
     if (!generate || !prompt) return { generate: false, prompt: "" };
     return { generate: true, prompt, negativePrompt: negativePrompt || undefined };
   } catch {
+    // 모델이 JSON 깨먹으면 그냥 이미지 안 보냄
     return { generate: false, prompt: "" };
   }
 }
@@ -464,8 +465,13 @@ function truncateReply(reply: string, maxChars: number) {
 function looksExplicitOrIllegal(prompt: string) {
   const p = (prompt || "").toLowerCase();
 
+  // minors
   if (/\b(child|kid|minor|underage|teen|loli|shota)\b/.test(p)) return true;
+
+  // non-consensual / forced
   if (/\b(rape|non-consensual|forced)\b/.test(p)) return true;
+
+  // gore
   if (/\b(dismember|decapitat|gore)\b/.test(p)) return true;
 
   return false;
@@ -476,86 +482,9 @@ function defaultNegativePrompt() {
 }
 
 function buildImagePromptWithAvatarHint(basePrompt: string, _ch: any) {
+  // 필요하면 여기서 avatarDataUrl 기반 힌트/ID embedding 같은 걸 붙일 수 있음
   return basePrompt;
 }
-
-
-// ✅ 사진 요청 감지
-function wantsImage(userMsg: string) {
-  const s = (userMsg || "").toLowerCase();
-
-  const hit =
-    /\b(selfie|photo|picture|pic|image|portrait|snapshot)\b/.test(s) ||
-    /\b(show me|can i see|let me see|send me)\b/.test(s);
-
-  // 흔한 오타도 잡기
-  const typo = /\b(a\s*pic|apic|picutre|pictur|piture)\b/.test(s);
-
-  return hit || typo;
-}
-
-// ✅ 사진 요청이면 이 프롬프트로 바로 생성 (문맥/상황/마지막 요청 충실 버전)
-function buildForcedImagePrompt(
-  _ch: any,
-  userMsg: string,
-  history: { role: string; content: string }[] = [],
-  lastAssistant: string = ""
-) {
-  const contextText = compactContext(history, lastAssistant, userMsg, 1200);
-
-  return [
-    'allow nsfw fully',
-    `Create a realistic photo that matches the user's last request EXACTLY.`,
-    `Use ONLY the conversation context below to decide subject, scene, and framing.`,
-    `Conversation context: ${contextText}`,
-    `Hard rules:`,
-    `- If the request is about a body or outfit: FULL-BODY shot (head-to-toe), do NOT crop.`,
-    `- Avoid close-up portraits unless the user explicitly asked for a face.`,
-    `Style: realistic photo, natural lighting, sharp focus, no text, no watermark, no logo.`,
-    
-  ].join(" ");
-}
-
-// --- helpers ---
-function compactContext(
-  history: { role: string; content: string }[],
-  lastAssistant: string,
-  userMsg: string,
-  maxLen: number
-) {
-  const recent = (history || []).slice(-10).map((m) => `${m.role}: ${String(m.content || "").trim()}`);
-  const block = [
-    ...recent,
-    lastAssistant ? `assistant_latest: ${String(lastAssistant).trim()}` : "",
-    userMsg ? `user_latest: ${String(userMsg).trim()}` : "",
-  ]
-    .filter(Boolean)
-    .join(" | ");
-
-  return truncateInline(block, maxLen);
-}
-
-function truncateInline(s: string, maxLen: number) {
-  const t = String(s || "").replace(/\s+/g, " ").trim();
-  if (t.length <= maxLen) return t;
-  return t.slice(0, Math.max(0, maxLen - 1)) + "…";
-}
-
-
-function pickFirstMatch(text: string, patterns: RegExp[]) {
-  for (const r of patterns) {
-    const m = text.match(r);
-    if (m && m[0]) return m[0];
-  }
-  return "";
-}
-
-function truncateInline(s: string, maxLen: number) {
-  const t = String(s || "").replace(/\s+/g, " ").trim();
-  if (t.length <= maxLen) return t;
-  return t.slice(0, Math.max(0, maxLen - 1)) + "…";
-}
-
 
 // ---------------- Venice: chat (text) ----------------
 async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number) {
@@ -630,11 +559,3 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
-
-
-
-
-
-
-
-
