@@ -635,9 +635,14 @@ async function send(){
 
   input.value = "";
   appendMsg("user", text);
-  requestAnimationFrame(() => {
+requestAnimationFrame(() => {
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+  requestAnimationFrame(() => {
+    chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+  });
 });
+
+  
 
   history.push({ role: "user", content: text });
   saveHistory(history);
@@ -680,9 +685,11 @@ async function send(){
     setBusy(true);
 
   // ✅ 입력창 disabled 등 레이아웃 확정된 다음에 한 번 더 바닥 고정
+setBusy(true);
 requestAnimationFrame(() => {
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
 });
+
 
     const res = await fetch("/api/imagechat", {
   method: "POST",
@@ -780,6 +787,7 @@ if (infoBtn && infoMenu){
 
 </body>
 </html>
+
 
 
 
