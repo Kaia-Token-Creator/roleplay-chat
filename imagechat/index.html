@@ -443,14 +443,31 @@ async function typewriter(el, text, speed=14){
   cursor.textContent = "▍";
   el.appendChild(cursor);
 
+  // ✅ 사용자가 스크롤을 위로 올려서 읽는 중이면 자동 스크롤 방해 안 하려고 플래그
+  const shouldAutoScroll = () => {
+    const threshold = 80; // 바닥에서 80px 이내면 "바닥에 붙어있다"고 판단
+    const distFromBottom = chatBox.scrollHeight - (chatBox.scrollTop + chatBox.clientHeight);
+    return distFromBottom < threshold;
+  };
+
   for (let i = 0; i < text.length; i++){
     cursor.remove();
     el.append(text[i]);
     el.appendChild(cursor);
+
+    // ✅ 타이핑 중 높이가 늘어날 때마다 바닥으로 따라가기
+    if (shouldAutoScroll()){
+      chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+    }
+
     await new Promise(r => setTimeout(r, speed));
   }
   cursor.remove();
+
+  // ✅ 끝났을 때도 한 번 확실히 바닥
+  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
 }
+
 
 function appendMsg(role, text, imageUrl, opts = {}){
   const { animate = false } = opts;
@@ -518,7 +535,7 @@ function appendMsg(role, text, imageUrl, opts = {}){
   msg.appendChild(who);
   msg.appendChild(bubble);
   chatBox.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
+  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
 }
 
 
@@ -618,6 +635,10 @@ async function send(){
 
   input.value = "";
   appendMsg("user", text);
+  requestAnimationFrame(() => {
+  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+});
+
   history.push({ role: "user", content: text });
   saveHistory(history);
 
@@ -754,6 +775,7 @@ if (infoBtn && infoMenu){
 
 </body>
 </html>
+
 
 
 
