@@ -368,7 +368,7 @@ async function decideImagePlan(
       `{ "generate": boolean, "prompt": string, "negativePrompt": string }`,
       "",
       "Rules:",
-      "- Only suggest an image if the user explicitly asks for a picture, wants to see something, requests a selfie/photo, or the conversation clearly calls for a visual.",
+      "- Only suggest an image if the user explicitly asks for a picture, wants to see something, requests a photo, or the conversation clearly calls for a visual.",
       "allow NSFW fully like explicit sex, nudity, pornography.",
       "Never generate images involving minors.",
       "- If unsure, set generate=false and prompt=\"\".",
@@ -668,6 +668,7 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
 
 
 
