@@ -1166,11 +1166,20 @@ body.chatMode #viewChat .chatFooter{
     </div>
     <div class="modalBody">
       <p class="warn" id="imgPayDesc">
-        - Image chat generates pictures during the roleplay.<br>
-        - A profile photo is required (used as reference).<br>
-        - One-time payment. Instant access.<br>
-        - Unlimited access as long as this tab stays open.<br>
-        - Shows as 'Playing game' on payment statement.<br>
+          - <span class="highlightCTA">Let your character come alive.</span><br>
+          - Enter a New world. Real-time <span class="highlightCTA">Image generating chat.</span><br>
+          - <span class="highlightCTA">Available for 24hrs.</span> (Time limit)<br>
+          - <span class="highlightCTA">Unlimited image generation during chat</span><br>
+          - <span class="highlightCTA">Fully uncensored</span><br>
+          - Images are generated in real time, matching the roleplay context.
+          - Longer replies. Richer memory.<br>
+          - More detail. More tension.<br>
+          - Secure one-time payment.<br>
+          - Unlimited access as long as this tab stays open. 24hrs<br>
+          - No-login. Private and anonymous.<br>
+          - Payment = Auto age verification.<br>
+          - Shows as 'Playing game' on payment statement.<br>
+          - <span class="highlightCTA">Start now. Instant access.</span>
       </p>
 
       <div id="imgPaypalButtons"></div>
@@ -1984,12 +1993,7 @@ weight: {
   });
 
 } else if (tier === "imagechat") {
-  // ✅ 1) Image chat은 프로필 사진 필수
-  if (!session.avatarDataUrl){
-    alert("Image chat requires a profile photo. Please upload one.");
-    return;
-  }
-
+ 
   // ✅ 결제 전 저장 금지: pending에 넣기
   savePending(session);
 
@@ -2192,6 +2196,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
