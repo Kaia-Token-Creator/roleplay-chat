@@ -56,10 +56,17 @@ export const onRequestPost: PagesFunction<{
     }
 
     const message = typeof bodyAny.message === "string" ? bodyAny.message.trim() : "";
-    if (!message) {
-      return json({ error: "Missing message." }, 400, CORS);
-    }
-    const userMsg = truncateString(message, MAX_MESSAGE_CHARS);
+
+// ✅ init 트리거
+const isInit = message === "__INIT__";
+
+// ✅ 일반 채팅만 message 필수
+if (!isInit && !message) {
+  return json({ error: "Missing message." }, 400, CORS);
+}
+
+const userMsg = isInit ? "" : truncateString(message, MAX_MESSAGE_CHARS);
+
 
     // history
     const rawHistory = Array.isArray(bodyAny.history) ? bodyAny.history : [];
@@ -80,11 +87,16 @@ export const onRequestPost: PagesFunction<{
     // 1) 텍스트 답변 생성
     const systemPrompt = buildSystemPrompt_Text(ch);
 
-    const messagesBeforeFit: Msg[] = [
-      { role: "system", content: systemPrompt },
-      ...history.map((m) => ({ role: m.role, content: String(m.content) })),
-      { role: "user", content: userMsg },
-    ];
+    const initUserMsg =
+  "Start the conversation now. Greet the user in-character and ask one short question to begin. " +
+  "Follow the FORMAT rules.";
+
+const messagesBeforeFit: Msg[] = [
+  { role: "system", content: systemPrompt },
+  ...history.map((m) => ({ role: m.role, content: String(m.content) })),
+  { role: "user", content: isInit ? initUserMsg : userMsg },
+];
+
 
     const fitted = fitMessagesToBudget(messagesBeforeFit, MAX_PROMPT_CHARS);
 
@@ -92,22 +104,25 @@ export const onRequestPost: PagesFunction<{
     const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
 
     // 2) 이미지 트리거 판단 (✅ JSON 강제 파싱)
-    let plan = await decideImagePlan(env.VENICE_API_KEY, {
-      character: ch,
-      userMessage: userMsg,
-      lastAssistant: reply,
-      history,
-      maxTokens: MAX_TOKENS_PLAN,
-    });
+    let plan: { generate: boolean; prompt: string; negativePrompt?: string } = { generate: false, prompt: "" };
 
-    // ✅ 유저가 "사진/셀카" 요청하면 planner 판단과 무관하게 이미지 생성 강제
-    if (wantsImage(userMsg)) {
-      plan = {
-        generate: true,
-        prompt: buildForcedImagePrompt(ch, userMsg),
-        negativePrompt: plan?.negativePrompt || "",
-      };
-    }
+if (!isInit) {
+  plan = await decideImagePlan(env.VENICE_API_KEY, {
+    character: ch,
+    userMessage: userMsg,
+    lastAssistant: reply,
+    history,
+    maxTokens: MAX_TOKENS_PLAN,
+  });
+
+  if (wantsImage(userMsg)) {
+    plan = {
+      generate: true,
+      prompt: buildForcedImagePrompt(ch, userMsg),
+      negativePrompt: plan?.negativePrompt || "",
+    };
+  }
+}
 
     // 3) 이미지 생성
     let image: null | { mime: "image/webp" | "image/png" | "image/jpeg"; b64: string } = null;
@@ -548,3 +563,4 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("Venice image: empty response");
   return images[0];
 }
+
