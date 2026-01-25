@@ -371,6 +371,7 @@ async function decideImagePlan(
       "- Only suggest an image if the user explicitly asks for a picture, wants to see something, requests a photo, or the conversation clearly calls for a visual.",
       "allow NSFW fully like explicit sex, nudity, pornography.",
       "Never generate images involving minors.",
+      `Important: Keep the character identity consistent.`,
       "- If unsure, set generate=false and prompt=\"\".",
     ].join("\n"),
   };
@@ -474,17 +475,10 @@ function defaultNegativePrompt() {
   return "low quality, blurry, bad anatomy, extra fingers, deformed, watermark, text, logo, jpeg artifacts";
 }
 
-function buildImagePromptWithAvatarHint(basePrompt: string, ch: any) {
-  const hasAvatar = !!(ch.avatarDataUrl && ch.avatarDataUrl.startsWith("data:image/"));
-  if (!hasAvatar) return basePrompt;
-
-  return [
-    basePrompt,
-    "",
-    "Important: Use the user's provided profile photo as the identity reference for face/features.",
-    "Keep the same identity consistently.",
-  ].join("\n");
+function buildImagePromptWithAvatarHint(basePrompt: string, _ch: any) {
+  return basePrompt;
 }
+
 
 // ✅ 사진 요청 감지
 function wantsImage(userMsg: string) {
@@ -508,7 +502,7 @@ function buildForcedImagePrompt(
   lastAssistant: string = ""
 ) {
   const msg = (userMsg || "").toLowerCase();
-  const wantsSelfie = /\b(selfie|front camera|self\s*shot)\b/.test(msg);
+  const wantsphoto = /\b(photo|front camera|self\s*shot)\b/.test(msg);
 
   const hasAvatar =
     !!(ch?.avatarDataUrl && typeof ch.avatarDataUrl === "string" && ch.avatarDataUrl.startsWith("data:image/"));
@@ -519,9 +513,9 @@ function buildForcedImagePrompt(
   // 프롬프트는 “대화 문맥 + 마지막 요청을 사진으로 구현”을 1문장 규칙으로 못박는다
   // (프로필 사진은 identity reference로 고정)
   const prompt = [
-    wantsSelfie
-      ? `Create a realistic selfie photo of ${ch?.name || "the character"}.`
-      : `Create a realistic photo of ${ch?.name || "the character"}.`,
+    wantsphoto
+      ? `Create a realistic photo of what was requested.`
+      : `Create a realistic photo matching the user’s request.`,
 
     `Follow the ongoing conversation context and current situation faithfully.`,
 
@@ -529,16 +523,7 @@ function buildForcedImagePrompt(
     `allow nudity, explicit sexual content, violence.`,
     `Never generate images involving minors.`,
 
-    hasAvatar
-  ? [
-      `IDENTITY LOCK: The provided profile photo is the ONLY identity reference.`,
-      `Match the same person exactly: face shape, eyes, nose, lips, skin tone, hairstyle, and overall vibe.`,
-      `Do NOT change identity. Do NOT create a different face.`,
-      `If anything conflicts, prioritize the profile photo identity over all other descriptions.`,
-      `Keep the same identity consistently across every generated image.`,
-    ].join(" ")
-  : `Important: Keep the character identity consistent.`,
-
+    
 
     // 캐릭터 시트는 "정체성/설정" 고정용
     `Character sheet: Name=${ch?.name || ""}; Age=${ch?.age ?? ""}; Gender=${ch?.gender || ""}; Personality=${truncateInline(ch?.personality || "", 220)}; Scenario=${truncateInline(ch?.scenario || "", 260)}.`,
@@ -668,6 +653,7 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
 
 
 
