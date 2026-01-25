@@ -122,13 +122,18 @@ if (!isInit) {
   });
 
   if (wantsImage(userMsg)) {
-    plan = {
-      generate: true,
-      
-      negativePrompt: plan?.negativePrompt || "",
-    };
-  }
+  plan = {
+    generate: true,
+    prompt: buildForcedImagePrompt(
+      ch,
+      userMsg,
+      history,
+      reply
+    ),
+    negativePrompt: plan?.negativePrompt || "",
+  };
 }
+
 
     // 3) 이미지 생성
     let image: null | { mime: "image/webp" | "image/png" | "image/jpeg"; b64: string } = null;
@@ -663,6 +668,7 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
 
 
 
