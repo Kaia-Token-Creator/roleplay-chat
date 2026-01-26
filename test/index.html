@@ -809,12 +809,9 @@ body.chatMode #viewChat .chatFooter{
 
 
     .pill.recommend{
-  border-color: #ffcc00;
-  box-shadow:
-    0 0 0 1px rgba(255,204,0,.35),
-    0 0 18px rgba(255,204,0,.45),
-    0 0 36px rgba(255,204,0,.25);
-  background: rgba(255,204,0,.08);
+  border-color: rgba(255,255,255,.16); /* 또는 그냥 border-color 지워도 됨 */
+  box-shadow: none;                    /* ✅ 글로우 제거 핵심 */
+  background: rgba(0,0,0,.35);         /* 일반 pill 느낌으로 맞추기(선택) */
 }
 
 .pillTag{
@@ -2218,6 +2215,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
