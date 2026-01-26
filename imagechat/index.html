@@ -563,6 +563,13 @@ function isImagechatPaidValid(){
   return true;
 }
 
+// ✅ paid 상태 확정 (Unlimited 포함)
+const paid = isImagechatPaidValid();
+
+// ✅ 헤더 타이머/문구 UI 시작
+startHeaderCountdown();
+  
+
 function formatRemaining(ms){
   const sec = Math.max(0, Math.floor(ms/1000));
   const h = Math.floor(sec/3600);
@@ -1154,6 +1161,7 @@ async function ensurePayPalUnlimitedButtons(){
 
 </body>
 </html>
+
 
 
 
