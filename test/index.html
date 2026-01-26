@@ -1076,7 +1076,7 @@ body.chatMode #viewChat .chatFooter{
                   <div>
                     <div>
       <b>+18 Uncensored text chat</b>
-      <small style="opacity:.65; font-size:10px; margin:0 4px;"> + high performance</small>
+      <small style="opacity:.65; font-size:10px; margin:0 4px;"> Lifetime + unlimited + high performance</small>
       <small>($2)</small>
     </div>
                   </div>
@@ -2072,65 +2072,45 @@ saveHistory(chatHistory);
 
 
     // --------- Submit flow
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
 
-      const name = nameInput.value.trim();
-      if (!name){
-        nameInput.focus();
-        return;
-      }
-
-      const tier = (form.querySelector('input[name="tier"]:checked') || {}).value || "general";
-
-      const session = {
-        name,
-        nickname: $("#nickname").value.trim(),
-        age: ageSelect.value,
-        gender: $("#gender").value,
-        language: $("#language").value,
-        height: {
-  unit: $("#heightUnit").value,
-  cm: $("#heightCm").value ? Number($("#heightCm").value) : null,
-  ft: $("#heightFt").value ? Number($("#heightFt").value) : null,
-  in: $("#heightIn").value ? Number($("#heightIn").value) : null
-},
-weight: {
-  unit: $("#weightUnit").value,
-  value: $("#weightValue").value ? Number($("#weightValue").value) : null
-},
-        mbti: $("#mbti").value,
-        personality: personality.value.trim(),
-        scenario: scenario.value.trim(),
-        fontColor: selectedColor,
-        fontColorName: selectedColorName,
-        avatarDataUrl: avatarDataUrl || "",
-        tier,
-        createdAt: Date.now()
-      };
-
-      if (tier === "general"){
-  // ✅ 무료는 즉시 확정 저장
-  try{
-    saveSession(session);
-  }catch(e){
-    console.error(e);
-    session.avatarDataUrl = "";
-    try{ saveSession(session); }catch(_){}
+  const name = nameInput.value.trim();
+  if (!name){
+    nameInput.focus();
+    return;
   }
-  enterChat(session);
 
-} else if (tier === "uncensored") {
-  // ✅ 유료(uncensored)는 결제 전까지 저장 금지 (pending)
-  savePending(session);
+  const tier = (form.querySelector('input[name="tier"]:checked') || {}).value || "general";
 
-  openPayModal();
-  mountPayPalButtons(() => {
-    paymentStatus = "paid";
-    sessionStorage.setItem(PAYMENT_KEY, "paid");
+  const session = {
+    name,
+    nickname: $("#nickname").value.trim(),
+    age: ageSelect.value,
+    gender: $("#gender").value,
+    language: $("#language").value,
+    height: {
+      unit: $("#heightUnit").value,
+      cm: $("#heightCm").value ? Number($("#heightCm").value) : null,
+      ft: $("#heightFt").value ? Number($("#heightFt").value) : null,
+      in: $("#heightIn").value ? Number($("#heightIn").value) : null
+    },
+    weight: {
+      unit: $("#weightUnit").value,
+      value: $("#weightValue").value ? Number($("#weightValue").value) : null
+    },
+    mbti: $("#mbti").value,
+    personality: personality.value.trim(),
+    scenario: scenario.value.trim(),
+    fontColor: selectedColor,
+    fontColorName: selectedColorName,
+    avatarDataUrl: avatarDataUrl || "",
+    tier,
+    createdAt: Date.now()
+  };
 
-    // ✅ 결제 성공 시점에만 저장
-    session.tier = "uncensored";
+  if (tier === "general"){
+    // ✅ 무료는 즉시 확정 저장
     try{
       saveSession(session);
     }catch(e){
@@ -2138,68 +2118,86 @@ weight: {
       session.avatarDataUrl = "";
       try{ saveSession(session); }catch(_){}
     }
-
-    clearPending();
     enterChat(session);
-  });
+    return;
+  }
 
-} else if (tier === "imagechat") {
+  if (tier === "uncensored"){
+    // ✅ 유료(uncensored)는 결제 전까지 저장 금지 (pending)
+    savePending(session);
 
-  savePending(session);
+    openPayModal();
+    mountPayPalButtons(() => {
+      paymentStatus = "paid";
+      sessionStorage.setItem(PAYMENT_KEY, "paid");
 
-  openImgPayModal();
-  mountPayPalButtonsImageChat(() => {
-    // ✅ 결제 완료(탭)
-    sessionStorage.setItem(IMAGECHAT_PAID_KEY, "paid");
+      // ✅ 결제 성공 시점에만 저장
+      session.tier = "uncensored";
+      try{
+        saveSession(session);
+      }catch(e){
+        console.error(e);
+        session.avatarDataUrl = "";
+        try{ saveSession(session); }catch(_){}
+      }
 
-    // ✅ 캐릭터 저장(탭)
-    session.tier = "imagechat";
-    try{
-      saveSession(session);
-    }catch(e){
-      console.error(e);
-      alert("Failed to save session. Please try again.");
-      return;
-    }
+      clearPending();
+      enterChat(session);
+    }, "2.00", "Playing game");
+    return;
+  }
 
-    clearPending();
+  if (tier === "imagechat"){
+    savePending(session);
 
-    // ✅ 같은 탭에서 이동
-    window.location.href = "/imagechat/";
-  }, "6.90", "playing image game");
+    openImgPayModal();
+    mountPayPalButtonsImageChat(() => {
+      sessionStorage.setItem(IMAGECHAT_PAID_KEY, "paid");
 
-} else if (tier === "imagechat_unlimited") {
+      session.tier = "imagechat";
+      try{
+        saveSession(session);
+      }catch(e){
+        console.error(e);
+        alert("Failed to save session. Please try again.");
+        return;
+      }
 
-  savePending(session);
+      clearPending();
+      window.location.href = "/imagechat/";
+    }, "6.90", "playing image game");
+    return;
+  }
 
-  openImgUnlimitedPayModal();
-  mountPayPalButtonsImageChatUnlimited(() => {
-    // ✅ 결제 완료(탭)
-    sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
+  if (tier === "imagechat_unlimited"){
+    savePending(session);
 
-    // ✅ 캐릭터 저장(탭)
-    session.tier = "imagechat_unlimited";
-    try{
-      saveSession(session);
-    }catch(e){
-      console.error(e);
-      alert("Failed to save session. Please try again.");
-      return;
-    }
+    openImgUnlimitedPayModal();
+    mountPayPalButtonsImageChatUnlimited(() => {
+      sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
 
-    clearPending();
+      session.tier = "imagechat_unlimited";
+      try{
+        saveSession(session);
+      }catch(e){
+        console.error(e);
+        alert("Failed to save session. Please try again.");
+        return;
+      }
 
-    // ✅ 같은 탭에서 이동
-    window.location.href = "/imagechat_unlimited";
-  }, "25.00", "Upgrade game");
+      clearPending();
+      window.location.href = "/imagechat_unlimited";
+    }, "25.00", "Upgrade game");
+    return;
+  }
 });
 
-    // (1) CHANGED: New opens a fresh setup tab (clears session in that new tab only)
-    resetBtn.addEventListener("click", () => {
-      window.open("/?new=1", "_blank");
-    });
+// ✅ submit 밖으로 빼야 정상 동작하는 버튼들
+resetBtn.addEventListener("click", () => {
+  window.open("/?new=1", "_blank");
+});
 
-    if (gameBtn){
+if (gameBtn){
   gameBtn.addEventListener("click", () => {
     window.open("https://2048global.com", "_blank", "noopener,noreferrer");
   });
@@ -2211,20 +2209,6 @@ if (vpnBtn){
   });
 }
 
-    // (1) ADDED: if opened as /?new=1, clear this tab's session and payment state
-    const params = new URLSearchParams(window.location.search);
-if (params.get("new") === "1"){
-  clearSession();
-  sessionStorage.removeItem(PAYMENT_KEY);
-  sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
-  sessionStorage.removeItem("roleplay-chat_history_v1"); // (추가) 히스토리도 삭제
-  sessionStorage.removeItem(IMAGECHAT_UNLIMITED_PAID_KEY);
-  paymentStatus = "unpaid";
-  show(viewSetup);
-
-  // ✅ 중요: 새로고침해도 다시 초기화되지 않도록 URL에서 ?new=1 제거
-  history.replaceState(null, "", window.location.pathname);
-}
 
 
     // --------- Restore session if exists
@@ -2353,6 +2337,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
