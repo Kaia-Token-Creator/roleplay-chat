@@ -1,4 +1,4 @@
-```ts
+
 // functions/api/chat.ts
 export const onRequestPost: PagesFunction<{
   DEEPSEEK_API_KEY: string;
@@ -514,4 +514,4 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
-```
+
