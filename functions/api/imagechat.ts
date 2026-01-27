@@ -245,6 +245,11 @@ function isValidMsg(m: any): m is { role: "system" | "user" | "assistant"; conte
   );
 }
 
+function scrubHistory(history: any[]) {
+  const bad = /(venice|uncensored|model|provider|openai|chatgpt|assistant)/i;
+  return history.filter(m => !(m.role === "assistant" && bad.test(String(m.content || ""))));
+}
+
 function normalizeMBTI(s: string) {
   const t = s.trim().toUpperCase();
   if (!/^[IE][NS][FT][PJ]$/.test(t)) return "";
@@ -713,4 +718,5 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
 
