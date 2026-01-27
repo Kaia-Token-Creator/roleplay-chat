@@ -951,18 +951,23 @@ async function bootstrapFirstMessage(){
   try{
     setBusy(true);
 
-    const res = await fetch("/api/imagechat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      ppearanceProfile,
-    });
+    const appearanceProfile = sessionStorage.getItem("appearanceProfile") || "";
+
+const res = await fetch("/api/imagechat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    ...payload,
+    appearanceProfile,
+  }),
+});
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.detail || data.error || `HTTP ${res.status}`);
+
 // ✅ 서버가 내려준 appearanceProfile 저장
-if (data.appearanceProfile) {
-  sessionStorage.setItem("appearanceProfile", data.appearanceProfile);
+if (typeof data.appearanceProfile === "string" && data.appearanceProfile.trim()) {
+  sessionStorage.setItem("appearanceProfile", data.appearanceProfile.trim());
 }
     const reply = (data && typeof data.reply === "string") ? data.reply : "(no text)";
 
@@ -1059,18 +1064,22 @@ const appearanceProfile = sessionStorage.getItem("appearanceProfile") || "";
     setBusy(true);
 
   // ✅ 입력창 disabled 등 레이아웃 확정된 다음에 한 번 더 바닥 고정
-setBusy(true);
 requestAnimationFrame(() => {
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
 });
 
 
-    const res = await fetch("/api/imagechat", {
+    const appearanceProfile = sessionStorage.getItem("appearanceProfile") || "";
+
+const res = await fetch("/api/imagechat", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload),
-  appearanceProfile,
+  body: JSON.stringify({
+    ...payload,
+    appearanceProfile,
+  }),
 });
+
 
 const data = await res.json().catch(() => ({}));
 
@@ -1258,6 +1267,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
