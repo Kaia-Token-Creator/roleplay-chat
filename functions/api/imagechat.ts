@@ -21,6 +21,7 @@ export const onRequestPost: PagesFunction<{
       age: number;
       gender: string;
       language: string;
+      appearance?: string;
       personality: string;
       scenario: string;
       nickname?: string;
@@ -236,6 +237,7 @@ function sanitizeCharacter(ch: any) {
 
   const gender = safeStr(ch.gender, 30);
   const language = safeStr(ch.language, 30) || "English";
+  const appearance = safeStr(ch.appearance, 500);
   const personality = safeStr(ch.personality, 500);
   const scenario = safeStr(ch.scenario, 500);
 
@@ -253,6 +255,7 @@ function sanitizeCharacter(ch: any) {
     age,
     gender,
     language,
+    appearance: appearance || "",  
     personality,
     scenario,
     nickname: nickname || "",
@@ -421,6 +424,7 @@ async function makeImagePlanWithTextModel(
     content: [
       "Character:",
       `Name=${ch.name}; Age=${ch.age}; Gender=${ch.gender}; MBTI=${ch.mbti}; Language=${ch.language}`,
+      `Appearance=${ch.appearance || ""}`,
       `Personality=${ch.personality}`,
       `Scenario=${ch.scenario}`,
       "",
@@ -486,7 +490,7 @@ async function makeForcedPromptWithTextModel(
   const user = {
     role: "user",
     content: [
-      `Character: Name=${ch.name}; Age=${ch.age}; Gender=${ch.gender}; Personality=${ch.personality}; Scenario=${ch.scenario}`,
+      `Character: Name=${ch.name}; Age=${ch.age}; Gender=${ch.gender}; Appearance=${ch.appearance || ""}; Personality=${ch.personality}; Scenario=${ch.scenario}`,
       "Recent history (latest last):",
       ...history.slice(-10).map((m) => `${m.role}: ${String(m.content || "").trim()}`),
       "",
@@ -642,3 +646,4 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
