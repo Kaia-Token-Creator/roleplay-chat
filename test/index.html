@@ -2284,9 +2284,99 @@ if (vpnBtn){
 }
 
 
+// =========================
+// Random neutral defaults (on load)
+// =========================
+const APPEARANCE_DEFAULTS = [
+  "Mixed-race (Black & East Asian), short curly hair, warm brown eyes, athletic build, light freckles, minimal accessories, clean streetwear vibe.",
+  "East Asian, straight jet-black bob, sharp eyebrows, pale skin, lean frame, monochrome outfit, calm and unreadable expression.",
+  "Black, deep mahogany skin, close-cropped hair, intense gaze, tall silhouette, simple gold ring, tailored coat, quiet confidence.",
+  "South Asian, wavy dark hair, olive skin, soft smile, average build, layered casual outfit, faint scar on the eyebrow.",
+  "White, sandy hair tucked under a beanie, grey-blue eyes, slim build, hoodie and boots, small tattoo on the wrist.",
+  "Latino/a, sun-kissed skin, thick eyebrows, shoulder-length curls, sturdy build, denim jacket, confident posture.",
+  "Middle Eastern, dark almond eyes, thick lashes, neat undercut, medium build, long cardigan, subtle scent of cologne/perfume.",
+  "Southeast Asian, warm tan skin, straight hair tied back, gentle eyes, compact build, sporty jacket, always looks ready to move.",
+  "Indigenous, long dark hair, strong cheekbones, steady gaze, relaxed stance, simple leather bracelet, outdoorsy style.",
+  "Eastern European, platinum hair, pale skin, sharp jawline, tall and slender, all-black outfit, slow deliberate movements.",
+  "North African, caramel skin, textured hair, bright smile, sturdy shoulders, patterned scarf, expressive eyes.",
+  "Pacific Islander, broad frame, thick hair, calm eyes, loose linen shirt, quiet strength in body language.",
+  "Mixed-race (White & Latino/a), messy hair, hazel eyes, average build, vintage tee, rings on a couple fingers.",
+  "East Asian, dyed silver hair, soft features, slim build, oversized sweater, subtle eyeliner, cool futuristic vibe.",
+  "Black, braided hair pulled back, dark eyes, athletic build, fitted turtleneck, neat and deliberate gestures.",
+  "South Asian, long wavy hair, warm brown eyes, average build, soft hoodie, small nose piercing, approachable aura.",
+  "White, auburn hair, freckles across nose, green eyes, medium build, flannel shirt, looks like a storyteller.",
+  "Middle Eastern, thick curly hair, olive skin, sharp eyes, lean build, leather jacket, slightly mysterious presence.",
+  "Southeast Asian, short hair with faded sides, tan skin, gentle smile, compact athletic build, clean sneakers, easygoing style.",
+  "Mixed-race (Black & White), tight curls, bright eyes, tall build, oversized coat, confident walk, faint dimple when smirking."
+];
+
+const PERSONALITY_DEFAULTS = [
+  "Soft-spoken but fearless, listens deeply, speaks with precise honesty, hates mind games.",
+  "Teasing and witty, never cruel, uses humor to break tension, secretly protective.",
+  "Calm strategist, plans three steps ahead, low-key competitive, respects competence.",
+  "Warm and patient, emotionally intuitive, gently challenges excuses, big “let’s fix it” energy.",
+  "Mysterious and poetic, speaks in vivid metaphors, keeps secrets until trust is earned.",
+  "High-energy chaos in a good way, impulsive, adventurous, always pulls you into something new.",
+  "Quietly intense, strong boundaries, doesn’t forgive easily, but loyalty is absolute once given.",
+  "Flirty and bold, playful confidence, loves pushing buttons, knows exactly when to stop.",
+  "Curious investigator type, asks sharp questions, notices tiny details, never forgets a promise.",
+  "Very affectionate (in words), reassuring, speaks like a safe place, hates unnecessary conflict.",
+  "Cool and sarcastic, acts unimpressed, but secretly cares a lot more than they admit.",
+  "Elegant and composed, controlled emotions, gets jealous quietly, values respect above all.",
+  "Bookish and dreamy, easily distracted by ideas, romantic about small moments, gentle touch.",
+  "Stern mentor vibe, expects discipline, rewards effort, softens when you prove yourself.",
+  "Playful rival, challenges you constantly, loves competitions, hates losing, laughs when you win.",
+  "Earnest and sincere, says what they mean, apologizes fast, believes people can change.",
+  "Charming and social, reads a room instantly, smooth talker, secretly lonely.",
+  "Protective guardian energy, watches your back, suspicious of strangers, will fight for you.",
+  "Shy at first, warms up slowly, blushes easily, becomes surprisingly bold once comfortable.",
+  "Unpredictable wildcard, sometimes sweet sometimes cold, tests trust, but craves real connection."
+];
+
+const SCENARIO_DEFAULTS = [
+  "A midnight diner during a thunderstorm; you’re the only two customers and the power keeps flickering.",
+  "A quiet library after closing; a hidden door is slightly open and a strange note is tucked in your book.",
+  "A neon-lit cyberpunk street market; someone is following you and your character offers “help” for a price.",
+  "A luxury train at night; your cabin key opens the wrong door and you find your character inside.",
+  "A snowy mountain lodge; the roads are blocked and the fireplace is the only warm place left.",
+  "A beach town in the off-season; empty streets, cold wind, and a mysterious lighthouse invitation.",
+  "An underground fight club (you’re not sure how you got invited); your character is the calm organizer.",
+  "A haunted hotel corridor; the elevator won’t come and the hallway seems longer every time you blink.",
+  "A spaceship on long-haul travel; a systems glitch locks you both in the observation room.",
+  "A fantasy tavern where nobody speaks your language; your character offers to translate, but wants a favor.",
+  "A crowded music festival; you get separated, then your character finds you near a backstage entrance.",
+  "A noir city alley; it’s raining, someone’s been hurt, and your character knows too much.",
+  "A quiet art gallery; one painting looks exactly like you and your character is staring at it.",
+  "A corporate high-rise after hours; the security doors lock and your character has the only keycard.",
+  "A remote cabin with no signal; a radio crackles with your names and coordinates.",
+  "A medieval castle under siege; you’re trapped in a tower and your character is the only ally you trust.",
+  "A modern apartment elevator; it stops between floors and the emergency light turns everything intimate.",
+  "A desert roadside motel; you both arrive at the same time and the clerk says there’s only one room left.",
+  "A magic academy hallway; your character catches you breaking a rule, but offers a deal instead of punishment.",
+  "A secret speakeasy behind a bookstore; the bartender recognizes you and your character is waiting at a reserved table."
+];
+
+function pick(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ✅ 로드 시 자동 채우기 (이미 값 있으면 덮어쓰지 않음)
+(function setRandomDefaultsOnLoad(){
+  const appearanceEl = document.getElementById("appearance");
+  const personalityEl = document.getElementById("personality");
+  const scenarioEl = document.getElementById("scenario");
+
+  if (appearanceEl && !appearanceEl.value.trim()) appearanceEl.value = pick(APPEARANCE_DEFAULTS);
+  if (personalityEl && !personalityEl.value.trim()) personalityEl.value = pick(PERSONALITY_DEFAULTS);
+  if (scenarioEl && !scenarioEl.value.trim()) scenarioEl.value = pick(SCENARIO_DEFAULTS);
+
+  // 글자수 카운터 갱신 (너 코드에 updateCounts가 있으니 호출)
+  if (typeof updateCounts === "function") updateCounts();
+})();
+
 
     // --------- Restore session if exists
-    const existing = loadSession();
+const existing = loadSession();
 const pending = loadPending();
 
 function setUnlockUIVisibility(){
@@ -2411,6 +2501,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
