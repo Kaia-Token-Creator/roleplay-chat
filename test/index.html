@@ -937,7 +937,9 @@ body.chatMode #viewChat .chatFooter{
 
             <div>
   <label for="nickname">What should the character call you? <span style="color: #fff;">(required)</span></label>
-  <input id="nickname" name="nickname" type="text" maxlength="30" placeholder="e.g., babe, buddy, captain, darling" />
+  <input id="nickname" name="nickname" type="text" maxlength="30"
+       placeholder="e.g., babe, buddy, captain, darling"
+       value="you" />
 </div>
 
 
@@ -950,7 +952,7 @@ body.chatMode #viewChat .chatFooter{
               <label for="gender">Gender</label>
               <select id="gender" name="gender" required>
                 <option value="Man">Man</option>
-                <option value="Woman">Woman</option>
+                <option value="Woman" selected>Woman</option>
                 <option value="None">None</option>
                 <option value="Gay">Gay</option>
                 <option value="Lesbian">Lesbian</option>
@@ -2124,26 +2126,94 @@ if (!nicknameVal){
     age: ageSelect.value,
     gender: $("#gender").value,
     language: $("#language").value,
-    height: {
-      unit: $("#heightUnit").value,
-      cm: $("#heightCm").value ? Number($("#heightCm").value) : null,
-      ft: $("#heightFt").value ? Number($("#heightFt").value) : null,
-      in: $("#heightIn").value ? Number($("#heightIn").value) : null
-    },
-    weight: {
-      unit: $("#weightUnit").value,
-      value: $("#weightValue").value ? Number($("#weightValue").value) : null
-    },
-    mbti: $("#mbti").value,
-    appearance: (appearance ? appearance.value.trim() : ""),
-    personality: personality.value.trim(),
-    scenario: scenario.value.trim(),
-    fontColor: selectedColor,
-    fontColorName: selectedColorName,
-    avatarDataUrl: avatarDataUrl || "",
-    tier,
-    createdAt: Date.now()
+    // ✅ defaults (neutral)
+const DEFAULT_FT = 5;
+const DEFAULT_IN = 7;     // 67 in
+const DEFAULT_LB = 150;
+
+const hu = $("#heightUnit").value;   // "cm" | "ft"
+const wu = $("#weightUnit").value;   // "kg" | "lb"
+
+let heightObj;
+if (hu === "cm"){
+  const cmRaw = $("#heightCm").value ? Number($("#heightCm").value) : null;
+  heightObj = {
+    unit: "cm",
+    cm: (cmRaw && cmRaw > 0) ? cmRaw : null,
+    ft: null,
+    in: null
   };
+} else {
+  const ftRaw = $("#heightFt").value ? Number($("#heightFt").value) : null;
+  const inRaw = $("#heightIn").value ? Number($("#heightIn").value) : null;
+
+// ✅ defaults (neutral)
+const DEFAULT_FT = 5;
+const DEFAULT_IN = 7;
+const DEFAULT_LB = 150;
+
+const hu = $("#heightUnit").value;   // "cm" | "ft"
+const wu = $("#weightUnit").value;   // "kg" | "lb"
+
+let heightObj;
+if (hu === "cm"){
+  const cmRaw = $("#heightCm").value ? Number($("#heightCm").value) : null;
+  heightObj = {
+    unit: "cm",
+    cm: (cmRaw && cmRaw > 0) ? cmRaw : null,
+    ft: null,
+    in: null
+  };
+} else {
+  const ftRaw = $("#heightFt").value ? Number($("#heightFt").value) : null;
+  const inRaw = $("#heightIn").value ? Number($("#heightIn").value) : null;
+
+  // ✅ 둘 다 비었으면 기본 ft/in
+  const useFt = (ftRaw == null && inRaw == null) ? DEFAULT_FT : (ftRaw ?? DEFAULT_FT);
+  const useIn = (ftRaw == null && inRaw == null) ? DEFAULT_IN : (inRaw ?? 0);
+
+  heightObj = {
+    unit: "ft",
+    cm: null,
+    ft: useFt,
+    in: useIn
+  };
+}
+
+let weightObj;
+{
+  const wRaw = $("#weightValue").value ? Number($("#weightValue").value) : null;
+
+  if (wRaw == null){
+    // ✅ 비었으면 기본 lb
+    weightObj = { unit: "lb", value: DEFAULT_LB };
+  } else {
+    weightObj = { unit: wu, value: wRaw };
+  }
+}
+
+// ✅ 이제 session 객체 (여긴 프로퍼티만!)
+const session = {
+  name,
+  nickname: $("#nickname").value.trim(),
+  age: ageSelect.value,
+  gender: $("#gender").value,
+  language: $("#language").value,
+
+  height: heightObj,
+  weight: weightObj,
+
+  mbti: $("#mbti").value,
+  appearance: (appearance ? appearance.value.trim() : ""),
+  personality: personality.value.trim(),
+  scenario: scenario.value.trim(),
+  fontColor: selectedColor,
+  fontColorName: selectedColorName,
+  avatarDataUrl: avatarDataUrl || "",
+  tier,
+  createdAt: Date.now()
+};
+
 
   if (tier === "general"){
     // ✅ 무료는 즉시 확정 저장
@@ -2373,6 +2443,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
