@@ -1,0 +1,2352 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+  <meta name='impact-site-verification' value='f343b3c2-5405-4f62-a4ed-b9d389be3089'>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
+     crossorigin="anonymous"></script>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4VRNKXVX3J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-4VRNKXVX3J');
+</script>
+
+  <meta name="yandex-verification" content="139f2b0989f2c7f0" />
+  
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Roleplay-chat.com",
+  "url": "https://roleplay-chat.com/",
+  "description": "Create a character and start an anonymous no-login AI roleplay chat instantly.",
+  "inLanguage": "en"
+  }
+</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>No-login AI Roleplay | Roleplay-chat.com</title>
+  <meta name="description" content="Create a character and start a no-login AI roleplay chat instantly. General and +18 Uncensored options available." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#000000" />
+
+ <!-- Open Graph -->
+<meta property="og:title" content="roleplay-chat.com | No-login AI Roleplay" />
+<meta property="og:description" content="Create a character and start a no-login AI roleplay chat instantly." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://roleplay-chat.com/" />
+<meta property="og:image" content="https://roleplay-chat.com/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/jpeg" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="roleplay-chat.com | No-login AI Roleplay" />
+<meta name="twitter:description" content="Create a character and start a no-login AI roleplay chat instantly." />
+<meta name="twitter:image" content="https://roleplay-chat.com/og-image.jpg" />
+
+ <!-- Favicon -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+
+  <!-- Rounded, commercial-free font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- PayPal SDK (for in-page popup/overlay checkout). Note: The "buttons" flow opens PayPal in an overlay/mini-window. -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AW41UQ3EzJV10FZHqYPy8yqdlDbklB4VjuT6hzu7DVoS-G9cJgKx9nHfxCRZpVSgs1dczhkPj4oM0VXv&currency=USD&intent=capture"></script>
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.75);
+      --muted2:rgba(255,255,255,.55);
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.09);
+      --border:rgba(255,255,255,.14);
+      --focus:rgba(255,255,255,.25);
+      --danger:#ff4d4d;
+      --ok:#52ff9a;
+      --shadow: 0 14px 36px rgba(0,0,0,.55);
+
+      --radius: 16px;
+      --radius2: 22px;
+
+      /* default chat font color selection (preview) */
+      --chatColor: #000000;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background: radial-gradient(900px 600px at 10% 0%, rgba(255,255,255,.06), transparent 55%),
+                  radial-gradient(900px 600px at 90% 10%, rgba(255,255,255,.05), transparent 60%),
+                  var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+    }
+
+    a{ color:inherit; }
+    .wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:flex-start;   /* ✅ center → flex-start */
+  justify-content:center;
+  padding: 18px 14px 26px;
+}
+    .shell{
+      width: min(860px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 4px 6px 0;
+  gap: 12px;
+}
+
+    .logo{
+      text-decoration: none;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: clamp(16px, 3.6vw, 24px);
+padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      user-select:none;
+    }
+
+    .logoRole{
+  color: #ffcc00; /* dark yellow */
+}
+
+
+.logoDot{
+  color: rgba(255,255,255,.95); /* keep white */
+  font-size: 0.5em;            /* half size */
+  vertical-align: baseline;
+}
+
+    .logo span{ opacity:.95; }
+    .sub{
+      text-align:center;
+      margin-top: 0px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .cardHead h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.2px;
+    }
+    .badge{
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      white-space:nowrap;
+    }
+
+    .cardBody{
+  padding: 8px 12px 12px;
+  display:flex;
+  flex-direction:column;
+  min-height: 0; /* 중요 */
+}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    @media (min-width: 720px){
+      .grid{
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 14px;
+      }
+      .span2{ grid-column: span 2; }
+    }
+
+    label{
+  display:block;
+  font-size: 15px;
+  color: #ffcc00; /* ← 여기 */
+  margin: 0 0 6px;
+  font-weight: 700; /* 선택: 더 잘 보이게 */
+}
+
+    input, select, textarea{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.45);
+      color: var(--fg);
+      outline: none;
+      transition: .15s ease;
+      font-size: 14px;
+    }
+    textarea{ resize: vertical; min-height: 92px; max-height: 240px; }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(255,255,255,.30);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.08);
+    }
+
+    .row{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .pillGroup{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.35);
+      border-radius: 999px;
+      padding: 10px 12px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      user-select:none;
+      transition:.15s ease;
+    }
+    .pill:hover{ background: rgba(255,255,255,.06); }
+    .pill input{ width:auto; margin:0; }
+    .pill small{
+  color: #ffffff;
+  font-weight: 700;
+}
+    .hint{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted2);
+    }
+
+    .colors{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (min-width:720px){
+      .colors{ grid-template-columns: repeat(8, minmax(0, 1fr)); }
+    }
+    .swatch{
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      transition:.15s ease;
+    }
+    .swatch:hover{ transform: translateY(-1px); }
+    .swatch[aria-selected="true"]{
+      outline: 3px solid rgba(255,255,255,.18);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+    }
+    .swatch .check{
+      position:absolute;
+      inset:auto 8px 8px auto;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.14);
+      display:none;
+    }
+    .swatch[aria-selected="true"] .check{ display:block; }
+
+    .preview{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(0,0,0,.25);
+    }
+
+    /* avatar X (clear) button */
+.avatar{
+  position: relative; /* 버튼 포지셔닝을 위해 */
+}
+
+.avatarClear{
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.55);
+  color: rgba(255,255,255,.9);
+  font-size: 16px;
+  line-height: 1;
+  display: none;        /* 기본 숨김 */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.avatarClear:hover{
+  background: rgba(0,0,0,.75);
+}
+
+/* 모바일 탭하기 편하게 */
+.avatarClear:active{
+  transform: scale(0.96);
+}
+    
+    .avatar{
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      flex: 0 0 auto;
+    }
+    .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .bubble{
+      flex:1;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .bubble b{
+      color: var(--fg);
+      font-weight: 700;
+      font-family: "Baloo 2", Inter, sans-serif;
+    }
+    .bubble .accent{
+      color: var(--fg);
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      text-decoration-color: var(--chatColor);
+    }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-top: 14px;
+    }
+
+    .btn{
+      width: 100%;
+      padding: 14px 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      background: rgba(255,255,255,.10);
+      color: var(--fg);
+      font-weight: 800;
+      cursor:pointer;
+      transition:.15s ease;
+      font-size: 15px;
+      letter-spacing:.2px;
+    }
+    .btn:hover{ background: rgba(255,255,255,.14); transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px); }
+
+    .btnPrimary{
+  background: #e0b400;
+  border: 1px solid #c9a200;
+  color: #000;
+  font-weight: 800;
+}
+
+    .note{
+      font-size: 12px;
+      color: var(--muted2);
+      margin: 10px 2px 0;
+    }
+
+    /* In-page "Next page" view (no full page load) */
+    .view{ display:none; }
+    .view.active{ display:block; }
+
+    /* Chat placeholder */
+    .chatShell{
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+  min-height: 0; /* 중요: flex 안에서 overflow가 제대로 동작 */
+}
+
+    .chip{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .chatBox{
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.35);
+  padding: 14px;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  overflow:auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+    .chatMsg{
+      display:flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items:flex-start;
+    }
+
+    /* (4) ADDED: user messages on the right */
+    .chatMsg.me{
+      flex-direction: row-reverse;
+    }
+    .chatMsg.me .text{
+      text-align: right;
+    }
+
+    .chatMsg .who{
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      flex: 0 0 auto;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .chatMsg .who img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .chatMsg .text{
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      max-width: 78%;
+      color: var(--fg);
+      font-size: 14px;
+    }
+    .chatMsg .text .name{
+      font-weight: 800;
+      font-family: "Baloo 2", Inter, sans-serif;
+      color: var(--chatColor);
+    }
+   
+    .chatInput{
+  flex: 1 1 auto;
+  min-width: 0;          /* 중요: 작은 화면에서 버튼 밀리지 않게 */
+  height: 42px;          /* sendBtn과 동일 */
+  padding: 0 10px;       /* 세로 패딩 제거, 높이로 관리 */
+  border-radius: 14px;
+}
+
+.sendBtn{
+  flex: 0 0 42px;        /* 줄바꿈 방지 */
+  height: 42px;
+  border-radius: 14px;
+}
+
+    /* Paywall modal */
+    .modalOverlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px 14px;
+      z-index: 9999;
+    }
+    .modalOverlay.active{ display:flex; }
+    .modal{
+      width: min(520px, 100%);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(10,10,10,.92);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modalHeader{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .modalHeader h3{
+      margin:0;
+      font-size: 15px;
+      letter-spacing:.2px;
+    }
+    .xBtn{
+      border:none;
+      background: rgba(255,255,255,.08);
+      color: var(--fg);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+/* ✅ Unlock 버튼: 핫핑크 */
+#unlockBtn{
+  background: #ff4fd8;
+  border: 1px solid #ff2fce;
+  color: #000;
+  font-weight: 900;
+}
+#unlockBtn:hover{ background:#ff6fe1; }
+#unlockBtn:active{ background:#ff2fce; }
+
+    /* New 버튼만 진한 노란색 */
+#resetBtn{
+  background: #e0b400;
+  border: 1px solid #c9a200;
+  color: #000;
+  font-weight: 800;
+}
+
+#resetBtn:hover{
+  background: #f0c800;
+}
+
+#resetBtn:active{
+  background: #cfa600;
+}
+
+    .modalBody{ padding: 14px 16px 16px; }
+    .warn{
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    .error{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--danger);
+      display:none;
+    }
+    .ok{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--ok);
+      display:none;
+    }
+
+    .shareBtn{
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  box-shadow: var(--shadow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:.15s ease;
+  flex: 0 0 auto;
+}
+.shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+.shareBtn:active{ transform: translateY(0px); }
+
+.shareBtn svg{
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: rgba(255,255,255,.92);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.infoMenu{
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: rgba(10,10,10,.92);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 6px;
+  display: none;
+  z-index: 99999;
+}
+
+.infoMenu.active{ display: block; }
+
+.infoMenu a{
+  display: block;
+  padding: 10px 10px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: rgba(255,255,255,.92);
+  font-size: 13px;
+}
+
+.infoMenu a:hover{
+  background: rgba(255,255,255,.08);
+}
+
+    .chatFooter{
+  text-align:center;
+  font-size: 10px;
+  color: rgba(255,255,255,.45);
+  padding: 2px 0 0px;
+}
+    
+    footer{
+      text-align:center;
+      font-size: 12px;
+      color: rgba(255,255,255,.45);
+      padding: 10px 0 4px;
+    }
+
+    /* =========================
+   CHAT MODE: TOP FIXED + INPUT FIXED + ONLY chatBox scroll
+   (PASTE AT VERY BOTTOM)
+   ========================= */
+
+/* 채팅 화면에서는 페이지 스크롤 자체를 막아버림 */
+body.chatMode{
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* chatHead(타이틀+메뉴) 세로 스택 유지 */
+#viewChat .cardHead.chatHead{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+/* 채팅 화면은 남은 높이를 꽉 먹는 flex 레이아웃 */
+body.chatMode .wrap{
+  height: 100dvh;
+  padding-top: 0px; /* 원래 18px → 조금 줄이기 */
+}
+
+body.chatMode .shell{
+  height: 100%;
+}
+
+/* viewChat 카드가 화면 남은 높이를 먹고 */
+body.chatMode #viewChat.active{
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* cardBody도 column flex로 */
+body.chatMode #viewChat.active .cardBody{
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 12px; /* 기존 느낌 유지 */
+}
+
+/* chatShell: 채팅박스(스크롤) + 입력창(고정) 구조 */
+body.chatMode #viewChat .chatShell{
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ✅ 기본(키보드 내려감): 아래 여백 넉넉하게 */
+body.chatMode #viewChat .chatBox{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+
+  /* 기본은 넉넉하게: 마지막 말풍선 하단 테두리까지 확실히 보이게 */
+  padding-bottom: calc(var(--controlsH) + 20px + env(safe-area-inset-bottom));
+
+  /* 스크롤이 "마지막 요소"를 어디까지 올려줄지 힌트 (체감 좋아짐) */
+  scroll-padding-bottom: calc(var(--controlsH) + 20px + env(safe-area-inset-bottom));
+}
+
+    /* ✅ 키보드 올라옴: 여백 조금 줄이기 */
+body.chatMode.kbUp #viewChat .chatBox{
+  padding-bottom: calc(var(--controlsH) + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(var(--controlsH) + env(safe-area-inset-bottom));
+}
+
+/* ✅ 입력창: 진짜 하단 고정 + 키보드 올라오면 같이 상승 */
+body.chatMode #viewChat .chatControls{
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%); /* ✅ 가운데 정렬(고정요소에서 margin auto 안 믿기) */
+  width: min(860px, 100%);
+  bottom: 0;                  /* ✅ 무조건 최하단 */
+
+  z-index: 999;
+
+  display:flex;
+  gap: 10px;
+  align-items: center;
+
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(10px);
+}
+
+
+/* chatFooter는 입력창 아래로 내려가면 안 보일 수 있으니,
+   채팅 모드에서는 살짝만 아래 여백 줄이기(텍스트는 유지) */
+body.chatMode #viewChat .chatFooter{
+  padding: 2px 0 0;
+}
+
+    body.chatMode .sub{
+  display: none !important;
+}
+
+.shareWrap{
+  display: flex;
+  align-items: center;
+  gap: 6px;               /* ← 여기서 거리 미세조정 */
+}
+
+.bookmarkHint{
+  font-size: 10px;
+  line-height: 1.1;
+  text-align: right;      /* 버튼 쪽으로 붙는 느낌 */
+  color: rgba(255,255,255,.55);
+  user-select: none;
+  white-space: nowrap;
+}
+
+    .highlightCTA{
+  color: #e0b400;
+  font-weight: 800;
+}
+
+    /* ✅ Info 버튼: 더 강한 노란 글로우 */
+#infoBtn{
+  border-color: rgba(255, 204, 0, .55);
+  box-shadow:
+    0 0 0 1px rgba(255, 204, 0, .25),
+    0 0 18px rgba(255, 204, 0, .35),
+    0 0 34px rgba(255, 204, 0, .22),
+    var(--shadow);
+}
+
+#infoBtn:hover{
+  border-color: rgba(255, 204, 0, .75);
+  box-shadow:
+    0 0 0 1px rgba(255, 204, 0, .35),
+    0 0 22px rgba(255, 204, 0, .45),
+    0 0 44px rgba(255, 204, 0, .28),
+    var(--shadow);
+}
+
+
+    .pill.recommend{
+  border-color: rgba(255,255,255,.16); /* 또는 그냥 border-color 지워도 됨 */
+  box-shadow: none;                    /* ✅ 글로우 제거 핵심 */
+  background: rgba(0,0,0,.35);         /* 일반 pill 느낌으로 맞추기(선택) */
+}
+
+.pillTag{
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #000;
+  background: #ff3b3b;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+    
+
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="shell">
+
+<header>
+  <!-- ✅ 2줄 스택 컨테이너 -->
+  <div style="display:block; width:100%;">
+
+    <!-- ✅ 1줄: 기존 헤더 내용 (그대로, 단 1글자도 수정X) -->
+    <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+      <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer" class="logo">
+        <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+      </a>
+
+      <!-- ✅ 공유 영역 묶기 -->
+      <div class="shareWrap" style="position:relative;">
+        <div class="bookmarkHint">
+          Bookmark<br>&amp; Share
+        </div>
+
+        <button class="shareBtn" id="shareBtn" type="button" aria-label="Share">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <path d="M8.6 13.5l6.8 3.9"></path>
+            <path d="M15.4 6.6L8.6 10.5"></path>
+          </svg>
+        </button>
+
+        <!-- ✅ 새 Info 버튼(최우측) -->
+        <button class="shareBtn" id="infoBtn" type="button" aria-label="Info" title="Info">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 10.5v6"></path>
+            <circle cx="12" cy="7.5" r="1"></circle>
+          </svg>
+        </button>
+
+        <!-- ✅ Info 메뉴 -->
+        <div class="infoMenu" id="infoMenu" role="menu" aria-label="Info menu">
+          <a href="https://chat-with-stranger.com" target="_blank" rel="noopener noreferrer" style="color: #FF69B4; font-weight: bold; text-decoration: none;">Chat with stranger</a>
+          <a href="https://roleplay-chat.com/human" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Chat with real human</a>
+          <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer">Home</a>
+          <a href="https://roleplay-chat.com/how" target="_blank" rel="noopener noreferrer">How to use</a>
+          <a href="https://roleplay-chat.com/about" target="_blank" rel="noopener noreferrer">About</a>
+          <a href="https://roleplay-chat.com/policy" target="_blank" rel="noopener noreferrer">Policy</a>
+          <a href="https://roleplay-chat.com/faq" target="_blank" rel="noopener noreferrer">FAQ</a>
+          <a href="mailto:showmetheaitools@gmail.com">Contact</a>
+          <a href="https://2048global.com" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Game</a>
+          <a href="https://roleplay-chat.com/VPN" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">VPN</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ 2줄: Chatango 라인(오른쪽) -->
+    <div align="right">
+      <sup><a href="https://roleplay-chat.com/human" target="_blank" style="text-decoration:none">
+        <font size="1" color="#ffcc00"><b>Live user chat</b></font>
+      </a></sup><script id="cid0020000430144912743" data-cfasync="false" async
+        src="https://st.chatango.com/js/gz/emb.js"
+        style="width:200px;height:300px;">
+        {"handle":"roleplay-chat-com","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"cv":1,"cvfntsz":"10px","cvbg":"000000","cvfg":"ffcc00","cvw":49,"cvh":18}}
+      </script>
+    </div>
+
+  </div>
+</header>
+
+      <div class="sub">Create the most human-like character, Enjoy roleplay.<br>no-login. Private & Safe.</div>
+
+      <!-- VIEW 1: Character setup -->
+      <section id="viewSetup" class="card view active" aria-label="Character creation">
+        <div class="cardHead">
+          <h2>Character Setup</h2>
+          </div>
+
+        <div class="cardBody">
+          <form id="characterForm" class="grid" autocomplete="off">
+            <div>
+              <label for="name">Character Name <span style="color: #fff;">(required)</span></label>
+              <input id="name" name="name" type="text" required maxlength="40" placeholder="e.g., Luna, Detective Gray, Captain Nova" />
+            </div>
+
+            <div class="span2">
+              <label for="avatar">Profile Photo <span style="color: rgba(255,255,255,.55);">(optional)</span></label>
+              <input id="avatar" name="avatar" type="file" accept="image/*" />
+              <div class="hint">PNG/JPG/WebP recommended.</div>
+            </div>
+
+            <div class="span2">
+              <div class="preview" aria-label="Preview">
+                <div class="avatar" id="avatarPreview">
+  <button type="button" class="avatarClear" id="avatarClearBtn" aria-label="Remove photo" title="Remove">×</button>
+  <span>🙂</span>
+</div>
+                <div class="bubble">
+                  <div><b>Preview</b></div>
+                  <div style="margin-top:6px;">
+                    <span class="accent" id="namePreview" style="--chatColor: var(--chatColor);">Your character</span>
+                    <span style="color: var(--muted2);"> will appear like this in chat.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+  <label for="nickname">What should the character call you?</label>
+  <input id="nickname" name="nickname" type="text" maxlength="30" placeholder="e.g., babe, buddy, captain, darling" />
+</div>
+
+
+            <div>
+              <label for="age">Age</label>
+              <select id="age" name="age" required></select>
+            </div>
+
+            <div>
+              <label for="gender">Gender</label>
+              <select id="gender" name="gender" required>
+                <option value="Man">Man</option>
+                <option value="Woman">Woman</option>
+                <option value="None">None</option>
+                <option value="Gay">Gay</option>
+                <option value="Lesbian">Lesbian</option>
+                <option value="Bi">Bi</option>
+                <option value="Trans man">Trans man</option>
+                <option value="Trans woman">Trans woman</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="language">Language</label>
+              <select id="language" name="language" required>
+                <option value="English">English</option>
+                <option value="Spanish">Español</option>
+                <option value="Chinese">中文</option>
+                <option value="French">Français</option>
+                <option value="Portuguese">Português</option>
+                <option value="German">Deutsch</option>
+                <option value="Japanese">日本語</option>
+                <option value="Italian">Italiano</option>
+                <option value="Korean">한국어</option>
+                <option value="Dutch">Nederlands</option>
+                <option value="Russian">Русский</option>
+                <option value="Arabic">العربية</option>
+                <option value="Swedish">Svenska</option>
+                <option value="Norwegian">Norsk</option>
+                <option value="Danish">Dansk</option>
+              </select>
+            </div>
+
+            <div class="span2">
+  <label>Height & Weight</label>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+    <!-- Height -->
+    <div>
+      <label for="heightUnit" style="font-size:12px; color: var(--muted); font-weight:600;">Height unit</label>
+      <select id="heightUnit" name="heightUnit" required>
+        <option value="cm">cm</option>
+        <option value="ft">ft/in</option>
+      </select>
+    </div>
+
+    <div id="heightCmWrap">
+      <label for="heightCm" style="font-size:12px; color: var(--muted); font-weight:600;">Height (cm)</label>
+      <input id="heightCm" type="number" min="50" max="260" placeholder="e.g., 170" />
+    </div>
+
+    <div id="heightFtWrap" style="display:none;">
+      <label style="font-size:12px; color: var(--muted); font-weight:600;">Height (ft/in)</label>
+      <div class="row">
+        <input id="heightFt" type="number" min="3" max="8" placeholder="ft" />
+        <input id="heightIn" type="number" min="0" max="11" placeholder="in" />
+      </div>
+    </div>
+
+    <!-- Weight -->
+    <div>
+      <label for="weightUnit" style="font-size:12px; color: var(--muted); font-weight:600;">Weight unit</label>
+      <select id="weightUnit" name="weightUnit" required>
+        <option value="kg">kg</option>
+        <option value="lb">lb</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="weightValue" style="font-size:12px; color: var(--muted); font-weight:600;">Weight</label>
+      <input id="weightValue" type="number" min="20" max="500" placeholder="e.g., 60" />
+    </div>
+  </div>
+
+  <div class="hint">Used as character traits for roleplay prompts.</div>
+</div>
+
+
+            <div>
+  <label for="mbti">MBTI</label>
+  <select id="mbti" name="mbti" required>
+    <option value="NONE" selected>Not sure</option>
+    <option value="INTJ">INTJ</option><option value="INTP">INTP</option>
+    <option value="ENTJ">ENTJ</option><option value="ENTP">ENTP</option>
+    <option value="INFJ">INFJ</option><option value="INFP">INFP</option>
+    <option value="ENFJ">ENFJ</option><option value="ENFP">ENFP</option>
+    <option value="ISTJ">ISTJ</option><option value="ISFJ">ISFJ</option>
+    <option value="ESTJ">ESTJ</option><option value="ESFJ">ESFJ</option>
+    <option value="ISTP">ISTP</option><option value="ISFP">ISFP</option>
+    <option value="ESTP">ESTP</option><option value="ESFP">ESFP</option>
+  </select>
+</div>
+
+
+            <div class="span2">
+              <label for="personality">Personality</label>
+              <textarea id="personality" name="personality" maxlength="300" placeholder="Describe their personality, tone, quirks, and boundaries... the more specific, the more fun and alive they become."></textarea>
+              <div class="hint"><span id="pCount">0</span>/300</div>
+            </div>
+
+            <div class="span2">
+              <label for="scenario">Place & Situation</label>
+              <textarea id="scenario" name="scenario" maxlength="300" placeholder="Where are you? What's happening? Set the scene... the more specific, the more fun and alive they become."></textarea>
+              <div class="hint"><span id="sCount">0</span>/300</div>
+            </div>
+
+            <div class="span2">
+              <label>Font Color</label>
+              <div class="colors" id="colorGrid" role="listbox" aria-label="Font color options"></div>
+              <div class="hint">This color will be used to display the character name in chat.</div>
+            </div>
+
+
+            <div class="span2">
+              <label>Chat Option <span style="color:#ff3b3b; font-weight:800; margin-left:6px;">(Secret price 50% off)</span></label>
+              <div class="pillGroup" role="radiogroup" aria-label="Chat option">
+                <label class="pill">
+                  <input type="radio" name="tier" value="general" checked/>
+                  <div>
+                    <div><b>General text chat</b> <small>(free)</small></div>
+                  </div>
+                </label>
+
+                <label class="pill">
+                  <input type="radio" name="tier" value="uncensored" />
+                  <div>
+                    <div>
+      <b>+18 Uncensored text chat</b> <small>
+  <del style="opacity:.6;">($2)</del>
+  <span style="color:#ff3b3b; font-weight:800; margin-left:6px;">
+    ($1) 50% OFF
+  </span>
+</small><br>
+      <small style="opacity:.65; font-size:10px; margin:0 4px;"> Lifetime + unlimited + high performance</small>
+    </div>
+                  </div>
+                </label>
+
+<label class="pill recommend">
+  <input type="radio" name="tier" value="imagechat" />
+  <div>
+    <div>
+      <b>🔥 +18 Uncensored <span style="color:#ff3b3b;">Image</span> Chat (24hrs limit)</b>
+      <small class="pillTag">Most Popular</small>
+      <small>
+  <del style="opacity:.6;">($6.9)</del>
+  <span style="color:#ff3b3b; font-weight:800; margin-left:6px;">
+    ($3.45) 50% OFF
+  </span>
+</small>
+    </div>
+  </div>
+</label>
+
+ <label class="pill">
+  <input type="radio" name="tier" value="imagechat_unlimited" />
+  <div>
+    <div>
+      <b>🔥 +18 Uncensored <span style="color:#ff3b3b;">Image</span> Chat (Unlimited)</b> <small>
+  <del style="opacity:.6;">($25)</del>
+  <span style="color:#ff3b3b; font-weight:800; margin-left:6px;">
+    ($12.5) 50% OFF
+  </span>
+</small>
+      <small style="opacity:.65; font-size:10px; margin:0 4px;"> Lifetime</small>
+    </div>
+  </div>
+</label>
+              
+
+              </div>
+            </div>
+
+            <div class="note">
+  No login. Your character is kept per browser tab.<br />
+  <span style="opacity:.8;">
+    The conversation will remain available for the lifetime of this browser tab (except for image chat for 24hrs option) as long as it stays open. This is an anonymous chat and is not stored on the server.
+  </span>
+</div>
+
+
+              <div class="actions">
+                <button id="createBtn" class="btn btnPrimary" type="submit">Create</button>
+              </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- VIEW 2: Chat (placeholder) -->
+     <section id="viewChat" class="card view" aria-label="Chat">
+ <div class="cardHead chatHead">
+  <h2 id="chatTitle">Chat</h2>
+
+  <div class="row" style="gap:10px;">
+    <button class="xBtn" id="resetBtn" type="button">New character</button>
+    <button class="xBtn" id="gameBtn" type="button">Game</button>
+    <button class="xBtn" id="vpnBtn" type="button">VPN</button>
+    <button class="xBtn" id="unlockBtn" type="button" style="display:none;">Unlock</button>
+  </div>
+</div>
+
+  <div class="cardBody">
+    <div class="chatShell">
+      <!-- ❌ 여기 있던 chatTop 블록은 제거됨 -->
+
+      <div class="chatBox" id="chatBox"></div>
+
+      <div class="chatControls">
+        <input class="chatInput" id="chatInput" type="text" placeholder="Type a message ..." />
+        <button class="sendBtn" id="sendBtn" type="button" title="Send">➤</button>
+      </div>
+
+      <div class="chatFooter">
+        Convos available while this tab is open
+      </div>
+    </div>
+  </div>
+</section>
+
+
+    </div>
+  </div>
+
+  <!-- Paywall Modal -->
+  <div id="payModal" class="modalOverlay" role="dialog" aria-modal="true" aria-label="+18 Uncensored payment">
+    <div class="modal">
+      <div class="modalHeader">
+        <h3 id="payTitle">Unlock +18 Uncensored ($2)</h3>
+        <button class="xBtn" id="closePay" type="button">Close</button>
+      </div>
+      <div class="modalBody">
+        <p class="warn">
+          - <span class="highlightCTA">Unlock <b id="payCharName">your character</b></span> and unleash yourself.<br>
+          - <span class="highlightCTA">Fully uncensored</span> experience.<br>
+          - <span class="highlightCTA">Longer replies. Richer memory.</span><br>
+          - <span class="highlightCTA">More detail. More tension.</span><br>
+          - Secure one-time payment.<br>
+          - Unlimited access as long as this tab stays open.<br>
+          - No-login. Private and anonymous.<br>
+          - Payment = Auto age verification.<br>
+          - Shows as 'Playing game' on payment statement.<br>
+          - <span class="highlightCTA">Start now. Instant access.</span>
+        </p>
+
+        <div id="paypalButtons"></div>
+
+        <div class="ok" id="payOk">Payment successful. Entering chat…</div>
+        <div class="error" id="payErr">Payment failed or cancelled. Please try again.</div>
+      </div>
+    </div>
+  </div>
+
+<!-- Image Chat Paywall Modal (NEW, separate) -->
+<div id="imgPayModal" class="modalOverlay" role="dialog" aria-modal="true" aria-label="Image chat payment">
+  <div class="modal">
+    <div class="modalHeader">
+      <h3 id="imgPayTitle">Ucensored Image Chat 24hrs ($6.9)</h3>
+      <button class="xBtn" id="closeImgPay" type="button">Close</button>
+    </div>
+    <div class="modalBody">
+      <p class="warn" id="imgPayDesc">
+          - <span class="highlightCTA">Let your character come alive.</span><br>
+          - <span class="highlightCTA">Enter a New world.</span><br>
+          - <span class="highlightCTA">Real-time Image generating chat.</span><br>
+          - <span class="highlightCTA">Available for 24hrs.</span> (Time limit)<br>
+          - <span class="highlightCTA">Unlimited image generation during chat</span><br>
+          - <span class="highlightCTA">Fully uncensored</span><br>
+           - Unlimited access as long as this tab stays open.<br>
+          - Image Gen matching the roleplay context.<br>
+          - Longer replies. Richer memory.<br>
+          - More detail. More tension.<br>
+          - Secure one-time payment.<br>
+          - No-login. Private and anonymous.<br>
+          - Payment = Auto age verification.<br>
+          - Shows as 'Playing game' on payment statement.<br>
+          - <span class="highlightCTA">Start now. Instant access.</span>
+      </p>
+
+      <div id="imgPaypalButtons"></div>
+
+      <div class="ok" id="imgPayOk">Payment successful. Entering image chat…</div>
+      <div class="error" id="imgPayErr">Payment failed or cancelled. Please try again.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Chat Unlimited Paywall Modal (NEW, separate) -->
+<div id="imgUnlimitedPayModal" class="modalOverlay" role="dialog" aria-modal="true" aria-label="Image chat unlimited payment">
+  <div class="modal">
+    <div class="modalHeader">
+      <h3 id="imgUnlimitedPayTitle">Uncensored Image Chat Unlimited ($25)</h3>
+      <button class="xBtn" id="closeImgUnlimitedPay" type="button">Close</button>
+    </div>
+    <div class="modalBody">
+      <p class="warn" id="imgUnlimitedPayDesc">
+          - <span class="highlightCTA">Unlimited image chat</span> (no time limit)<br>
+          - <span class="highlightCTA">Real-time Image generating chat.</span><br>
+          - <span class="highlightCTA">Available for lifetime</span><br>
+          - <span class="highlightCTA">Unlimited image generation during chat</span><br>
+          - <span class="highlightCTA">Fully uncensored</span><br>
+          - Unlimited access as long as this tab stays open.<br>
+          - Image Gen matching the roleplay context.<br>
+          - Longer replies. Richer memory.<br>
+          - More detail. More tension.<br>
+          - Secure one-time payment.<br>
+          - No-login. Private and anonymous.<br>
+          - Payment = Auto age verification.<br>
+          - Shows as 'Playing game' on payment statement.<br>
+          - <span class="highlightCTA">Start now. Instant access.</span>
+      </p>
+
+      <div id="imgUnlimitedPaypalButtons"></div>
+
+      <div class="ok" id="imgUnlimitedPayOk">Payment successful. Entering unlimited image chat…</div>
+      <div class="error" id="imgUnlimitedPayErr">Payment failed or cancelled. Please try again.</div>
+    </div>
+  </div>
+</div>
+
+
+
+  <script>
+    // --------- Helpers
+    const $ = (q) => document.querySelector(q);
+    const $$ = (q) => Array.from(document.querySelectorAll(q));
+
+    const DEFAULT_TITLE = "roleplay-chat.com | No-login AI Roleplay"; // (3) ADDED
+    document.title = DEFAULT_TITLE; // (3) ADDED
+
+    const viewSetup = $("#viewSetup");
+    const viewChat = $("#viewChat");
+
+    const form = $("#characterForm");
+    const nameInput = $("#name");
+    const personality = $("#personality");
+    const scenario = $("#scenario");
+    const pCount = $("#pCount");
+    const sCount = $("#sCount");
+
+    const ageSelect = $("#age");
+    const avatarInput = $("#avatar");
+    const avatarPreview = $("#avatarPreview");
+    const avatarClearBtn = $("#avatarClearBtn");
+    const namePreview = $("#namePreview");
+
+    const payModal = $("#payModal");
+    const closePay = $("#closePay");
+    const payOk = $("#payOk");
+    const payErr = $("#payErr");
+
+    const imgPayModal = $("#imgPayModal");
+    const closeImgPay = $("#closeImgPay");
+    const imgPayOk = $("#imgPayOk");
+    const imgPayErr = $("#imgPayErr");
+
+    const imgUnlimitedPayModal = $("#imgUnlimitedPayModal");
+const closeImgUnlimitedPay = $("#closeImgUnlimitedPay");
+const imgUnlimitedPayOk = $("#imgUnlimitedPayOk");
+const imgUnlimitedPayErr = $("#imgUnlimitedPayErr");
+
+    const modelBadge = $("#modelBadge");
+const chipName = $("#chipName");
+const chipLang = $("#chipLang");
+const chipTier = $("#chipTier");
+const chatName = $("#chatName");
+const chatAvatar = $("#chatAvatar");
+    
+    const resetBtn = $("#resetBtn");
+    const gameBtn = $("#gameBtn");
+    const vpnBtn = $("#vpnBtn");
+    const unlockBtn = $("#unlockBtn");
+
+    const STORAGE_KEY = "roleplay-chat_session_v1";
+    const HISTORY_KEY = "roleplay-chat_history_v1";
+    const PENDING_KEY = "roleplay-chat_pending_session_v1";
+    const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
+    const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
+
+    // Share button
+const shareBtn = document.querySelector("#shareBtn");
+if (shareBtn){
+  shareBtn.addEventListener("click", async () => {
+    const url = window.location.href;
+    try{
+      if (navigator.share){
+        await navigator.share({ title: document.title, url });
+      }else{
+        await navigator.clipboard.writeText(url);
+        // optional tiny feedback
+        shareBtn.title = "Copied!";
+        setTimeout(() => (shareBtn.title = "Share"), 900);
+      }
+    }catch(e){
+      // user cancelled or blocked
+    }
+  });
+}
+
+    // Info button dropdown ✅ (여기!)
+const infoBtn = document.querySelector("#infoBtn");
+const infoMenu = document.querySelector("#infoMenu");
+
+function closeInfoMenu(){
+  if (infoMenu) infoMenu.classList.remove("active");
+}
+
+if (infoBtn && infoMenu){
+  infoBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    infoMenu.classList.toggle("active");
+  });
+
+  infoMenu.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  document.addEventListener("click", closeInfoMenu);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeInfoMenu();
+  });
+}
+    
+    // Colors: bright & readable colors
+    const colorOptions = [
+      { name: "White", value: "#ffffff" },
+      { name: "Sky Blue", value: "#5cc8ff" },
+      { name: "Mint", value: "#5cffc4" },
+      { name: "Lime", value: "#b8ff5c" },
+      { name: "Yellow", value: "#ffd95c" },
+      { name: "Orange", value: "#ff9f5c" },
+      { name: "Pink", value: "#ff7ac8" },
+      { name: "Violet", value: "#b68cff" },
+    ];
+
+    let selectedColor = colorOptions[4].value;
+    let selectedColorName = colorOptions[4].name;
+
+    // --------- Init: age options 18..200
+    for (let i = 18; i <= 200; i++){
+      const opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = String(i);
+      ageSelect.appendChild(opt);
+    }
+    ageSelect.value = "18";
+
+    // --------- Init: colors grid
+    const colorGrid = $("#colorGrid");
+    function renderColors(){
+      colorGrid.innerHTML = "";
+      colorOptions.forEach((c, idx) => {
+        const div = document.createElement("div");
+        div.className = "swatch";
+        div.style.background = c.value;
+        div.setAttribute("role", "option");
+        div.setAttribute("tabindex", "0");
+        div.setAttribute("aria-label", c.name);
+        div.setAttribute("aria-selected", String(c.value === selectedColor));
+        div.dataset.value = c.value;
+        div.dataset.name = c.name;
+        div.innerHTML = `<div class="check">✓</div>`;
+        div.addEventListener("click", () => chooseColor(c.value, c.name));
+        div.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            chooseColor(c.value, c.name);
+          }
+        });
+        colorGrid.appendChild(div);
+      });
+      applyPreviewColor();
+    }
+    function chooseColor(val, name){
+      selectedColor = val;
+      selectedColorName = name;
+      $$("#colorGrid .swatch").forEach(el => el.setAttribute("aria-selected", String(el.dataset.value === selectedColor)));
+      applyPreviewColor();
+    }
+    function applyPreviewColor(){
+      document.documentElement.style.setProperty("--chatColor", selectedColor);
+      namePreview.textContent = nameInput.value.trim() || "Your character";
+    }
+    renderColors();
+
+    const heightUnit = $("#heightUnit");
+const heightCmWrap = $("#heightCmWrap");
+const heightFtWrap = $("#heightFtWrap");
+
+heightUnit.addEventListener("change", () => {
+  const isCm = heightUnit.value === "cm";
+  heightCmWrap.style.display = isCm ? "block" : "none";
+  heightFtWrap.style.display = isCm ? "none" : "block";
+});
+
+    // --------- Counters
+    function updateCounts(){
+      pCount.textContent = String(personality.value.length);
+      sCount.textContent = String(scenario.value.length);
+    }
+    personality.addEventListener("input", updateCounts);
+    scenario.addEventListener("input", updateCounts);
+    updateCounts();
+
+    // --------- Name preview
+    nameInput.addEventListener("input", applyPreviewColor);
+
+    async function resizeImageToDataURL(file, {
+  maxSize = 512,      // 가로/세로 최대 픽셀
+  quality = 0.78,     // JPEG 품질 (0~1)
+  mime = "image/jpeg" // 저장 포맷
+} = {}){
+  // 이미지 디코드 (iOS 호환 위해 createImageBitmap 대신 Image 사용)
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(file);
+
+  try{
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = objectUrl;
+    });
+
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+
+    // 비율 유지 리사이즈
+    let nw = w;
+    let nh = h;
+    if (w > h && w > maxSize){
+      nw = maxSize;
+      nh = Math.round(h * (maxSize / w));
+    } else if (h >= w && h > maxSize){
+      nh = maxSize;
+      nw = Math.round(w * (maxSize / h));
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = nw;
+    canvas.height = nh;
+    const ctx = canvas.getContext("2d", { alpha: false });
+
+    // 크기 줄일 때 품질 개선(지원되는 브라우저에서만)
+    if (ctx && "imageSmoothingEnabled" in ctx){
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+    }
+
+    ctx.drawImage(img, 0, 0, nw, nh);
+
+    // JPEG로 변환 (용량 크게 줄어듦)
+    return canvas.toDataURL(mime, quality);
+  } finally{
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+
+   // --------- Avatar preview
+let avatarDataUrl = "";
+
+function clearAvatar(){
+  avatarDataUrl = "";
+  avatarInput.value = ""; // 파일 인풋 비우기
+
+  avatarPreview.innerHTML = `
+    <button type="button"
+            class="avatarClear"
+            id="avatarClearBtn"
+            aria-label="Remove photo"
+            title="Remove">×</button>
+    <span>🙂</span>
+  `;
+
+  const b = document.getElementById("avatarClearBtn");
+  if (b) b.style.display = "none";
+}
+
+avatarInput.addEventListener("change", async () => {
+  const file = avatarInput.files && avatarInput.files[0];
+
+  // 파일 선택 취소/비움
+  if (!file){
+    clearAvatar();
+    return;
+  }
+
+  avatarPreview.innerHTML = "<span>⏳</span>";
+
+  try{
+    avatarDataUrl = await resizeImageToDataURL(file, { maxSize: 512, quality: 0.78 });
+
+    avatarPreview.innerHTML = `
+      <button type="button"
+              class="avatarClear"
+              id="avatarClearBtn"
+              aria-label="Remove photo"
+              title="Remove">×</button>
+      <img alt="Profile preview" src="${avatarDataUrl}">
+    `;
+
+    const btn = document.getElementById("avatarClearBtn");
+    if (btn){
+      btn.style.display = "flex";
+      btn.addEventListener("click", clearAvatar);
+    }
+  }catch(e){
+    console.error(e);
+    clearAvatar();
+    alert("Couldn’t load this image.");
+  }
+});
+
+// 처음 로드시 기본 상태 확실히
+clearAvatar();
+
+
+
+    // --------- View switching
+function show(view){
+  viewSetup.classList.remove("active");
+  viewChat.classList.remove("active");
+  view.classList.add("active");
+
+  document.body.classList.toggle("chatMode", view === viewChat);
+
+  if (view === viewSetup) document.title = DEFAULT_TITLE;
+
+  // ✅ 채팅뷰로 들어갈 때마다 controlsH 재측정 (핵심)
+  if (view === viewChat){
+    requestAnimationFrame(() => {
+      setupKeyboardBar(); // 재호출
+    });
+  }
+}
+
+    // --------- Save & load (tab-scoped)
+    function saveSession(data){
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+    function loadSession(){
+      try{
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      }catch(e){
+        return null;
+      }
+    }
+    function clearSession(){
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
+
+    function savePending(session){
+  sessionStorage.setItem(PENDING_KEY, JSON.stringify(session));
+}
+function loadPending(){
+  try{
+    const raw = sessionStorage.getItem(PENDING_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    return null;
+  }
+}
+function clearPending(){
+  sessionStorage.removeItem(PENDING_KEY);
+}
+
+
+    // --------- Save & load (chat history, tab-scoped)
+function saveHistory(history){
+  sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+function loadHistory(){
+  try{
+    const raw = sessionStorage.getItem(HISTORY_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){
+    return [];
+  }
+}
+function clearHistory(){
+  sessionStorage.removeItem(HISTORY_KEY);
+}
+
+    // --------- Fill chat view (NULL-SAFE)
+function enterChat(session){
+  // ✅ 채팅 타이틀 변경
+  const chatTitle = document.getElementById("chatTitle");
+  if (chatTitle){
+    chatTitle.textContent = `Chat with ${session.name}`;
+  }
+  // Basic display
+  const tierLabel = session.tier === "uncensored" ? "+18 Uncensored" : "General";
+  // const modelLabel = session.tier === "uncensored" ? "Venice Uncensored" : "DeepSeek"; // 필요 없으면 주석 유지
+
+  // ✅ UI 요소가 있어도/없어도 에러 안 나게 (Name/Language/Tier 칩)
+  if (chipName) chipName.textContent = "Name: " + session.name;
+  if (chipLang) chipLang.textContent = "Language: " + session.language;
+  if (chipTier) chipTier.textContent = "Tier: " + tierLabel;
+
+  // ✅ 채팅에서 사용할 이름/색
+  if (chatName) chatName.textContent = session.name;
+  document.documentElement.style.setProperty("--chatColor", session.fontColor || "#000000");
+
+  // ✅ 탭 타이틀
+  document.title = session.name + " | roleplay-chat.com";
+
+  // ✅ 아바타 (DOM이 없어도 에러 안 나게)
+  if (chatAvatar){
+    chatAvatar.innerHTML = session.avatarDataUrl
+      ? `<img alt="Profile" src="${session.avatarDataUrl}">`
+      : "🙂";
+  }
+
+  // ✅ 화면 전환
+  show(viewChat);
+
+setUnlockUIVisibility();
+
+  // ✅ history restore
+  chatHistory = loadHistory();
+
+  // 채팅 UI 비우고 다시 그리기
+  const box = document.getElementById("chatBox");
+  if (box){
+    box.innerHTML = "";
+    for (const m of chatHistory){
+      appendMsg(m.role, m.content);
+    }
+    box.scrollTop = box.scrollHeight;
+  }
+  // ✅ 처음 입장 & 히스토리 없을 때만: TS에 첫 인사 요청
+  if (!chatHistory || chatHistory.length === 0){
+    (async () => {
+      try{
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            init: true,
+            tier: session.tier,
+            character: {
+              name: session.name,
+              nickname: session.nickname,
+              age: Number(session.age),
+              gender: session.gender,
+              language: session.language,
+              height: session.height,
+              weight: session.weight,
+              mbti: session.mbti,
+              personality: session.personality,
+              scenario: session.scenario
+            },
+            history: []
+          })
+        });
+
+        const data = await res.json();
+        appendMsg("assistant", data.reply);
+        chatHistory = [{ role: "assistant", content: data.reply }];
+        saveHistory(chatHistory);
+      }catch(e){
+        console.error(e);
+      }
+    })();
+  }
+}
+
+
+    // --------- Paywall modal controls
+    function openPayModal(){
+      payErr.style.display = "none";
+      payOk.style.display = "none";
+      payModal.classList.add("active");
+    }
+    function closePayModal(){
+      payModal.classList.remove("active");
+      clearPending();
+    }
+    closePay.addEventListener("click", closePayModal);
+    payModal.addEventListener("click", (e) => {
+      if (e.target === payModal) closePayModal();
+    });
+
+function openImgPayModal(){
+  if (imgPayErr) imgPayErr.style.display = "none";
+  if (imgPayOk) imgPayOk.style.display = "none";
+  if (imgPayModal) imgPayModal.classList.add("active");
+}
+
+function closeImgPayModalFn(){
+  if (imgPayModal) imgPayModal.classList.remove("active");
+  // imagechat 결제는 pending을 유지해도 되지만, 닫으면 취소로 보고 지우는 게 깔끔
+  clearPending();
+}
+
+if (closeImgPay){
+  closeImgPay.addEventListener("click", closeImgPayModalFn);
+}
+if (imgPayModal){
+  imgPayModal.addEventListener("click", (e) => {
+    if (e.target === imgPayModal) closeImgPayModalFn();
+  });
+}
+
+function openImgUnlimitedPayModal(){
+  if (imgUnlimitedPayErr) imgUnlimitedPayErr.style.display = "none";
+  if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "none";
+  if (imgUnlimitedPayModal) imgUnlimitedPayModal.classList.add("active");
+}
+
+function closeImgUnlimitedPayModalFn(){
+  if (imgUnlimitedPayModal) imgUnlimitedPayModal.classList.remove("active");
+  clearPending();
+}
+
+if (closeImgUnlimitedPay){
+  closeImgUnlimitedPay.addEventListener("click", closeImgUnlimitedPayModalFn);
+}
+if (imgUnlimitedPayModal){
+  imgUnlimitedPayModal.addEventListener("click", (e) => {
+    if (e.target === imgUnlimitedPayModal) closeImgUnlimitedPayModalFn();
+  });
+}
+    
+
+// Image-chat 전용 PayPal 버튼 렌더 (기존 mountPayPalButtons와 거의 동일, 렌더 위치만 다름)
+function mountPayPalButtonsImageChat(onSuccess, priceUsd = "3.45", description = "Playing image game"){
+  const container = document.querySelector("#imgPaypalButtons");
+  container.innerHTML = "";
+
+  if (!window.paypal){
+    if (imgPayErr){
+      imgPayErr.textContent = "PayPal SDK failed to load. Please refresh and try again.";
+      imgPayErr.style.display = "block";
+    }
+    return;
+  }
+
+  window.paypal.Buttons({
+    style: { layout: "vertical", shape: "pill" },
+    createOrder: (data, actions) => {
+      return actions.order.create({
+        purchase_units: [{
+          description,
+          amount: { value: String(priceUsd), currency_code: "USD" }
+        }]
+      });
+    },
+    onApprove: async (data, actions) => {
+      try{
+        await actions.order.capture();
+        if (imgPayOk){
+          imgPayOk.style.display = "block";
+        }
+        if (imgPayErr) imgPayErr.style.display = "none";
+
+        setTimeout(() => {
+          closeImgPayModalFn();
+          onSuccess();
+        }, 600);
+      }catch(err){
+        if (imgPayErr){
+          imgPayErr.textContent = "Payment capture failed. Please try again.";
+          imgPayErr.style.display = "block";
+        }
+        if (imgPayOk) imgPayOk.style.display = "none";
+      }
+    },
+    onCancel: () => {
+      if (imgPayErr){
+        imgPayErr.textContent = "Payment cancelled.";
+        imgPayErr.style.display = "block";
+      }
+      if (imgPayOk) imgPayOk.style.display = "none";
+    },
+    onError: () => {
+      if (imgPayErr){
+        imgPayErr.textContent = "Payment error. Please try again.";
+        imgPayErr.style.display = "block";
+      }
+      if (imgPayOk) imgPayOk.style.display = "none";
+    }
+  }).render("#imgPaypalButtons");
+}
+
+
+function mountPayPalButtonsImageChatUnlimited(onSuccess, priceUsd = "12.50", description = "Upgrade game"){
+  const container = document.querySelector("#imgUnlimitedPaypalButtons");
+  container.innerHTML = "";
+
+  if (!window.paypal){
+    if (imgUnlimitedPayErr){
+      imgUnlimitedPayErr.textContent = "PayPal SDK failed to load. Please refresh and try again.";
+      imgUnlimitedPayErr.style.display = "block";
+    }
+    return;
+  }
+
+  window.paypal.Buttons({
+    style: { layout: "vertical", shape: "pill" },
+    createOrder: (data, actions) => {
+      return actions.order.create({
+        purchase_units: [{
+          description,
+          amount: { value: String(priceUsd), currency_code: "USD" }
+        }]
+      });
+    },
+    onApprove: async (data, actions) => {
+      try{
+        await actions.order.capture();
+        if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "block";
+        if (imgUnlimitedPayErr) imgUnlimitedPayErr.style.display = "none";
+
+        setTimeout(() => {
+          closeImgUnlimitedPayModalFn();
+          onSuccess();
+        }, 600);
+      }catch(err){
+        if (imgUnlimitedPayErr){
+          imgUnlimitedPayErr.textContent = "Payment capture failed. Please try again.";
+          imgUnlimitedPayErr.style.display = "block";
+        }
+        if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "none";
+      }
+    },
+    onCancel: () => {
+      if (imgUnlimitedPayErr){
+        imgUnlimitedPayErr.textContent = "Payment cancelled.";
+        imgUnlimitedPayErr.style.display = "block";
+      }
+      if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "none";
+    },
+    onError: () => {
+      if (imgUnlimitedPayErr){
+        imgUnlimitedPayErr.textContent = "Payment error. Please try again.";
+        imgUnlimitedPayErr.style.display = "block";
+      }
+      if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "none";
+    }
+  }).render("#imgUnlimitedPaypalButtons");
+}
+
+
+
+    // --------- PayPal Buttons (client-only demo)
+function mountPayPalButtons(onSuccess, priceUsd = "1.00", description = "Playing game"){
+  const container = $("#paypalButtons");
+  container.innerHTML = "";
+  if (!window.paypal){
+    payErr.textContent = "PayPal SDK failed to load. Please refresh and try again.";
+    payErr.style.display = "block";
+    return;
+  }
+
+  window.paypal.Buttons({
+    style: { layout: "vertical", shape: "pill" },
+    createOrder: (data, actions) => {
+      return actions.order.create({
+        purchase_units: [{
+          description,
+          amount: { value: String(priceUsd), currency_code: "USD" }
+        }]
+      });
+    },
+    onApprove: async (data, actions) => {
+      try{
+        await actions.order.capture();
+        payOk.style.display = "block";
+        payErr.style.display = "none";
+        setTimeout(() => {
+          closePayModal();
+          onSuccess();
+        }, 600);
+      }catch(err){
+        payErr.textContent = "Payment capture failed. Please try again.";
+        payErr.style.display = "block";
+        payOk.style.display = "none";
+      }
+    },
+    onCancel: () => {
+      payErr.textContent = "Payment cancelled.";
+      payErr.style.display = "block";
+      payOk.style.display = "none";
+    },
+    onError: () => {
+      payErr.textContent = "Payment error. Please try again.";
+      payErr.style.display = "block";
+      payOk.style.display = "none";
+    }
+  }).render("#paypalButtons");
+}
+
+
+    // =========================
+    // ADDED: chat.ts connection
+    // =========================
+    const chatInput = $("#chatInput");
+    const sendBtn = $("#sendBtn");
+
+    let chatHistory = []; // {role:"user"|"assistant", content:string}
+    const PAYMENT_KEY = "roleplay-chat_paid_v1";
+    let paymentStatus = sessionStorage.getItem(PAYMENT_KEY) || "unpaid"; // refresh-safe within this tab
+
+    function appendMsg(role, content){
+      const currentSession = loadSession();
+const assistantName = (currentSession && currentSession.name) || "Character";
+      
+      const msg = document.createElement("div");
+      msg.className = "chatMsg";
+
+      // (4) ADDED: user messages on right
+      if (role === "user") msg.classList.add("me");
+
+      const who = document.createElement("div");
+      who.className = "who";
+
+who.innerHTML = (role === "assistant")
+  ? (currentSession && currentSession.avatarDataUrl
+      ? `<img alt="Profile" src="${currentSession.avatarDataUrl}">`
+      : "🙂")
+  : "<span>YOU</span>";
+
+      const bubble = document.createElement("div");
+      bubble.className = "text";
+
+      if (role === "assistant"){
+        // (2) CHANGED: assistant content color uses --chatColor too
+        bubble.innerHTML = `<div class="name" style="color: var(--chatColor);">${assistantName}</div>
+                            <div style="margin-top:6px; color: var(--chatColor); white-space:pre-wrap;"></div>`;
+      } else {
+        bubble.innerHTML = `<div style="font-weight:800; margin-bottom:6px;">You</div>
+                            <div style="color: rgba(255,255,255,.86); white-space:pre-wrap;"></div>`;
+      }
+
+      bubble.querySelector("div:last-child").textContent = content;
+
+      msg.appendChild(who);
+      msg.appendChild(bubble);
+      $("#chatBox").appendChild(msg);
+      $("#chatBox").scrollTop = $("#chatBox").scrollHeight;
+      return msg; // ✅ 이 줄 추가
+    }
+
+    async function typeWriter(targetEl, text, speed = 18){
+  targetEl.textContent = "";
+  for (let i = 0; i < text.length; i++){
+    targetEl.textContent += text[i];
+    $("#chatBox").scrollTop = $("#chatBox").scrollHeight;
+    await new Promise(r => setTimeout(r, speed));
+  }
+}
+
+    async function sendToChatApi(text){
+      const session = loadSession();
+      if (!session) throw new Error("No session");
+
+      const tier = session.tier === "uncensored" ? "uncensored" : "general";
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tier,
+          paymentStatus: tier === "uncensored" ? paymentStatus : undefined,
+          character: {
+            name: session.name,
+            nickname: session.nickname,
+            age: Number(session.age),
+            gender: session.gender,
+            language: session.language,
+            height: session.height,
+            weight: session.weight,
+            mbti: $("#mbti").value,
+            personality: session.personality,
+            scenario: session.scenario
+          },
+          message: text,
+          history: chatHistory
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.error || `Request failed (${res.status})`);
+      }
+      return data.reply;
+    }
+
+    async function handleSend(){
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      chatInput.value = "";
+      appendMsg("user", text);
+      chatHistory.push({ role: "user", content: text });
+saveHistory(chatHistory);
+
+      try{
+        sendBtn.disabled = true;
+        chatInput.disabled = true;
+
+        const reply = await sendToChatApi(text);
+
+        const msgEl = appendMsg("assistant", ""); // 빈 메시지 먼저 만들고
+const textEl = msgEl.querySelector(".text div:last-child"); // 본문 div 잡기
+await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
+chatHistory.push({ role: "assistant", content: reply });
+saveHistory(chatHistory);
+        
+      }catch(e){
+        appendMsg("assistant", `Error: ${String(e.message || e)}`);
+      }finally{
+        sendBtn.disabled = false;
+        chatInput.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    sendBtn.addEventListener("click", handleSend);
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter"){
+        e.preventDefault();
+        handleSend();
+      }
+    });
+    chatInput.addEventListener("focus", () => {
+  setTimeout(() => {
+    const box = document.getElementById("chatBox");
+    box.scrollTop = box.scrollHeight;
+  }, 50);
+});
+
+
+    // --------- Submit flow
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = nameInput.value.trim();
+  if (!name){
+    nameInput.focus();
+    return;
+  }
+
+  const tier = (form.querySelector('input[name="tier"]:checked') || {}).value || "general";
+
+  const session = {
+    name,
+    nickname: $("#nickname").value.trim(),
+    age: ageSelect.value,
+    gender: $("#gender").value,
+    language: $("#language").value,
+    height: {
+      unit: $("#heightUnit").value,
+      cm: $("#heightCm").value ? Number($("#heightCm").value) : null,
+      ft: $("#heightFt").value ? Number($("#heightFt").value) : null,
+      in: $("#heightIn").value ? Number($("#heightIn").value) : null
+    },
+    weight: {
+      unit: $("#weightUnit").value,
+      value: $("#weightValue").value ? Number($("#weightValue").value) : null
+    },
+    mbti: $("#mbti").value,
+    personality: personality.value.trim(),
+    scenario: scenario.value.trim(),
+    fontColor: selectedColor,
+    fontColorName: selectedColorName,
+    avatarDataUrl: avatarDataUrl || "",
+    tier,
+    createdAt: Date.now()
+  };
+
+  if (tier === "general"){
+    // ✅ 무료는 즉시 확정 저장
+    try{
+      saveSession(session);
+    }catch(e){
+      console.error(e);
+      session.avatarDataUrl = "";
+      try{ saveSession(session); }catch(_){}
+    }
+    enterChat(session);
+    return;
+  }
+
+  if (tier === "uncensored"){
+    // ✅ 유료(uncensored)는 결제 전까지 저장 금지 (pending)
+    savePending(session);
+
+    openPayModal();
+    mountPayPalButtons(() => {
+      paymentStatus = "paid";
+      sessionStorage.setItem(PAYMENT_KEY, "paid");
+
+      // ✅ 결제 성공 시점에만 저장
+      session.tier = "uncensored";
+      try{
+        saveSession(session);
+      }catch(e){
+        console.error(e);
+        session.avatarDataUrl = "";
+        try{ saveSession(session); }catch(_){}
+      }
+
+      clearPending();
+      enterChat(session);
+    }, "1.00", "Playing game");
+    return;
+  }
+
+  if (tier === "imagechat"){
+    savePending(session);
+
+    openImgPayModal();
+    mountPayPalButtonsImageChat(() => {
+      sessionStorage.setItem(IMAGECHAT_PAID_KEY, "paid");
+
+      session.tier = "imagechat";
+      try{
+        saveSession(session);
+      }catch(e){
+        console.error(e);
+        alert("Failed to save session. Please try again.");
+        return;
+      }
+
+      clearPending();
+      window.location.href = "/imagechat/";
+    }, "3.45", "playing image game");
+    return;
+  }
+
+  if (tier === "imagechat_unlimited"){
+    savePending(session);
+
+    openImgUnlimitedPayModal();
+    mountPayPalButtonsImageChatUnlimited(() => {
+      sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
+
+      session.tier = "imagechat_unlimited";
+      try{
+        saveSession(session);
+      }catch(e){
+        console.error(e);
+        alert("Failed to save session. Please try again.");
+        return;
+      }
+
+      clearPending();
+      window.location.href = "/imagechat_unlimited";
+    }, "12.50", "Upgrade game");
+    return;
+  }
+});
+
+// ✅ submit 밖으로 빼야 정상 동작하는 버튼들
+resetBtn.addEventListener("click", () => {
+  window.open("/?new=1", "_blank");
+});
+
+if (gameBtn){
+  gameBtn.addEventListener("click", () => {
+    window.open("https://2048global.com", "_blank", "noopener,noreferrer");
+  });
+}
+
+if (vpnBtn){
+  vpnBtn.addEventListener("click", () => {
+    window.open("https://www.2048global.com/vpn", "_blank", "noopener,noreferrer");
+  });
+}
+
+
+
+    // --------- Restore session if exists
+    const existing = loadSession();
+const pending = loadPending();
+
+function setUnlockUIVisibility(){
+  const s = loadSession();
+  const isPaid = sessionStorage.getItem(PAYMENT_KEY) === "paid";
+  const isGeneral = s && s.tier === "general";
+  if (unlockBtn){
+    unlockBtn.style.display = (isGeneral && !isPaid) ? "inline-flex" : "none";
+  }
+}
+
+function openPayModalForCurrentChat(){
+  const s = loadSession();
+  if (!s) return;
+
+  // ✅ Unlock 업그레이드 전용 모달 텍스트
+  const payTitle = document.getElementById("payTitle");
+  const payCharName = document.getElementById("payCharName");
+
+  if (payTitle){
+    payTitle.textContent = `Unlock ${s.name} +18 Uncensored, continuing this chat ($3)`;
+  }
+  if (payCharName){
+    payCharName.textContent = s.name;
+  }
+
+  openPayModal();
+
+  // ✅ 결제 성공 시: "현재 채팅"을 uncensored로 승격
+  mountPayPalButtons(
+    () => {
+      paymentStatus = "paid";
+      sessionStorage.setItem(PAYMENT_KEY, "paid");
+
+      const cur = loadSession();
+      if (cur){
+        cur.tier = "uncensored";
+        try{ saveSession(cur); }catch(e){ console.error(e); }
+      }
+
+      setUnlockUIVisibility();
+    },
+    "3.00",
+    "Upgrade game"
+  );
+}
+
+
+if (unlockBtn){
+  unlockBtn.addEventListener("click", () => {
+    openPayModalForCurrentChat();
+  });
+}
+
+
+// ✅ 결제 진행하다 닫았던 상태면: 셋업 화면 유지
+if (!existing){
+  // 세션이 없으면 그냥 셋업 화면
+  show(viewSetup);
+} else if (
+  (existing.tier === "uncensored" && sessionStorage.getItem(PAYMENT_KEY) !== "paid") ||
+  (existing.tier === "imagechat" && sessionStorage.getItem(IMAGECHAT_PAID_KEY) !== "paid") ||
+  (existing.tier === "imagechat_unlimited" && sessionStorage.getItem(IMAGECHAT_UNLIMITED_PAID_KEY) !== "paid")
+){
+  show(viewSetup);
+} else {
+  if (existing.tier === "imagechat"){
+    window.location.href = "/imagechat/";
+  } else if (existing.tier === "imagechat_unlimited"){
+    window.location.href = "/imagechat_unlimited";
+  } else {
+    enterChat(existing);
+  }
+}
+
+function setupKeyboardBar(){
+  const controls = document.querySelector(".chatControls");
+  const chatBox = document.getElementById("chatBox");
+
+  function measureControlsH(){
+    if (!controls) return;
+    const h = controls.getBoundingClientRect().height || 76;
+    document.documentElement.style.setProperty("--controlsH", h + "px");
+  }
+
+  function updateKeyboardOffset(){
+    // iOS Safari에서 키보드가 올라오면 visualViewport.height가 줄어듦
+    const vv = window.visualViewport;
+    if (!vv){
+      document.documentElement.style.setProperty("--kb", "0px");
+      measureControlsH();
+      return;
+    }
+
+    // 키보드로 가려진 높이(대략)
+    const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    document.documentElement.style.setProperty("--kb", kb + "px");
+    document.body.classList.toggle("kbUp", kb > 0);
+    measureControlsH();
+
+    // 바닥 유지
+    if (chatBox){
+      requestAnimationFrame(() => {
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+    }
+  }
+
+  // 초기
+  measureControlsH();
+  updateKeyboardOffset();
+
+  // 키보드/주소창 변화 대응
+  if (window.visualViewport){
+    window.visualViewport.addEventListener("resize", updateKeyboardOffset);
+    window.visualViewport.addEventListener("scroll", updateKeyboardOffset);
+  }
+  window.addEventListener("resize", updateKeyboardOffset);
+}
+
+    
+  </script>
+</body>
+</html>
