@@ -955,11 +955,15 @@ async function bootstrapFirstMessage(){
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      ppearanceProfile,
     });
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.detail || data.error || `HTTP ${res.status}`);
-
+// ✅ 서버가 내려준 appearanceProfile 저장
+if (data.appearanceProfile) {
+  sessionStorage.setItem("appearanceProfile", data.appearanceProfile);
+}
     const reply = (data && typeof data.reply === "string") ? data.reply : "(no text)";
 
     let imageUrl = "";
@@ -1046,6 +1050,11 @@ requestAnimationFrame(() => {
     }
   };
 
+  // ✅ appearanceProfile을 세션에서 꺼냄 (없으면 "")
+const appearanceProfile = sessionStorage.getItem("appearanceProfile") || "";
+
+  
+
   try{
     setBusy(true);
 
@@ -1060,6 +1069,7 @@ requestAnimationFrame(() => {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(payload),
+  appearanceProfile,
 });
 
 const data = await res.json().catch(() => ({}));
@@ -1248,6 +1258,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
