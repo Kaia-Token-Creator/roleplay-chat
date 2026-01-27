@@ -346,6 +346,168 @@ padding: 5px 8px;
   backdrop-filter: blur(12px);
 }
 
+/* =========================
+   Secret Gift Modal
+   ========================= */
+.secretModal{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.62);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000; /* header/infoMenu보다 위 */
+  backdrop-filter: blur(6px);
+}
+
+.secretModal.active{ display:flex; }
+
+.secretCard{
+  width: min(520px, calc(100vw - 28px));
+  background: rgba(10,10,10,.92);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 14px 14px 12px;
+}
+
+.secretTop{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.secretTitle{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  font-family: "Baloo 2", Inter, sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: #fff;
+}
+
+.giftIcon{
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  background: rgba(255,204,0,.12);
+  border: 1px solid rgba(255,204,0,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.giftIcon svg{
+  width: 16px;
+  height: 16px;
+  stroke: #ffcc00;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.secretX{
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.9);
+  cursor:pointer;
+}
+
+.secretX:hover{ background: rgba(255,255,255,.10); }
+
+.secretBody{
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: rgba(255,255,255,.88);
+}
+
+.secretLine{
+  margin: 8px 0 10px;
+  color: rgba(255,255,255,.78);
+}
+
+.secretLinkRow{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+}
+
+.secretLinkText{
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  color: #ffcc00;
+  user-select: text;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.iconBtn{
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.35);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition: .15s ease;
+}
+.iconBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
+.iconBtn:active{ transform: translateY(0px); }
+
+.iconBtn svg{
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: rgba(255,255,255,.92);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.secretNote{
+  margin-top: 10px;
+  color: rgba(255,255,255,.75);
+}
+
+.secretActions{
+  margin-top: 12px;
+  display:flex;
+  justify-content: flex-end;
+}
+
+.thankBtn{
+  border: none;
+  background: #e0b400;
+  color: #000;
+  font-weight: 900;
+  padding: 10px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+.thankBtn:hover{ background:#f0c800; }
+.thankBtn:active{ background:#cfa600; }
+
+.toastMini{
+  margin-left: 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,.7);
+  user-select:none;
+}
 
   </style>
 </head>
@@ -441,6 +603,72 @@ padding: 5px 8px;
     <div class="chatControls">
       <input id="chatInput" class="chatInput" placeholder="Type a message..." />
       <button id="sendBtn" class="sendBtn">➤</button>
+    </div>
+  </div>
+</div>
+  
+<!-- =========================
+     Secret Gift Modal (in-page)
+     ========================= -->
+<div class="secretModal" id="secretModal" aria-hidden="true">
+  <div class="secretCard" role="dialog" aria-modal="true" aria-label="Secret Gift">
+    <div class="secretTop">
+      <div class="secretTitle">
+        <span class="giftIcon" aria-hidden="true">
+          <!-- gift icon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"></path>
+            <path d="M2 7h20v5H2z"></path>
+            <path d="M12 7v15"></path>
+            <path d="M12 7c-2.5 0-4-1-4-2.5S9 2 10.7 2C12 2 12 4 12 7Z"></path>
+            <path d="M12 7c2.5 0 4-1 4-2.5S15 2 13.3 2C12 2 12 4 12 7Z"></path>
+          </svg>
+        </span>
+        <span>Secret Gift arrived!</span>
+      </div>
+
+      <button class="secretX" id="secretCloseX" type="button" aria-label="Close">✕</button>
+    </div>
+
+    <div class="secretBody">
+      <div class="secretLine">Here is secret price link.</div>
+
+      <div class="secretLinkRow">
+        <div class="secretLinkText" id="secretLinkText">https://roleplay-chat.com/secret_price</div>
+
+        <!-- Copy -->
+        <button class="iconBtn" id="secretCopyBtn" type="button" aria-label="Copy link" title="Copy">
+          <svg viewBox="0 0 24 24">
+            <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+
+        <!-- Share -->
+        <button class="iconBtn" id="secretShareBtn" type="button" aria-label="Share link" title="Share">
+          <svg viewBox="0 0 24 24">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <path d="M8.6 13.5l6.8 3.9"></path>
+            <path d="M15.4 6.6L8.6 10.5"></path>
+          </svg>
+        </button>
+
+        <span class="toastMini" id="secretToast" style="display:none;">Copied!</span>
+      </div>
+
+      <div class="secretNote">
+        You can use this secret price link (50% off) forever to create a new character.<br>
+        All prices are 50% off and you can use it unlimited times.<br>
+        Copy the link and use it when you create a new character.<br>
+        You may share this link with friends or on social media.<br>
+        Enjoy your time
+      </div>
+
+      <div class="secretActions">
+        <button class="thankBtn" id="secretThankBtn" type="button">Thank you</button>
+      </div>
     </div>
   </div>
 </div>
@@ -909,9 +1137,106 @@ if (infoBtn && infoMenu){
     if (e.key === "Escape") closeInfoMenu();
   });
 }
-  
+
+/* =========================
+   Secret Gift popup (paid only)
+   ========================= */
+const SECRET_LINK = "https://roleplay-chat.com/secret_price";
+
+const secretModal = document.getElementById("secretModal");
+const secretCloseX = document.getElementById("secretCloseX");
+const secretThankBtn = document.getElementById("secretThankBtn");
+const secretCopyBtn = document.getElementById("secretCopyBtn");
+const secretShareBtn = document.getElementById("secretShareBtn");
+const secretToast = document.getElementById("secretToast");
+const secretLinkText = document.getElementById("secretLinkText");
+
+function openSecretModal(){
+  if (!secretModal) return;
+  secretModal.classList.add("active");
+  secretModal.setAttribute("aria-hidden", "false");
+}
+
+function closeSecretModal(){
+  if (!secretModal) return;
+  secretModal.classList.remove("active");
+  secretModal.setAttribute("aria-hidden", "true");
+}
+
+function showToast(msg){
+  if (!secretToast) return;
+  secretToast.textContent = msg || "Done";
+  secretToast.style.display = "inline";
+  setTimeout(() => (secretToast.style.display = "none"), 900);
+}
+
+// Close actions
+if (secretCloseX) secretCloseX.addEventListener("click", closeSecretModal);
+if (secretThankBtn) secretThankBtn.addEventListener("click", closeSecretModal);
+
+// Click outside to close
+if (secretModal){
+  secretModal.addEventListener("click", (e) => {
+    if (e.target === secretModal) closeSecretModal();
+  });
+}
+
+// Esc to close
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeSecretModal();
+});
+
+// Copy button
+if (secretCopyBtn){
+  secretCopyBtn.addEventListener("click", async () => {
+    try{
+      await navigator.clipboard.writeText(SECRET_LINK);
+      showToast("Copied!");
+    }catch(e){
+      showToast("Copy failed");
+    }
+  });
+}
+
+// Share button
+if (secretShareBtn){
+  secretShareBtn.addEventListener("click", async () => {
+    try{
+      if (navigator.share){
+        await navigator.share({ title: "Secret price link", url: SECRET_LINK });
+      }else{
+        await navigator.clipboard.writeText(SECRET_LINK);
+        showToast("Copied!");
+      }
+    }catch(e){
+      // user cancelled or blocked
+    }
+  });
+}
+
+// Set link text (no anchor, just text)
+if (secretLinkText){
+  secretLinkText.textContent = SECRET_LINK;
+}
+
+/* Show once per tab, only if paid */
+const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
+
+(function maybeShowSecretGift(){
+  try{
+    if (!paid) return; // ✅ paid일 때만
+    if (sessionStorage.getItem(SECRET_POPUP_SHOWN_KEY) === "1") return;
+    sessionStorage.setItem(SECRET_POPUP_SHOWN_KEY, "1");
+    openSecretModal();
+  }catch(e){
+    // if storage blocked, still try showing
+    if (paid) openSecretModal();
+  }
+})();
+
 </script>
 
 </body>
 </html>
+
 
