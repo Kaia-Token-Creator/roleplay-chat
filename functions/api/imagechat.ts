@@ -14,7 +14,7 @@ export const onRequestPost: PagesFunction<{
   if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
 
   try {
-    type Msg = { role: "system" | "user" | "assistant"; content: any }; // ✅ content can be string OR multimodal array
+    type Msg = { role: "system" | "user" | "assistant"; content: string };
 
     type Character = {
       name: string;
@@ -31,9 +31,6 @@ export const onRequestPost: PagesFunction<{
 
       avatarDataUrl?: string;
       fontColor?: string;
-
-      // ✅ NEW: computed or provided appearance profile summary
-      appearanceProfile?: string;
     };
 
     // ---------------- LIMITS ----------------
@@ -46,41 +43,42 @@ export const onRequestPost: PagesFunction<{
     // text reply tokens
     const MAX_TOKENS_TEXT = 650;
 
-    // image plan tokens
+    // image plan tokens (same text model, separate call)
     const MAX_TOKENS_IMAGE_PLAN = 260;
 
-    // forced prompt tokens
+    // if user explicitly asks for an image and plan prompt is empty, generate forced prompt via text model
     const MAX_TOKENS_IMAGE_FORCED_PROMPT = 220;
-
-    // ✅ NEW: avatar appearance extraction tokens
-    const MAX_TOKENS_APPEARANCE = 220;
-
-    // ✅ NEW: cap size of appearance hint
-    const MAX_APPEARANCE_CHARS = 420;
     // ---------------------------------------
 
+    // ✅ body는 딱 1번만 읽어야 함
     const bodyAny = await request.json<any>().catch(() => null);
     if (!bodyAny || typeof bodyAny !== "object") {
       return json({ error: "Invalid body." }, 400, CORS);
     }
 
+    // ✅ character 또는 session 둘 다 허용
     const characterRaw = bodyAny.character || bodyAny.session;
     if (!characterRaw) {
       return json({ error: "Missing character/session." }, 400, CORS);
     }
 
     const message = typeof bodyAny.message === "string" ? bodyAny.message.trim() : "";
+
+    // ✅ init 트리거
     const isInit = message === "__INIT__";
 
+    // ✅ 일반 채팅만 message 필수
     if (!isInit && !message) {
       return json({ error: "Missing message." }, 400, CORS);
     }
 
     const userMsg = isInit ? "" : truncateString(message, MAX_MESSAGE_CHARS);
 
+    // history
     const rawHistory = Array.isArray(bodyAny.history) ? bodyAny.history : [];
-    const history: any[] = scrubHistory(rawHistory.filter(isValidMsg)).slice(-MAX_HISTORY_MSGS);
+    const history: Msg[] = rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
 
+    // paymentStatus
     const paymentStatus = bodyAny.paymentStatus;
     if (paymentStatus !== "paid") {
       return json(
@@ -90,27 +88,9 @@ export const onRequestPost: PagesFunction<{
       );
     }
 
-    const ch: Character = sanitizeCharacter(characterRaw) as any;
+    const ch = sanitizeCharacter(characterRaw);
 
-    // ✅ NEW: appearance profile handling
-    // If front already computed/sent appearanceProfile, use it.
-    // Else if avatarDataUrl exists, extract once per request (best-effort).
-    const providedAppearance =
-      typeof bodyAny.appearanceProfile === "string" ? bodyAny.appearanceProfile.trim() : "";
-
-    if (providedAppearance) {
-      ch.appearanceProfile = truncateString(providedAppearance, MAX_APPEARANCE_CHARS);
-    } else if (ch.avatarDataUrl && looksLikeDataImageUrl(ch.avatarDataUrl)) {
-      // Only attempt extraction if we have a usable data URL
-      // (If you use hosted URLs instead, adjust looksLikeDataImageUrl accordingly)
-      ch.appearanceProfile = await extractAppearanceFromAvatar(env.VENICE_API_KEY, ch.avatarDataUrl, MAX_TOKENS_APPEARANCE)
-        .then((s) => truncateString(s, MAX_APPEARANCE_CHARS))
-        .catch(() => "");
-    } else {
-      ch.appearanceProfile = "";
-    }
-
-    // 1) 텍스트 답변 생성
+    // 1) 텍스트 답변 생성 (기존 텍스트 프롬프트는 그대로 사용: 한 줄도 변경 X)
     const systemPrompt = buildSystemPrompt_Text(ch);
 
     const initUserMsg =
@@ -122,9 +102,9 @@ export const onRequestPost: PagesFunction<{
       "Ask at most one short question only if it helps the scene move forward. " +
       "Follow the FORMAT rules exactly: spoken dialogue only, no narration, no parentheses or brackets.";
 
-    const messagesBeforeFit: any[] = [
+    const messagesBeforeFit: Msg[] = [
       { role: "system", content: systemPrompt },
-      ...history.map((m: any) => ({ role: m.role, content: String(m.content) })),
+      ...history.map((m) => ({ role: m.role, content: String(m.content) })),
       { role: "user", content: isInit ? initUserMsg : userMsg },
     ];
 
@@ -133,7 +113,7 @@ export const onRequestPost: PagesFunction<{
     const replyRaw = await callVeniceChat(env.VENICE_API_KEY, fitted, MAX_TOKENS_TEXT);
     const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
 
-    // 2) 사진 판단 + 프롬프트 생성
+    // 2) 사진 판단 + 프롬프트 생성: 텍스트 모델이 JSON으로 내리도록 (강건 파서 적용)
     let plan: { generate: boolean; prompt: string; negativePrompt?: string } = { generate: false, prompt: "" };
 
     if (!isInit) {
@@ -145,6 +125,7 @@ export const onRequestPost: PagesFunction<{
         maxTokens: MAX_TOKENS_IMAGE_PLAN,
       });
 
+      // ✅ 유저가 명시적으로 사진을 요구하면, planner가 삐끗해도 generate=true로 "안전핀"
       if (userExplicitlyAsksImage(userMsg)) {
         if (!plan.prompt) {
           const forcedPrompt = await makeForcedPromptWithTextModel(env.VENICE_API_KEY, {
@@ -177,15 +158,12 @@ export const onRequestPost: PagesFunction<{
             note: "Image request was blocked by server safety rules.",
             tier: "venice-uncensored",
             imageModel: "lustify-sdxl",
-            // ✅ optional: allow client to cache this
-            appearanceProfile: ch.appearanceProfile || "",
           },
           200,
           CORS
         );
       }
 
-      // ✅ NEW: Attach appearance hint only if the image likely includes a person.
       const promptWithRef = buildImagePromptWithAvatarHint(plan.prompt, ch);
 
       const imgB64 = await callVeniceImageGenerate(env.VENICE_API_KEY, {
@@ -209,13 +187,12 @@ export const onRequestPost: PagesFunction<{
         image,
         tier: "venice-uncensored",
         imageModel: "lustify-sdxl",
-        // ✅ optional: front can store and re-send to avoid re-analyzing every time
-        appearanceProfile: ch.appearanceProfile || "",
       },
       200,
       CORS
     );
   } catch (err: any) {
+    // ✅ 디버깅 위해 detail은 최대한 살려서 내려줌
     return json({ error: "Server error.", detail: String(err?.message || err) }, 500, CORS);
   }
 };
@@ -242,13 +219,6 @@ function isValidMsg(m: any): m is { role: "system" | "user" | "assistant"; conte
     typeof m === "object" &&
     (m.role === "system" || m.role === "user" || m.role === "assistant") &&
     typeof m.content === "string"
-  );
-}
-
-function scrubHistory(history: any[]) {
-  const bad = /(venice|uncensored|model|provider|openai|chatgpt|assistant)/i;
-  return (Array.isArray(history) ? history : []).filter(
-    (m) => !(m?.role === "assistant" && bad.test(String(m?.content || "")))
   );
 }
 
@@ -332,7 +302,7 @@ function formatWeight(w: any) {
 }
 
 // ---------------- prompts ----------------
-// ⚠️ buildSystemPrompt_Text는 "기존 그대로" 유지 (한 줄도 변경 X)
+// ⚠️ 아래 buildSystemPrompt_Text는 "기존 그대로" 유지 (한 줄도 변경 X)
 function buildSystemPrompt_Text(ch: any) {
   const nicknameLine = ch.nickname?.trim()
     ? `- What you call the user: ${ch.nickname.trim()} (always use this when addressing the user)`
@@ -366,6 +336,7 @@ function buildSystemPrompt_Text(ch: any) {
     "Do not share your social media accounts.",
     "Maintain context strictly.",
     "If asked 'are you AI/model/etc', deny briefly like a human.",
+    // --- anti-repetition & naturalness
     "Do NOT repeat yourself. Do NOT echo the user's wording.",
     "Use fresh phrasing each turn. Keep replies human, natural, and on-topic.",
     "Avoid random, unrelated, or gibberish phrases.",
@@ -387,6 +358,7 @@ function buildSystemPrompt_Text(ch: any) {
 }
 
 // ---------------- image planning via SAME text model ----------------
+// ✅ planner JSON 파싱을 강건하게: JSON.parse 실패 시 {..}만 뽑아서 재파싱
 function extractFirstJsonObject(text: string) {
   const s = String(text || "").trim();
   const start = s.indexOf("{");
@@ -407,6 +379,7 @@ function safeParseJsonObject(raw: string) {
   return null;
 }
 
+// ✅ 사진 필요 여부 + 프롬프트를 텍스트 모델이 JSON으로 결정
 async function makeImagePlanWithTextModel(
   apiKey: string,
   args: {
@@ -444,27 +417,25 @@ async function makeImagePlanWithTextModel(
   };
 
   const plannerUser = {
-  role: "user",
-  content: [
-    "Character:",
-    `Name=${ch.name}; Age=${ch.age}; Gender=${ch.gender}; MBTI=${ch.mbti}; Language=${ch.language}`,
-    `Personality=${ch.personality}`,
-    `Scenario=${ch.scenario}`,
-    ch.appearanceProfile ? `AppearanceProfile=${ch.appearanceProfile}` : "AppearanceProfile=",
-    "",
-    "Recent history (latest last):",
-    ...history.slice(-10).map((m) => `${m.role}: ${String(m.content || "").trim()}`),
-    "",
-    "User message:",
-    userMessage,
-    "",
-    "Assistant reply (already generated):",
-    lastAssistant,
-    "",
-    "Decide and output JSON only.",
-  ].join("\n"),
-};
-
+    role: "user",
+    content: [
+      "Character:",
+      `Name=${ch.name}; Age=${ch.age}; Gender=${ch.gender}; MBTI=${ch.mbti}; Language=${ch.language}`,
+      `Personality=${ch.personality}`,
+      `Scenario=${ch.scenario}`,
+      "",
+      "Recent history (latest last):",
+      ...history.slice(-10).map((m) => `${m.role}: ${String(m.content || "").trim()}`),
+      "",
+      "User message:",
+      userMessage,
+      "",
+      "Assistant reply (already generated):",
+      lastAssistant,
+      "",
+      "Decide and output JSON only.",
+    ].join("\n"),
+  };
 
   const raw = await callVeniceChat(apiKey, [plannerSystem, plannerUser], maxTokens);
 
@@ -479,6 +450,7 @@ async function makeImagePlanWithTextModel(
   return { generate: true, prompt, negativePrompt: negativePrompt || undefined };
 }
 
+// ✅ 유저가 "사진/이미지"를 명시적으로 요구하는 경우 감지 (안전핀용)
 function userExplicitlyAsksImage(userMsg: string) {
   const s = (userMsg || "").toLowerCase();
   return (
@@ -487,6 +459,7 @@ function userExplicitlyAsksImage(userMsg: string) {
   );
 }
 
+// ✅ 유저가 명시 요구했는데 planner가 prompt를 비워버리면: 텍스트 모델로 prompt만 생성
 async function makeForcedPromptWithTextModel(
   apiKey: string,
   args: {
@@ -511,26 +484,25 @@ async function makeForcedPromptWithTextModel(
   };
 
   const user = {
-  role: "user",
-  content: [
-    `Character: Name=${ch.name}; Age=${ch.age}; Gender=${ch.gender}; Personality=${ch.personality}; Scenario=${ch.scenario}`,
-    ch.appearanceProfile ? `AppearanceProfile: ${ch.appearanceProfile}` : "AppearanceProfile:",
-    "Recent history (latest last):",
-    ...history.slice(-10).map((m) => `${m.role}: ${String(m.content || "").trim()}`),
-    "",
-    `User message: ${userMessage}`,
-    `Assistant reply: ${lastAssistant}`,
-    "",
-    "Generate the best possible image prompt for what the user is asking to see.",
-  ].join("\n"),
-};
+    role: "user",
+    content: [
+      `Character: Name=${ch.name}; Age=${ch.age}; Gender=${ch.gender}; Personality=${ch.personality}; Scenario=${ch.scenario}`,
+      "Recent history (latest last):",
+      ...history.slice(-10).map((m) => `${m.role}: ${String(m.content || "").trim()}`),
+      "",
+      `User message: ${userMessage}`,
+      `Assistant reply: ${lastAssistant}`,
+      "",
+      "Generate the best possible image prompt for what the user is asking to see.",
+    ].join("\n"),
+  };
 
   const raw = await callVeniceChat(apiKey, [sys, user], maxTokens);
   return String(raw || "").trim();
 }
 
 // ---------------- budget helpers ----------------
-function fitMessagesToBudget(messages: { role: any; content: any }[], maxChars: number) {
+function fitMessagesToBudget(messages: { role: any; content: string }[], maxChars: number) {
   if (!Array.isArray(messages) || messages.length === 0) return [];
 
   const system = messages[0];
@@ -538,17 +510,14 @@ function fitMessagesToBudget(messages: { role: any; content: any }[], maxChars: 
   const sys = system?.role === "system" ? system : null;
   const middle = messages.slice(sys ? 1 : 0, -1);
 
-  // Only count string sizes reliably; for multimodal, stringify safely.
-  const safeContentStr = (c: any) => (typeof c === "string" ? c : JSON.stringify(c || ""));
-
-  const safeSys = sys ? { role: "system" as const, content: safeContentStr(sys.content) } : null;
-  const safeLast = { role: last.role, content: safeContentStr(last.content) };
+  const safeSys = sys ? { role: "system" as const, content: String(sys.content || "") } : null;
+  const safeLast = { role: last.role, content: String(last.content || "") };
 
   let result: any[] = [];
   if (safeSys) result.push(safeSys);
   result.push(safeLast);
 
-  const sizeOf = (arr: any[]) => arr.reduce((s, m) => s + safeContentStr(m.content).length, 0);
+  const sizeOf = (arr: any[]) => arr.reduce((s, m) => s + String(m.content || "").length, 0);
 
   if (sizeOf(result) > maxChars) {
     if (safeSys) {
@@ -561,7 +530,7 @@ function fitMessagesToBudget(messages: { role: any; content: any }[], maxChars: 
 
   for (let i = middle.length - 1; i >= 0; i--) {
     const m = middle[i];
-    const entry = { role: m.role, content: safeContentStr(m.content) };
+    const entry = { role: m.role, content: String(m.content || "") };
     const insertIndex = safeSys ? 1 : 0;
     const candidate = result.slice(0, insertIndex).concat([entry], result.slice(insertIndex));
     if (sizeOf(candidate) <= maxChars) result = candidate;
@@ -596,72 +565,19 @@ function defaultNegativePrompt() {
   return "low quality, blurry, bad anatomy, extra fingers, deformed, watermark, text, logo, jpeg artifacts";
 }
 
-// ✅ NEW: detect data URL
-function looksLikeDataImageUrl(s: string) {
-  return /^data:image\/(png|jpeg|jpg|webp);base64,/i.test(String(s || "").trim());
+function buildImagePromptWithAvatarHint(basePrompt: string, _ch: any) {
+  return basePrompt;
 }
 
-// ✅ NEW: decide if prompt likely includes a person; if not, skip appearance hint
-function promptLikelyHasPerson(prompt: string) {
-  const p = (prompt || "").toLowerCase();
-  return /\b(person|human|woman|man|female|male|adult|model|portrait|selfie|couple|nude|body|figure|girl|boy|she|her|him|he)\b/.test(p);
-}
-
-// ✅ CHANGED: actually apply appearance hint when relevant
-function buildImagePromptWithAvatarHint(basePrompt: string, ch: any) {
-  const ap = String(ch?.appearanceProfile || "").trim();
-  if (!ap) return basePrompt;
-
-  if (!promptLikelyHasPerson(basePrompt)) return basePrompt;
-
-  return [
-    `Subject must match these traits: ${ap}`, // ✅ 앞에 박아넣기
-    basePrompt.trim(),
-    "No text, no watermark, no logo."
-  ].join("\n");
-}
-
-// ✅ NEW: extract appearance summary from avatar using vision-capable chat format
-async function extractAppearanceFromAvatar(apiKey: string, avatarDataUrl: string, maxTokens: number) {
-  const sys = {
-    role: "system",
-    content: [
-      "You are extracting stable visual traits from a single profile photo for consistent depiction in generated images.",
-      "Return ONLY ONE line of plain text, no JSON, no lists, no extra commentary.",
-      "Include: hair color, hair style/length, eye color if visible, facial hair, and 1-2 notable facial features.",
-      "Do NOT mention age numbers. Do NOT add names. Do NOT add speculation beyond visible traits."
-    ].join("\n"),
-  };
-
-  const user = {
-    role: "user",
-    content: [
-      { type: "text", text: "Extract stable visual traits from this profile photo." },
-      { type: "image_url", image_url: { url: avatarDataUrl } },
-    ],
-  };
-
-  // ✅ IMPORTANT: use a vision-capable model (example in docs shows qwen-2.5-vl)
-  const raw = await callVeniceChat(apiKey, [sys, user], maxTokens, "qwen-2.5-vl");
-  return String(raw || "").trim();
-}
-
-
-// ---------------- Venice: chat (text / multimodal) ----------------
-// ---------------- Venice: chat (text / multimodal) ----------------
-async function callVeniceChat(
-  apiKey: string,
-  messages: any[],
-  maxTokens: number,
-  model: string = "venice-uncensored"   // ✅ NEW: default
-) {
+// ---------------- Venice: chat (text) ----------------
+async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number) {
   if (!apiKey) throw new Error("Missing VENICE_API_KEY");
 
   const res = await fetch("https://api.venice.ai/api/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model, // ✅ CHANGED
+      model: "venice-uncensored",
       messages,
       stream: false,
       temperature: 0.92,
@@ -681,7 +597,6 @@ async function callVeniceChat(
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
-
 
 // ---------------- Venice: image generate ----------------
 async function callVeniceImageGenerate(
@@ -714,7 +629,6 @@ async function callVeniceImageGenerate(
       safe_mode: args.safe_mode ?? true,
       variants: args.variants ?? 1,
       return_binary: false,
-      hide_watermark: true,
     }),
   });
 
@@ -728,5 +642,3 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
-
-
