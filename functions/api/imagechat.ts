@@ -79,7 +79,7 @@ export const onRequestPost: PagesFunction<{
     const userMsg = isInit ? "" : truncateString(message, MAX_MESSAGE_CHARS);
 
     const rawHistory = Array.isArray(bodyAny.history) ? bodyAny.history : [];
-    const history: any[] = rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
+    const history: any[] = scrubHistory(rawHistory.filter(isValidMsg)).slice(-MAX_HISTORY_MSGS);
 
     const paymentStatus = bodyAny.paymentStatus;
     if (paymentStatus !== "paid") {
@@ -718,5 +718,6 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
 
 
