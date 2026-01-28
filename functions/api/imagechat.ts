@@ -812,12 +812,12 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
 
   if (!res.ok) {
     const t = await res.text();
-    throw new Error(`Venice error (${res.status}): ${t.slice(0, 800)}`);
+    throw new Error(`error (${res.status}): ${t.slice(0, 800)}`);
   }
 
   const data: any = await res.json();
   const content = data?.choices?.[0]?.message?.content;
-  if (!content) throw new Error("Venice: empty response");
+  if (!content) throw new Error("empty response");
   return String(content);
 }
 
@@ -867,6 +867,7 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
 
 
 
