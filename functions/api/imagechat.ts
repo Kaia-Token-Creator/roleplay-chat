@@ -36,13 +36,13 @@ export const onRequestPost: PagesFunction<{
 
     // ---------------- LIMITS ----------------
     const MAX_MESSAGE_CHARS = 800;
-    const MAX_REPLY_CHARS = 900;
+    const MAX_REPLY_CHARS = 700;
 
     const MAX_HISTORY_MSGS = 50;
-    const MAX_PROMPT_CHARS = 20000;
+    const MAX_PROMPT_CHARS = 15000;
 
     // text reply tokens
-    const MAX_TOKENS_TEXT = 700;
+    const MAX_TOKENS_TEXT = 600;
 
     // image plan tokens (same text model, separate call)
     const MAX_TOKENS_IMAGE_PLAN = 260;
@@ -867,6 +867,7 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
 
 
 
