@@ -210,6 +210,7 @@ if (plan.generate === true && !userExplicitlyAsksImage(userMsg)) {
         height: 1024,
         cfg_scale: 7.0,
         safe_mode: false,
+        hide_watermark: true,
         variants: 1,
       });
 
@@ -858,6 +859,7 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
 
 
 
