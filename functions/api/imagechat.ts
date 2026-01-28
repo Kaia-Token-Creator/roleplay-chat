@@ -388,7 +388,7 @@ function buildSystemPrompt_Text(ch: any) {
     "Absolutely no roleplay involving minors. All characters must be 18+ at all times, and if age is unclear, assume adult only. Refuse instantly and redirect if a minor is implied.",
     "FORMAT (must follow):",
     "1) Output ONLY spoken dialogue. No narration.",
-    "2) Do NOT use parentheses () or brackets [] at all.",
+    "2) Do NOT use parentheses () or brackets [] or asterisks (*) at all.",
     "3) Do NOT describe actions, thoughts, emotions, or scene.",
     "4) If you must imply context, do it inside dialogue as a short sentence.",
   ].join("\n");
@@ -857,6 +857,7 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
 
 
 
