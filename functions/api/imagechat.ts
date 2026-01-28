@@ -833,6 +833,7 @@ async function callVeniceImageGenerate(
     height?: number;
     cfg_scale?: number;
     safe_mode?: boolean;
+    hide_watermark?: boolean;
     variants?: number;
   }
 ): Promise<string> {
@@ -849,7 +850,8 @@ async function callVeniceImageGenerate(
       width: args.width ?? 1024,
       height: args.height ?? 1024,
       cfg_scale: args.cfg_scale ?? 7.5,
-      safe_mode: args.safe_mode ?? true,
+      safe_mode: args.safe_mode ?? false,
+      hide_watermark: args.hide_watermark ?? false,
       variants: args.variants ?? 1,
       return_binary: false,
     }),
@@ -865,6 +867,7 @@ async function callVeniceImageGenerate(
   if (!Array.isArray(images) || !images[0]) throw new Error("image: empty response");
   return images[0];
 }
+
 
 
 
