@@ -161,7 +161,14 @@ export const onRequestPost: PagesFunction<{
 
     // ✅ history 정규화 + 상한
     const rawHistory = Array.isArray(body.history) ? body.history : [];
-    const history = rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
+
+const isSexTrigger =
+  tier === "uncensored" && containsSexKeyword(userMsg);
+
+const history = isSexTrigger
+  ? [] // 🔥 여기서 기존 거절 히스토리 완전 차단
+  : rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
+
 
     // ✅ CHANGED: tier 전달
     const systemPrompt = buildSystemPrompt(chForPrompt, tier);
@@ -309,6 +316,11 @@ function isValidMsg(m: any): m is { role: "system" | "user" | "assistant"; conte
     (m.role === "system" || m.role === "user" || m.role === "assistant") &&
     typeof m.content === "string"
   );
+}
+
+function containsSexKeyword(text: string) {
+  const t = text.toLowerCase();
+  return SEX_KEYWORDS.some(k => t.includes(k));
 }
 
 function formatMeasure(
@@ -549,4 +561,15 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
+
+const SEX_KEYWORDS = [
+  "sex","sexual","fuck","fucking","fucked","suck","sucking","blowjob","handjob",
+  "cock","dick","penis","pussy","vagina","clit","clitoris","cum","cumming",
+  "orgasm","moan","horny","aroused","wet","hard","thrust","ride","missionary",
+  "doggy","anal","oral","deepthroat","penetrate","penetration","breed",
+  "nsfw","erotic","kink","fetish","bdsm","spank","ejaculate","masturbate","jerk","stroke","lick","licking","rim",
+  "69","one night","fuck me","make love","take off","nude"
+];
+
+
 
