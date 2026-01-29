@@ -556,22 +556,8 @@ padding: 5px 8px;
   border: 1px solid #ff2fce;
   color: #000;
   font-weight: 900;
-  border-color: rgba(255, 79, 216, .55);
-  box-shadow:
-    0 0 0 1px rgba(255, 79, 216, .25),
-    0 0 18px rgba(255, 79, 216, .35),
-    0 0 34px rgba(255, 79, 216, .22),
-    var(--shadow);
 }
-#unlockBtn:hover
-    { background:#ff6fe1;
-    border-color: rgba(255, 79, 216, .75);
-  box-shadow:
-    0 0 0 1px rgba(255, 79, 216, .35),
-    0 0 22px rgba(255, 79, 216, .45),
-    0 0 44px rgba(255, 79, 216, .28),
-    var(--shadow);
-    }
+#unlockBtn:hover{ background:#ff6fe1; }
 #unlockBtn:active{ background:#ff2fce; }
 
     /* New 버튼만 진한 노란색 */
@@ -838,33 +824,7 @@ body.chatMode #viewChat .chatFooter{
   border-radius: 999px;
 }
 
-/* ✅ FORCE Unlock button styling (paste at VERY bottom) */
-button#unlockBtn{
-  background: #ff4fd8 !important;
-  border: 1px solid #ff2fce !important;
-  color: #000 !important;
-  font-weight: 900 !important;
-  border-color: rgba(255, 79, 216, .55) !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 79, 216, .25),
-    0 0 18px rgba(255, 79, 216, .35),
-    0 0 34px rgba(255, 79, 216, .22),
-    var(--shadow) !important;
-}
-
-button#unlockBtn:hover{
-  background:#ff6fe1 !important;
-  border-color: rgba(255, 79, 216, .75) !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 79, 216, .35),
-    0 0 22px rgba(255, 79, 216, .45),
-    0 0 44px rgba(255, 79, 216, .28),
-    var(--shadow) !important;
-}
-
-button#unlockBtn:active{
-  background:#ff2fce !important;
-}
+    
 
   </style>
 </head>
@@ -1103,7 +1063,7 @@ button#unlockBtn:active{
               <label for="scenario">Place & Situation</label>
               <textarea id="scenario" name="scenario" maxlength="300" placeholder="Where are you? What's happening? Set the scene... the more specific, the more fun and alive they become."></textarea>
               <div class="hint"><span id="sCount">0</span>/300</div>
-            </div> <div class="hint"><span style="color:#ffcc00;">Add more detail to the scenario.<br>The more NSFW the prompt, the more NSFW the output.</span></div>
+            </div>
 
             <div class="span2">
               <label>Font Color</label>
@@ -1174,11 +1134,10 @@ button#unlockBtn:active{
             <div class="note">
   No login. Your character is kept per browser tab.<br />
   <span style="opacity:.8;">
-    The conversation will remain available for the lifetime of this browser tab (except for image chat for 24hrs option) as long as it stays open.
-    This is an anonymous chat and is not stored on the server.
-  </span><br><span style="color:#fff;">Add more detail to the scenario.</span><br><span style="color:#ffcc00;">The more NSFW the prompt, the more NSFW the output.</span>
+    The conversation will remain available for the lifetime of this browser tab (except for image chat for 24hrs option) as long as it stays open. This is an anonymous chat and is not stored on the server.
+  </span>
+  <br><span style="color:#fff;">Add more detail to the scenario.</span><br><span style="color:#ffcc00;">The more NSFW the prompt, the more NSFW the output.</span>
 </div>
-
 
 
               <div class="actions">
@@ -2013,33 +1972,6 @@ function mountPayPalButtons(onSuccess, priceUsd = "2.00", description = "Playing
     const PAYMENT_KEY = "roleplay-chat_paid_v1";
     let paymentStatus = sessionStorage.getItem(PAYMENT_KEY) || "unpaid"; // refresh-safe within this tab
 
-    const SEXT_NUDGE_KEY = "roleplay-chat_sext_nudge_shown_v1";
-
-// sext 관련 키워드(필요하면 더 추가/조정)
-function looksLikeSext(text){
-  const t = String(text || "").toLowerCase();
-
-  // 너무 빡세게 잡으면 오탐 많아져서, 대표적인 것 위주로
-  const re = /\b(sex|sext|sex chat|dirty talk|nude|nudes|naked|horny|turn me on|explicit|nsfw|blowjob|handjob|fuck|fucking|cum|cumming|orgasm|climax|ride me|spank|dominant|submissive)\b/i;
-  return re.test(t);
-}
-
-function shouldShowSextNudge(session, text){
-  if (!session) return false;
-
-  const isUncensored = session.tier === "uncensored";
-  const isGeneral = session.tier === "general";
-  const isPaid = sessionStorage.getItem(PAYMENT_KEY) === "paid";
-
-  // ✅ general + unpaid일 때만
-  if (!isGeneral || isUncensored || isPaid) return false;
-
-  // ✅ 이미 한 번 보여줬으면 끝
-  if (sessionStorage.getItem(SEXT_NUDGE_KEY) === "1") return false;
-
-  return looksLikeSext(text);
-}
-
     function appendMsg(role, content){
       const currentSession = loadSession();
 const assistantName = (currentSession && currentSession.name) || "Character";
@@ -2135,21 +2067,6 @@ who.innerHTML = (role === "assistant")
       chatHistory.push({ role: "user", content: text });
 saveHistory(chatHistory);
 
-// ✅ general + unpaid + sext 키워드면: 캐릭터 말풍선으로 1번만 안내하고 API 호출은 막기
-const session = loadSession();
-if (shouldShowSextNudge(session, text)){
-  sessionStorage.setItem(SEXT_NUDGE_KEY, "1");
-
-  const charName = (session && session.name) ? session.name : "this character";
-  const nudge = `If you want sexting, unlock ${charName}.`;
-
-  appendMsg("assistant", nudge);
-  chatHistory.push({ role: "assistant", content: nudge });
-  saveHistory(chatHistory);
-
-  return; // ✅ 여기서 끝 (paid/uncensored일 땐 절대 안 탐)
-}
-      
       try{
         sendBtn.disabled = true;
         chatInput.disabled = true;
@@ -2587,47 +2504,3 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
