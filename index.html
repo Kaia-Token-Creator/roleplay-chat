@@ -552,12 +552,58 @@ padding: 5px 8px;
 
 /* ✅ Unlock 버튼: 핫핑크 */
 #unlockBtn{
+  animation: unlockAura 2.4s ease-in-out infinite;
   background: #ff4fd8;
   border: 1px solid #ff2fce;
   color: #000;
   font-weight: 900;
+  border-color: rgba(255, 204, 0, .65) !important;
+  outline: 2px solid rgba(255, 204, 0, .28);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 1px rgba(255, 204, 0, .30),
+    0 0 18px rgba(255, 204, 0, .35),
+    0 0 34px rgba(255, 204, 0, .22),
+    var(--shadow);
+ will-change: box-shadow, transform;
+ animation: unlockAura 1.6s ease-in-out infinite;   
 }
-#unlockBtn:hover{ background:#ff6fe1; }
+@keyframes unlockAura {
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow:
+      0 0 0 1px rgba(255,204,0,.22),
+      0 0 12px rgba(255,204,0,.28),
+      0 0 26px rgba(255,204,0,.14),
+      var(--shadow);
+  }
+  50% {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow:
+      0 0 0 2px rgba(255,204,0,.55),
+      0 0 26px rgba(255,204,0,.65),
+      0 0 58px rgba(255,204,0,.34),
+      var(--shadow);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow:
+      0 0 0 1px rgba(255,204,0,.22),
+      0 0 12px rgba(255,204,0,.28),
+      0 0 26px rgba(255,204,0,.14),
+      var(--shadow);
+  }
+}
+    
+#unlockBtn:hover{
+  background:#ff6fe1;
+  border-color: rgba(255, 204, 0, .85) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 204, 0, .38),
+    0 0 22px rgba(255, 204, 0, .50),
+    0 0 44px rgba(255, 204, 0, .28),
+    var(--shadow);
+}
 #unlockBtn:active{ background:#ff2fce; }
 
     /* New 버튼만 진한 노란색 */
@@ -2504,6 +2550,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
