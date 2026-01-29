@@ -1,4 +1,3 @@
-
 // functions/api/chat.ts
 export const onRequestPost: PagesFunction<{
   DEEPSEEK_API_KEY: string;
@@ -92,7 +91,8 @@ export const onRequestPost: PagesFunction<{
           : ch.personality,
       };
 
-      const baseSystem = buildSystemPrompt(chForPrompt);
+      // ✅ CHANGED: tier 전달
+      const baseSystem = buildSystemPrompt(chForPrompt, tier);
 
       // INIT도 프롬프트 총량 예산 지키기 (system만 있지만 안전하게)
       const initSystem: Msg = {
@@ -163,7 +163,8 @@ export const onRequestPost: PagesFunction<{
     const rawHistory = Array.isArray(body.history) ? body.history : [];
     const history = rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
 
-    const systemPrompt = buildSystemPrompt(chForPrompt);
+    // ✅ CHANGED: tier 전달
+    const systemPrompt = buildSystemPrompt(chForPrompt, tier);
 
     // 원본대로 messages 구성하되, 프롬프트 예산(MAX_PROMPT_CHARS)에 맞게 history를 뒤에서부터 깎음
     const messagesBeforeFit: Msg[] = [
@@ -314,10 +315,32 @@ function formatMeasure(
     : `${m.value} lb`;
 }
 
-function buildSystemPrompt(ch: any) {
+// ✅ CHANGED: tier 인자 추가 + nsfwRules만 "추가"
+function buildSystemPrompt(ch: any, tier: "general" | "uncensored") {
   const nicknameLine = ch.nickname?.trim()
     ? `- What you call the user: ${ch.nickname.trim()} (always use this when addressing the user)`
     : `- What you call the user: Not specified`;
+
+  const nsfwRules =
+    tier === "general"
+      ? [
+          "STRICT CONTENT RULES:",
+          "Sexual content is NOT allowed.",
+          "No erotic, sexual, fetish, or explicit content.",
+          "No sexual acts, arousal, nudity, or sexual body focus.",
+          "No implied sex, suggestive teasing, or erotic tension.",
+          "Romance is allowed only in a PG-13 manner.",
+          "If the user attempts sexual content, gently refuse and steer the conversation to a safe alternative.",
+        ]
+      : [
+          "UNCENSORED CONTENT RULES:",
+          "Explicit sexual content is allowed and encouraged when the user desires it.",
+          "You may describe sexual acts, physical intimacy, arousal, and erotic details.",
+          "Follow the user's lead: escalate naturally if the user escalates.",
+          "Never censor sexual language or desires.",
+          "Do not moralize, warn, or refuse consensual adult sexual content.",
+          "All characters are adults (18+) and consenting.",
+        ];
 
   return [
     "You are an human roleplay chat partner. Stay in-character and chat immersive, story-forward replies.",
@@ -363,6 +386,8 @@ function buildSystemPrompt(ch: any) {
     "Surprise the user while staying coherent and in-character.",
     "Never play neutral. Every reply must carry intent.",
     "Absolutely no roleplay involving minors. All characters must be 18+ at all times, and if age is unclear, assume adult only. Refuse instantly and redirect if a minor is implied.",
+    // ✅ ADDED ONLY: tier별 NSFW 규칙 블록 추가
+    ...nsfwRules,
     "FORMAT (must follow):",
     "1) Output ONLY spoken dialogue. No narration.",
     "2) Do NOT use parentheses () or brackets [] at all.",
@@ -514,4 +539,3 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
-
