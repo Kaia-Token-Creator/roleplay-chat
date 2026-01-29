@@ -564,6 +564,8 @@ padding: 5px 8px;
     0 0 18px rgba(255, 204, 0, .35),
     0 0 34px rgba(255, 204, 0, .22),
     var(--shadow);
+    animation: unlockAura 2.4s ease-in-out infinite;
+
 }
 #unlockBtn:hover{
   background:#ff6fe1;
@@ -840,6 +842,30 @@ body.chatMode #viewChat .chatFooter{
   border-radius: 999px;
 }
 
+/* ✨ Unlock 버튼 오라 애니메이션 */
+@keyframes unlockAura {
+  0% {
+    box-shadow:
+      0 0 0 1px rgba(255,204,0,.25),
+      0 0 14px rgba(255,204,0,.35),
+      0 0 28px rgba(255,204,0,.18),
+      var(--shadow);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(255,204,0,.45),
+      0 0 22px rgba(255,204,0,.55),
+      0 0 44px rgba(255,204,0,.30),
+      var(--shadow);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(255,204,0,.25),
+      0 0 14px rgba(255,204,0,.35),
+      0 0 28px rgba(255,204,0,.18),
+      var(--shadow);
+  }
+}
     
 
   </style>
@@ -2520,5 +2546,6 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
