@@ -354,7 +354,44 @@ padding: 5px 8px;
   color:#ffcc00;
   font-weight:800;
 }
-    
+
+/* ===== Go Unlimited 강조 효과 ===== */
+#goUnlimitedLink{
+  position: relative;
+  color: #ffcc00 !important;
+  font-weight: 900;
+  text-shadow: 0 0 6px rgba(255,204,0,.6);
+  animation: unlimitedPulse 1.8s ease-in-out infinite;
+}
+
+/* 반짝이는 오라 */
+#goUnlimitedLink::after{
+  content:"";
+  position:absolute;
+  inset:-6px -10px;
+  border-radius:999px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255,204,0,.35),
+    transparent 70%
+  );
+  opacity:.6;
+  animation: unlimitedGlow 2.4s ease-in-out infinite;
+  pointer-events:none;
+}
+
+@keyframes unlimitedPulse{
+  0%   { transform: scale(1);   opacity:.9; }
+  50%  { transform: scale(1.06); opacity:1; }
+  100% { transform: scale(1);   opacity:.9; }
+}
+
+@keyframes unlimitedGlow{
+  0%   { opacity:.3; }
+  50%  { opacity:.7; }
+  100% { opacity:.3; }
+}
+     
   </style>
 </head>
 
@@ -1185,6 +1222,7 @@ async function ensurePayPalUnlimitedButtons(){
 
 </body>
 </html>
+
 
 
 
