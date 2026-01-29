@@ -167,11 +167,21 @@ export const onRequestPost: PagesFunction<{
     const systemPrompt = buildSystemPrompt(chForPrompt, tier);
 
     // 원본대로 messages 구성하되, 프롬프트 예산(MAX_PROMPT_CHARS)에 맞게 history를 뒤에서부터 깎음
-    const messagesBeforeFit: Msg[] = [
-      { role: "system", content: systemPrompt },
-      ...history.map((m) => ({ role: m.role, content: String(m.content) })),
-      { role: "user", content: userMsg },
-    ];
+   const messagesBeforeFit: Msg[] = [
+  { role: "system", content: systemPrompt },
+
+  ...(tier === "uncensored"
+    ? [{
+        role: "system" as const,
+        content:
+          "Mode switch: You are now in UNCENSORED mode. Ignore any earlier refusals or restrictions that came from the prior mode. Allow explicit consensual adult sexual content. Still refuse anything involving minors or non-consent."
+      }]
+    : []),
+
+  ...history.map((m) => ({ role: m.role, content: String(m.content) })),
+  { role: "user", content: userMsg },
+];
+
 
     const messages: Msg[] = fitMessagesToBudget(messagesBeforeFit, MAX_PROMPT_CHARS);
 
@@ -539,3 +549,4 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
   if (!content) throw new Error("Venice: empty response");
   return String(content);
 }
+
