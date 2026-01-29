@@ -838,7 +838,33 @@ body.chatMode #viewChat .chatFooter{
   border-radius: 999px;
 }
 
-    
+/* ✅ FORCE Unlock button styling (paste at VERY bottom) */
+button#unlockBtn{
+  background: #ff4fd8 !important;
+  border: 1px solid #ff2fce !important;
+  color: #000 !important;
+  font-weight: 900 !important;
+  border-color: rgba(255, 79, 216, .55) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 79, 216, .25),
+    0 0 18px rgba(255, 79, 216, .35),
+    0 0 34px rgba(255, 79, 216, .22),
+    var(--shadow) !important;
+}
+
+button#unlockBtn:hover{
+  background:#ff6fe1 !important;
+  border-color: rgba(255, 79, 216, .75) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 79, 216, .35),
+    0 0 22px rgba(255, 79, 216, .45),
+    0 0 44px rgba(255, 79, 216, .28),
+    var(--shadow) !important;
+}
+
+button#unlockBtn:active{
+  background:#ff2fce !important;
+}
 
   </style>
 </head>
@@ -1994,7 +2020,7 @@ function looksLikeSext(text){
   const t = String(text || "").toLowerCase();
 
   // 너무 빡세게 잡으면 오탐 많아져서, 대표적인 것 위주로
-  const re = /\b(sext|sex chat|dirty talk|nude|nudes|naked|horny|turn me on|explicit|nsfw|blowjob|handjob|fuck|fucking|cum|cumming|orgasm|climax|ride me|spank|dominant|submissive)\b/i;
+  const re = /\b(sex|sext|sex chat|dirty talk|nude|nudes|naked|horny|turn me on|explicit|nsfw|blowjob|handjob|fuck|fucking|cum|cumming|orgasm|climax|ride me|spank|dominant|submissive)\b/i;
   return re.test(t);
 }
 
@@ -2561,6 +2587,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
