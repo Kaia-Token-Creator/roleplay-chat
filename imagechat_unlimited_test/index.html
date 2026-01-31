@@ -11,6 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
+  <!-- ✅ PayPal SDK (client-id provided) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=ASts4hxcd4-DkLEL8b-PbbawSaCD4G5pQiuJM9aZYawixhxWbQ2upSru10WQNZa4HzCqHUcGC8Z1RIrW&currency=USD&intent=capture"></script>
+
   <style>
     :root{
       --bg:#000;
@@ -19,6 +22,7 @@
       --border:rgba(255,255,255,.14);
       --chatColor:#ffffff;
       --shadow: 0 14px 36px rgba(0,0,0,.55);
+      --yellow:#ffcc00;
     }
 
     *{ box-sizing:border-box; }
@@ -53,7 +57,7 @@
       font-weight: 700;
       letter-spacing: .3px;
       font-size: clamp(16px, 3.6vw, 24px);
-padding: 5px 8px;
+      padding: 5px 8px;
       border-radius: 999px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
@@ -61,257 +65,231 @@ padding: 5px 8px;
       user-select:none;
     }
 
-    .logoRole{
-  color: #ffcc00; /* dark yellow */
-}
+    .logoRole{ color:#ffcc00; }
+    .logoDot{
+      color: rgba(255,255,255,.95);
+      font-size: 0.5em;
+      vertical-align: baseline;
+    }
+    .logo span{ opacity:.95; }
 
-
-.logoDot{
-  color: rgba(255,255,255,.95); /* keep white */
-  font-size: 0.5em;            /* half size */
-  vertical-align: baseline;
-}
-
-.logo span{ opacity:.95; }
-    .sub{
-      text-align:center;
-      margin-top: 0px;
-      color: var(--muted);
-      font-size: 12px;
+    .shareWrap{
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-.shareWrap{
-  display: flex;
-  align-items: center;
-  gap: 6px;               /* ← 여기서 거리 미세조정 */
-}
+    .bookmarkHint{
+      font-size: 10px;
+      line-height: 1.1;
+      text-align: right;
+      color: rgba(255,255,255,.55);
+      user-select: none;
+      white-space: nowrap;
+    }
 
-.bookmarkHint{
-  font-size: 10px;
-  line-height: 1.1;
-  text-align: right;      /* 버튼 쪽으로 붙는 느낌 */
-  color: rgba(255,255,255,.55);
-  user-select: none;
-  white-space: nowrap;
-}
+    .shareBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:.15s ease;
+      flex: 0 0 auto;
+    }
+    .shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+    .shareBtn:active{ transform: translateY(0px); }
 
-.shareBtn{
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  box-shadow: var(--shadow);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  transition:.15s ease;
-  flex: 0 0 auto;
-}
-.shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
-.shareBtn:active{ transform: translateY(0px); }
+    .shareBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
-.shareBtn svg{
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: rgba(255,255,255,.92);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+    .infoMenu{
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display: none;
+      z-index: 99999;
+    }
 
-.infoMenu{
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 220px;
-  background: rgba(10,10,10,.92);
-  border: 1px solid rgba(255,255,255,.16);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  padding: 6px;
-  display: none;
-  z-index: 99999;
-}
+    .infoMenu.active{ display: block; }
 
-.infoMenu.active{ display: block; }
+    .infoMenu a{
+      display: block;
+      padding: 10px 10px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+    }
 
-.infoMenu a{
-  display: block;
-  padding: 10px 10px;
-  border-radius: 12px;
-  text-decoration: none;
-  color: rgba(255,255,255,.92);
-  font-size: 13px;
-}
+    .infoMenu a:hover{
+      background: rgba(255,255,255,.08);
+    }
 
-.infoMenu a:hover{
-  background: rgba(255,255,255,.08);
-}
+    /* ===== Chat ===== */
+    .chatShell{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
 
-   /* ===== Chat ===== */
-.chatShell{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-}
+    .chatBox{
+      flex:1;
+      overflow:auto;
+      padding:14px;
+      font-size: 12px;
+      line-height: 1.25;
+    }
 
-/* 전체 채팅 글씨 더 작게 */
-.chatBox{
-  flex:1;
-  overflow:auto;
-  padding:14px;
-  font-size: 12px;        /* ✅ 더 작게 */
-  line-height: 1.25;
-}
+    .chatMsg{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+    }
 
-/* 메시지 간격 살짝 줄임 */
-.chatMsg{
-  display:flex;
-  gap:8px;                /* ✅ 더 촘촘 */
-  margin-bottom:10px;     /* ✅ 더 촘촘 */
-}
+    .chatMsg.me{ flex-direction:row-reverse; }
 
-.chatMsg.me{ flex-direction:row-reverse; }
+    .who{
+      width:30px;
+      height:30px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      font-size:8px;
+      font-weight:700;
+      color: rgba(255,255,255,.55);
+    }
 
-/* 아바타/You 영역도 더 작게 */
-.who{
-  width:30px;             /* ✅ 38 -> 30 */
-  height:30px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  font-size:8px;          /* ✅ YOU 글씨 더 작게 */
-  font-weight:700;
-  color: rgba(255,255,255,.55);
-}
+    .who img{ width:100%;height:100%;object-fit:cover; }
 
-.who img{ width:100%;height:100%;object-fit:cover; }
+    .whoLabel{
+      font-size:8px;
+      letter-spacing:.1px;
+      opacity:.7;
+    }
 
-/* JS에서 넣는 You 라벨 */
-.whoLabel{
-  font-size:8px;          /* ✅ 더 작게 */
-  letter-spacing:.1px;
-  opacity:.7;
-}
+    .bubble{
+      max-width:78%;
+      border-radius:14px;
+      border:1px solid var(--border);
+      padding:7px 9px;
+      background: var(--card);
+    }
 
-/* 말풍선도 살짝 컴팩트 */
-.bubble{
-  max-width:78%;
-  border-radius:14px;     /* ✅ 16 -> 14 */
-  border:1px solid var(--border);
-  padding:7px 9px;        /* ✅ 더 작게 */
-  background: var(--card);
-}
+    .bubble .name{
+      font-weight:800;
+      color: var(--chatColor);
+      margin-bottom:3px;
+      font-family:"Baloo 2",sans-serif;
+      font-size:12px;
+      line-height: 1.1;
+    }
 
-/* 이름(캐릭터/나) 둘 다 작게 */
-.bubble .name{
-  font-weight:800;
-  color: var(--chatColor);
-  margin-bottom:3px;      /* ✅ 간격 줄임 */
-  font-family:"Baloo 2",sans-serif;
-  font-size:12px;         /* ✅ 이름 더 작게 */
-  line-height: 1.1;
-}
+    .bubble .asstText{
+      color: var(--chatColor);
+      font-size:12px;
+      line-height: 1.25;
+    }
 
-/* assistant text color should follow character color */
-.bubble .asstText{
-  color: var(--chatColor);
-  font-size:12px;         /* ✅ 내용 더 작게 */
-  line-height: 1.25;
-}
+    .bubble .userText{
+      color:#fff;
+      font-size:12px;
+      line-height: 1.25;
+    }
 
-/* user text stays white */
-.bubble .userText{
-  color:#fff;
-  font-size:12px;         /* ✅ 내용 더 작게 */
-  line-height: 1.25;
-}
+    .bubble img{
+      width:100%;
+      border-radius:12px;
+      margin-top:6px;
+      border:1px solid var(--border);
+    }
 
-/* 이미지도 살짝 덜 두껍게 */
-.bubble img{
-  width:100%;
-  border-radius:12px;
-  margin-top:6px;         /* ✅ 8 -> 6 */
-  border:1px solid var(--border);
-}
+    /* ✅ video element */
+    .bubble video{
+      width:100%;
+      border-radius:12px;
+      margin-top:6px;
+      border:1px solid var(--border);
+      background:#000;
+    }
 
-/* 입력 영역 글씨도 줄임 */
-.chatControls{
-  display:flex;
-  gap:10px;
-  padding:10px;           /* ✅ 12 -> 10 */
-  border-top:1px solid var(--border);
-  background: rgba(0,0,0,.7);
-}
+    .chatControls{
+      display:flex;
+      gap:10px;
+      padding:10px;
+      border-top:1px solid var(--border);
+      background: rgba(0,0,0,.7);
+    }
 
-.chatInput{
-  flex:1;
-  height:40px;            /* ✅ 42 -> 40 */
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:#000;
-  color:#fff;
-  padding:0 10px;
-  font-size:12px;         /* ✅ 입력 글씨 줄임 */
-}
+    .chatInput{
+      flex:1;
+      height:40px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#000;
+      color:#fff;
+      padding:0 10px;
+      font-size:12px;
+    }
 
-.sendBtn{
-  width:40px;             /* ✅ 42 -> 40 */
-  height:40px;
-  border-radius:14px;
-  background:#e0b400;
-  border:none;
-  font-weight:800;
-  cursor:pointer;
-}
+    .sendBtn{
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      background:#e0b400;
+      border:none;
+      font-weight:800;
+      cursor:pointer;
+    }
 
-/* ===== Typing cursor (이미 JS에서 쓰고 있으니 CSS만 보강) ===== */
-.typeCursor{
-  display:inline-block;
-  width:8px;
-  opacity:.8;
-  animation: blink 1s steps(1) infinite;
-}
-@keyframes blink { 50% { opacity: 0; } }
+    .typeCursor{
+      display:inline-block;
+      width:8px;
+      opacity:.8;
+      animation: blink 1s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
 
+    .imgChatTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+    }
 
-    /* assistant text color should follow character color */
-.bubble .asstText{
-  color: var(--chatColor);
-}
+    .imgChatTitle{
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: #FFFFFF;
+    }
 
-/* user text stays white */
-.bubble .userText{
-  color: #fff;
-}
-
-/* ===== Image chat top bar ===== */
-.imgChatTop{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 8px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.65);
-  backdrop-filter: blur(8px);
-}
-
-
-.imgChatTitle{
-  font-family: "Baloo 2", Inter, sans-serif;
-  font-weight: 700;
-  font-size: 14px;
-  color: #FFFFFF;
-}
-
- .xBtn{
+    .xBtn{
       border:none;
       background: rgba(255,255,255,.08);
       color: var(--fg);
@@ -321,241 +299,354 @@ padding: 5px 8px;
       border: 1px solid rgba(255,255,255,.14);
     }
 
-/* ===== Image chat: New character button highlight ===== */
-#imgResetBtn{
-  background: #e0b400;          /* 노란 배경 */
-  border: 1px solid #c9a200;    /* 노란 테두리 */
-  color: #000;                  /* 검은 글씨 */
-  font-weight: 800;
-}
+    #imgResetBtn{
+      background: #e0b400;
+      border: 1px solid #c9a200;
+      color: #000;
+      font-weight: 800;
+    }
 
-#imgResetBtn:hover{
-  background: #f0c800;
-}
+    #imgResetBtn:hover{ background: #f0c800; }
+    #imgResetBtn:active{ background: #cfa600; }
 
-#imgResetBtn:active{
-  background: #cfa600;
-}
+    .chatMsg .bubble{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 12px 28px rgba(0,0,0,.45);
+      backdrop-filter: blur(12px);
+    }
 
+    /* =========================
+       Secret Gift Modal
+       ========================= */
+    .secretModal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100000;
+      backdrop-filter: blur(6px);
+    }
+    .secretModal.active{ display:flex; }
+    .secretCard{
+      width: min(520px, calc(100vw - 28px));
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px 14px 12px;
+    }
+    .secretTop{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .secretTitle{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      color: #ffcc00;
+    }
+    .giftIcon{
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      background: rgba(255,204,0,.12);
+      border: 1px solid rgba(255,204,0,.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .giftIcon svg{
+      width: 16px;
+      height: 16px;
+      stroke: #ffcc00;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .secretX{
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+      cursor:pointer;
+    }
+    .secretX:hover{ background: rgba(255,255,255,.10); }
+    .secretBody{
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(255,255,255,.88);
+    }
+    .secretLine{ margin: 8px 0 10px; color: rgba(255,255,255,.78); }
+    .secretLinkRow{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+    }
+    .secretLinkText{
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-all;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      color: #ffcc00;
+    }
+    .iconBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.35);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition: .15s ease;
+    }
+    .iconBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
+    .iconBtn:active{ transform: translateY(0px); }
+    .iconBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .secretNote{
+      margin-top: 10px;
+      color: #ffcc00;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .secretNote .offHighlight{
+      color: #ffffff;
+      font-weight: 900;
+    }
+    .secretActions{
+      margin-top: 12px;
+      display:flex;
+      justify-content: flex-end;
+    }
+    .thankBtn{
+      border: none;
+      background: #e0b400;
+      color: #000;
+      font-weight: 900;
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+    }
+    .thankBtn:hover{ background:#f0c800; }
+    .thankBtn:active{ background:#cfa600; }
+    .toastMini{
+      margin-left: 8px;
+      font-size: 11px;
+      color: rgba(255,255,255,.7);
+      user-select:none;
+    }
 
-/* ===== Image chat bubbles: glass separation ===== */
-.chatMsg .bubble{
-  background: rgba(255,255,255,.08);        /* ✅ 체감 올라감 */
-  border: 1px solid rgba(255,255,255,.22);
-  box-shadow: 0 12px 28px rgba(0,0,0,.45);  /* ✅ 떠있는 느낌 */
-  backdrop-filter: blur(12px);
-}
+    /* =========================
+       ✅ Generate video link (under image)
+       ========================= */
+    .genVideoRow{
+      margin-top: 8px;
+      display:flex;
+      align-items:center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .genVideoLink{
+      color: var(--yellow);
+      font-weight: 900;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: none; /* ✅ no underline */
+      user-select:none;
+    }
+    .genVideoLink:hover{ opacity:.9; }
+    .genVideoLink:active{ opacity:.75; }
 
-/* =========================
-   Secret Gift Modal
-   ========================= */
-.secretModal{
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.62);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 100000; /* header/infoMenu보다 위 */
-  backdrop-filter: blur(6px);
-}
+    /* =========================
+       ✅ Video Download button
+       ========================= */
+    .videoActionsRow{
+      margin-top: 8px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap: 10px;
+    }
+    .dlBtn{
+      border:none;
+      background: rgba(255,204,0,.14);
+      color: var(--yellow);
+      border: 1px solid rgba(255,204,0,.35);
+      font-weight: 900;
+      padding: 8px 10px;
+      border-radius: 14px;
+      cursor:pointer;
+    }
+    .dlBtn:hover{ background: rgba(255,204,0,.20); transform: translateY(-1px); }
+    .dlBtn:active{ transform: translateY(0px); opacity:.9; }
 
-.secretModal.active{ display:flex; }
+    /* =========================
+       ✅ PayPal Video Modal
+       ========================= */
+    .videoPayModal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 110000; /* secret modal보다 위 */
+      backdrop-filter: blur(6px);
+    }
+    .videoPayModal.active{ display:flex; }
 
-.secretCard{
-  width: min(520px, calc(100vw - 28px));
-  background: rgba(10,10,10,.92);
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 18px;
-  box-shadow: var(--shadow);
-  padding: 14px 14px 12px;
-}
+    .videoPayCard{
+      width: min(520px, calc(100vw - 28px));
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px 14px 12px;
+    }
 
-.secretTop{
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 10px;
-}
+    .videoPayTop{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+    }
 
-.secretTitle{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-  font-family: "Baloo 2", Inter, sans-serif;
-  font-weight: 800;
-  font-size: 16px;
-  color: #ffcc00;
-}
+    .videoPayTitle{
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      color: var(--yellow);
+    }
 
-.giftIcon{
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-  background: rgba(255,204,0,.12);
-  border: 1px solid rgba(255,204,0,.35);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+    .videoPayX{
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+      cursor:pointer;
+    }
+    .videoPayX:hover{ background: rgba(255,255,255,.10); }
 
-.giftIcon svg{
-  width: 16px;
-  height: 16px;
-  stroke: #ffcc00;
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+    .videoPayBody{
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(255,255,255,.88);
+    }
 
-.secretX{
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.9);
-  cursor:pointer;
-}
+    .optionBox{
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
 
-.secretX:hover{ background: rgba(255,255,255,.10); }
+    .optRow{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 8px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .optLeft{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .optLabel{
+      font-weight: 900;
+      color: #fff;
+    }
+    .optPrice{
+      font-weight: 900;
+      color: var(--yellow);
+    }
 
-.secretBody{
-  margin-top: 10px;
-  font-size: 12px;
-  line-height: 1.35;
-  color: rgba(255,255,255,.88);
-}
+    .promptBox{
+      margin-top: 10px;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+    }
+    .promptBox label{
+      color: rgba(255,255,255,.75);
+      font-size: 11px;
+    }
+    .promptInput{
+      width:100%;
+      height: 40px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: #000;
+      color:#fff;
+      padding: 0 10px;
+      font-size: 12px;
+    }
 
-.secretLine{
-  margin: 8px 0 10px;
-  color: rgba(255,255,255,.78);
-}
+    .paypalArea{
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+    }
 
-.secretLinkRow{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-  padding: 10px 10px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-}
-
-.secretLinkText{
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  word-break: break-all;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  font-size: 12px;
-  color: #ffcc00;
-}
-
-.iconBtn{
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.35);
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition: .15s ease;
-}
-.iconBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
-.iconBtn:active{ transform: translateY(0px); }
-
-.iconBtn svg{
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: rgba(255,255,255,.92);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.secretNote{
-  margin-top: 10px;
-  color: #ffcc00;          /* ✅ 전체 노란색 */
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.secretNote .offHighlight{
-  color: #ffffff;          /* ✅ 50% off 흰색 강조 */
-  font-weight: 900;
-}
-
-.secretActions{
-  margin-top: 12px;
-  display:flex;
-  justify-content: flex-end;
-}
-
-.thankBtn{
-  border: none;
-  background: #e0b400;
-  color: #000;
-  font-weight: 900;
-  padding: 10px 12px;
-  border-radius: 14px;
-  cursor: pointer;
-}
-.thankBtn:hover{ background:#f0c800; }
-.thankBtn:active{ background:#cfa600; }
-
-.toastMini{
-  margin-left: 8px;
-  font-size: 11px;
-  color: rgba(255,255,255,.7);
-  user-select:none;
-}
-
-    /* ===== Generate video link ===== */
-.genVideoWrap{
-  margin-top: 6px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.genVideoBtn{
-  font-size: 11px;
-  font-weight: 800;
-  color: #ffcc00;
-  cursor: pointer;
-  user-select: none;
-}
-
-.genVideoBtn:hover{
-  opacity: .85;
-}
-
-
+    .smallHint{
+      margin-top: 10px;
+      font-size: 11px;
+      color: rgba(255,255,255,.65);
+    }
   </style>
-
-<script src="https://www.paypal.com/sdk/js?client-id=ASts4hxcd4-DkLEL8b-PbbawSaCD4G5pQiuJM9aZYawixhxWbQ2upSru10WQNZa4HzCqHUcGC8Z1RIrW&currency=USD"></script>
-
 </head>
 
 <body>
 <div class="wrap">
 
 <header>
-  <!-- ✅ 2줄 스택 컨테이너 -->
   <div style="display:block; width:100%;">
 
-    <!-- ✅ 1줄: 기존 헤더 내용 (그대로, 단 1글자도 수정X) -->
     <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
       <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer" class="logo">
         <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
       </a>
 
-      <!-- ✅ 공유 영역 묶기 -->
       <div class="shareWrap" style="position:relative;">
         <div class="bookmarkHint">
           Bookmark<br>&amp; Share
@@ -571,7 +662,6 @@ padding: 5px 8px;
           </svg>
         </button>
 
-        <!-- ✅ 새 Info 버튼(최우측) -->
         <button class="shareBtn" id="infoBtn" type="button" aria-label="Info" title="Info">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="9"></circle>
@@ -580,7 +670,6 @@ padding: 5px 8px;
           </svg>
         </button>
 
-        <!-- ✅ Info 메뉴 -->
         <div class="infoMenu" id="infoMenu" role="menu" aria-label="Info menu">
           <a href="https://chat-with-stranger.com" target="_blank" rel="noopener noreferrer" style="color: #FF69B4; font-weight: bold; text-decoration: none;">Chat with stranger</a>
           <a href="https://roleplay-chat.com/human" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Chat with real human</a>
@@ -597,47 +686,45 @@ padding: 5px 8px;
       </div>
     </div>
 
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; width:100%;">
+      <sup style="color:#ffcc00; font-size:10px; font-weight:bold; user-select:none;">
+        Unlimited access while this tab is open.
+      </sup>
 
-   <div style="display:flex; align-items:flex-start; justify-content:space-between; width:100%;">
-  <sup style="color:#ffcc00; font-size:10px; font-weight:bold; user-select:none;">
-  Unlimited access while this tab is open.
-</sup>
+      <div align="right">
+        <sup>
+          <a href="https://roleplay-chat.com/human" target="_blank" style="text-decoration:none">
+            <font size="1" color="#ffcc00"><b>Live user chat</b></font>
+          </a>
+        </sup>
 
-  <!-- ✅ 오른쪽: 기존 Live user chat (위치 유지) -->
-  <div align="right">
-    <sup>
-      <a href="https://roleplay-chat.com/human" target="_blank" style="text-decoration:none">
-        <font size="1" color="#ffcc00"><b>Live user chat</b></font>
-      </a>
-    </sup>
+        <script id="cid0020000430144912743" data-cfasync="false" async
+          src="https://st.chatango.com/js/gz/emb.js"
+          style="width:200px;height:300px;">
+          {"handle":"roleplay-chat-com","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"cv":1,"cvfntsz":"10px","cvbg":"000000","cvfg":"ffcc00","cvw":49,"cvh":18}}
+        </script>
+      </div>
+    </div>
 
-    <script id="cid0020000430144912743" data-cfasync="false" async
-      src="https://st.chatango.com/js/gz/emb.js"
-      style="width:200px;height:300px;">
-      {"handle":"roleplay-chat-com","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"cv":1,"cvfntsz":"10px","cvbg":"000000","cvfg":"ffcc00","cvw":49,"cvh":18}}
-    </script>
   </div>
-</div>
-
 </header>
 
-  <!-- Image chat top bar -->
 <div class="imgChatTop">
   <div class="imgChatTitle" id="imgChatTitle">Image chat</div>
   <button class="xBtn" id="imgResetBtn" type="button">New character</button>
 </div>
 
-  <!-- Chat -->
-  <div class="chatShell">
-    <div class="chatBox" id="chatBox"></div>
+<div class="chatShell">
+  <div class="chatBox" id="chatBox"></div>
 
-    <div class="chatControls">
-      <input id="chatInput" class="chatInput" placeholder="Type a message..." />
-      <button id="sendBtn" class="sendBtn">➤</button>
-    </div>
+  <div class="chatControls">
+    <input id="chatInput" class="chatInput" placeholder="Type a message..." />
+    <button id="sendBtn" class="sendBtn">➤</button>
   </div>
 </div>
-  
+
+</div>
+
 <!-- =========================
      Secret Gift Modal (in-page)
      ========================= -->
@@ -646,7 +733,6 @@ padding: 5px 8px;
     <div class="secretTop">
       <div class="secretTitle">
         <span class="giftIcon" aria-hidden="true">
-          <!-- gift icon -->
           <svg viewBox="0 0 24 24">
             <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"></path>
             <path d="M2 7h20v5H2z"></path>
@@ -667,7 +753,6 @@ padding: 5px 8px;
       <div class="secretLinkRow">
         <div class="secretLinkText" id="secretLinkText">https://roleplay-chat.com/secret_price</div>
 
-        <!-- Copy -->
         <button class="iconBtn" id="secretCopyBtn" type="button" aria-label="Copy link" title="Copy">
           <svg viewBox="0 0 24 24">
             <rect x="9" y="9" width="13" height="13" rx="2"></rect>
@@ -675,7 +760,6 @@ padding: 5px 8px;
           </svg>
         </button>
 
-        <!-- Share -->
         <button class="iconBtn" id="secretShareBtn" type="button" aria-label="Share link" title="Share">
           <svg viewBox="0 0 24 24">
             <circle cx="18" cy="5" r="3"></circle>
@@ -689,19 +773,68 @@ padding: 5px 8px;
         <span class="toastMini" id="secretToast" style="display:none;">Copied!</span>
       </div>
 
-     <div class="secretNote">
-       <b style="font-size:13px;">Copy it now and keep it for later.</b><br><br>
-  You can use this secret price link <span class="offHighlight">50% off</span> forever to create a new character.<br><br>
-  This link must be used in a new tab.<br><br>
-  All prices are <span class="offHighlight">50% off</span> and you can use it unlimited times.<br><br>
-  Copy the link and use it when you create a new character.<br><br>
-  You may share this link with friends or on social media.<br>
-  Yeah, secretly.<br><br>
-  Enjoy your time
-</div>
+      <div class="secretNote">
+        <b style="font-size:13px;">Copy it now and keep it for later.</b><br><br>
+        You can use this secret price link <span class="offHighlight">50% off</span> forever to create a new character.<br><br>
+        This link must be used in a new tab.<br><br>
+        All prices are <span class="offHighlight">50% off</span> and you can use it unlimited times.<br><br>
+        Copy the link and use it when you create a new character.<br><br>
+        You may share this link with friends or on social media.<br>
+        Yeah, secretly.<br><br>
+        Enjoy your time
+      </div>
 
       <div class="secretActions">
         <button class="thankBtn" id="secretThankBtn" type="button">Thank you (Go to chat)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     ✅ Video PayPal Modal
+     ========================= -->
+<div class="videoPayModal" id="videoPayModal" aria-hidden="true">
+  <div class="videoPayCard" role="dialog" aria-modal="true" aria-label="Generate Video Payment">
+    <div class="videoPayTop">
+      <div class="videoPayTitle">Generate video</div>
+      <button class="videoPayX" id="videoPayCloseX" type="button" aria-label="Close">✕</button>
+    </div>
+
+    <div class="videoPayBody">
+      <div style="color:rgba(255,255,255,.75); font-size:12px; margin-top:4px;">
+        Choose video length and pay with PayPal.
+      </div>
+
+      <div class="optionBox" role="radiogroup" aria-label="Video length options">
+        <div class="optRow">
+          <div class="optLeft">
+            <input type="radio" name="vidLen" id="vid5" value="5s" checked />
+            <label for="vid5" class="optLabel">5s</label>
+          </div>
+          <div class="optPrice">$1.5</div>
+        </div>
+
+        <div class="optRow">
+          <div class="optLeft">
+            <input type="radio" name="vidLen" id="vid10" value="10s" />
+            <label for="vid10" class="optLabel">10s</label>
+          </div>
+          <div class="optPrice">$2</div>
+        </div>
+      </div>
+
+      <div class="promptBox">
+        <label for="vidPrompt">Additional prompt (optional)</label>
+        <input id="vidPrompt" class="promptInput" placeholder="e.g. cinematic camera move, gentle wind, etc." />
+      </div>
+
+      <div class="paypalArea">
+        <div id="paypalButtons"></div>
+      </div>
+
+      <div class="smallHint">
+        After payment, we’ll generate a video from the image in the selected bubble.
       </div>
     </div>
   </div>
@@ -722,17 +855,14 @@ function readSession(){
   catch { return null; }
 }
 
-
 const session = readSession();
 
-  // ✅ Page title (browser tab)
 if (session?.name){
   document.title = `Image chat with ${session.name} | roleplay-chat.com`;
 } else {
   document.title = "Image chat | roleplay-chat.com";
 }
 
-  
 function setPaidForever(){
   const payload = { status: "paid", paidAt: Date.now() };
   sessionStorage.setItem(
@@ -746,7 +876,6 @@ function readUnlimitedPaid(){
   const raw = sessionStorage.getItem(IMAGECHAT_UNLIMITED_PAID_KEY);
   if (!raw) return null;
 
-  // 메인에서 "paid" 문자열만 저장한 경우도 호환
   if (raw === "paid"){
     return setPaidForever();
   }
@@ -765,8 +894,6 @@ function isUnlimitedPaid(){
 
 const paid = isUnlimitedPaid();
 
-
-  // ✅ Top bar title + New character button
 const titleEl = document.getElementById("imgChatTitle");
 if (titleEl){
   titleEl.textContent = session?.name
@@ -781,7 +908,6 @@ if (imgResetBtn){
   });
 }
 
-
 function loadHistory(){
   const raw = sessionStorage.getItem(IMAGECHAT_HISTORY_KEY);
   try { return raw ? JSON.parse(raw) : []; }
@@ -793,20 +919,16 @@ function saveHistory(list){
   catch(e){ console.error(e); }
 }
 
-
 if (!paid){
   alert("Image chat is locked. Please complete payment first.");
   location.href = "https://roleplay-chat.com/";
 }
-
 
 if (!session || !session.name){
   alert("No character session found. Please create a character first.");
   location.href = "https://roleplay-chat.com/";
 }
 
-
-/* Apply font color */
 if (session?.fontColor){
   document.documentElement.style.setProperty("--chatColor", session.fontColor);
 }
@@ -819,7 +941,7 @@ const chatBox = document.getElementById("chatBox");
 const input = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 
-let history = loadHistory(); // ✅ refresh에도 남음
+let history = loadHistory();
 
 function escapeText(s){
   return (s ?? "").toString();
@@ -832,9 +954,8 @@ async function typewriter(el, text, speed=14){
   cursor.textContent = "▍";
   el.appendChild(cursor);
 
-  // ✅ 사용자가 스크롤을 위로 올려서 읽는 중이면 자동 스크롤 방해 안 하려고 플래그
   const shouldAutoScroll = () => {
-    const threshold = 80; // 바닥에서 80px 이내면 "바닥에 붙어있다"고 판단
+    const threshold = 80;
     const distFromBottom = chatBox.scrollHeight - (chatBox.scrollTop + chatBox.clientHeight);
     return distFromBottom < threshold;
   };
@@ -844,7 +965,6 @@ async function typewriter(el, text, speed=14){
     el.append(text[i]);
     el.appendChild(cursor);
 
-    // ✅ 타이핑 중 높이가 늘어날 때마다 바닥으로 따라가기
     if (shouldAutoScroll()){
       chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
     }
@@ -852,13 +972,201 @@ async function typewriter(el, text, speed=14){
     await new Promise(r => setTimeout(r, speed));
   }
   cursor.remove();
-
-  // ✅ 끝났을 때도 한 번 확실히 바닥
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
 }
 
+/* =========================
+   ✅ Video Payment Modal logic
+   ========================= */
+const videoPayModal = document.getElementById("videoPayModal");
+const videoPayCloseX = document.getElementById("videoPayCloseX");
+const paypalButtonsWrap = document.getElementById("paypalButtons");
+const vidPrompt = document.getElementById("vidPrompt");
 
-function appendMsg(role, text, imageUrl, opts = {}){
+let selectedImageDataUrl = "";
+let selectedImageCaption = ""; // optional future use
+
+function openVideoPayModal(){
+  if (!videoPayModal) return;
+  videoPayModal.classList.add("active");
+  videoPayModal.setAttribute("aria-hidden","false");
+  renderPayPalButtons();
+}
+
+function closeVideoPayModal(){
+  if (!videoPayModal) return;
+  videoPayModal.classList.remove("active");
+  videoPayModal.setAttribute("aria-hidden","true");
+}
+
+if (videoPayCloseX) videoPayCloseX.addEventListener("click", closeVideoPayModal);
+if (videoPayModal){
+  videoPayModal.addEventListener("click", (e) => {
+    if (e.target === videoPayModal) closeVideoPayModal();
+  });
+}
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeVideoPayModal();
+});
+
+function getSelectedDuration(){
+  const el = document.querySelector('input[name="vidLen"]:checked');
+  return el ? el.value : "5s";
+}
+function getSelectedPrice(){
+  const d = getSelectedDuration();
+  return (d === "10s") ? "2.00" : "1.50";
+}
+
+/* PayPal Buttons re-render safe */
+let paypalRendered = false;
+function renderPayPalButtons(){
+  if (!paypalButtonsWrap) return;
+
+  // wipe + re-render (keeps it simple and always correct)
+  paypalButtonsWrap.innerHTML = "";
+  paypalRendered = false;
+
+  if (!window.paypal || !window.paypal.Buttons){
+    paypalButtonsWrap.innerHTML = '<div style="color:rgba(255,255,255,.75); font-size:12px;">PayPal SDK not loaded.</div>';
+    return;
+  }
+
+  window.paypal.Buttons({
+    style: {
+      layout: 'vertical',
+      shape: 'pill',
+      label: 'pay'
+    },
+    createOrder: (data, actions) => {
+      const value = getSelectedPrice();
+      const duration = getSelectedDuration();
+      return actions.order.create({
+        purchase_units: [{
+          description: "video game", // ✅ requested
+          amount: { value },
+          custom_id: `video_${duration}`
+        }]
+      });
+    },
+    onApprove: async (data, actions) => {
+      const capture = await actions.order.capture();
+      // 결제 성공 → 모달 닫고 생성 시작
+      closeVideoPayModal();
+
+      const duration = getSelectedDuration();
+      const extraPrompt = (vidPrompt && vidPrompt.value ? String(vidPrompt.value).trim() : "");
+
+      // UX: user가 뭘 샀는지 보이게 한 줄
+      appendMsg("assistant", `Payment complete. Generating ${duration} video...`, undefined, undefined, { animate: true });
+
+      try{
+        await generateVideoFromSelectedImage({ duration, extraPrompt });
+      }catch(e){
+        appendMsg("assistant", `Error: ${String(e?.message || e)}`);
+      }
+    },
+    onError: (err) => {
+      // optional: show error in chat
+      appendMsg("assistant", `PayPal error: ${String(err?.message || err)}`);
+    }
+  }).render(paypalButtonsWrap);
+
+  paypalRendered = true;
+}
+
+// radio change → rerender 버튼 금액 반영
+document.addEventListener("change", (e) => {
+  if (e && e.target && e.target.name === "vidLen"){
+    // re-render to ensure amount updates
+    renderPayPalButtons();
+  }
+});
+
+/* =========================
+   ✅ Venice video generation flow (via /api/video)
+   ========================= */
+async function generateVideoFromSelectedImage({ duration, extraPrompt }){
+  if (!selectedImageDataUrl){
+    throw new Error("No image selected.");
+  }
+
+  // 1) queue
+  const qRes = await fetch("/api/video", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "queue",
+      duration,
+      imageDataUrl: selectedImageDataUrl,
+      prompt: extraPrompt || ""
+    })
+  });
+
+  const qData = await qRes.json().catch(() => ({}));
+  if (!qRes.ok){
+    throw new Error(qData.detail || qData.error || `HTTP ${qRes.status}`);
+  }
+
+  const model = qData.model;
+  const queue_id = qData.queue_id;
+  if (!model || !queue_id){
+    throw new Error("Queue failed: missing model/queue_id");
+  }
+
+  // 2) poll retrieve
+  const startedAt = Date.now();
+  const maxMs = 6 * 60 * 1000; // 6 minutes client-side
+  const pollEveryMs = 2500;
+
+  while (Date.now() - startedAt < maxMs){
+    await new Promise(r => setTimeout(r, pollEveryMs));
+
+    const rRes = await fetch("/api/video", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "retrieve",
+        model,
+        queue_id
+      })
+    });
+
+    const ct = (rRes.headers.get("content-type") || "").toLowerCase();
+    const rData = await rRes.json().catch(() => ({}));
+    if (!rRes.ok){
+      throw new Error(rData.detail || rData.error || `HTTP ${rRes.status}`);
+    }
+
+    if (rData && rData.status === "PROCESSING"){
+      // keep waiting
+      continue;
+    }
+
+    if (rData && rData.status === "COMPLETED" && rData.video && rData.video.b64 && rData.video.mime){
+      const videoUrl = `data:${rData.video.mime};base64,${rData.video.b64}`;
+
+      // ✅ show in a new bubble with download button
+      appendMsg("assistant", "Here is your video.", undefined, videoUrl, { animate: true });
+
+      // ✅ persist
+      history.push({ role: "assistant", content: "Here is your video.", videoUrl });
+      saveHistory(history);
+
+      return;
+    }
+
+    // unknown response
+    throw new Error("Unexpected retrieve response.");
+  }
+
+  throw new Error("Video generation timed out.");
+}
+
+/* =========================
+   appendMsg (updated: supports video + generate link under image)
+   ========================= */
+function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
   const { animate = false } = opts;
 
   const msg = document.createElement("div");
@@ -915,26 +1223,61 @@ function appendMsg(role, text, imageUrl, opts = {}){
     bubble.appendChild(body);
   }
 
+  // image
+  let imgEl = null;
   if (imageUrl){
-  const img = document.createElement("img");
-  img.src = imageUrl;
-  bubble.appendChild(img);
+    const img = document.createElement("img");
+    img.src = imageUrl;
+    img.dataset.imageDataUrl = imageUrl; // ✅ capture for modal
+    imgEl = img;
+    bubble.appendChild(img);
 
-  // ✅ 이미지 포함 + assistant 말풍선에만 "Generate video"
-  if (role === "assistant"){
-    const genWrap = document.createElement("div");
-    genWrap.className = "genVideoWrap";
+    // ✅ Only for assistant bubble with image: add Generate video link
+    if (role === "assistant"){
+      const row = document.createElement("div");
+      row.className = "genVideoRow";
 
-    const genBtn = document.createElement("div");
-    genBtn.className = "genVideoBtn";
-    genBtn.textContent = "Generate video";
+      const link = document.createElement("a");
+      link.className = "genVideoLink";
+      link.textContent = "Generate video";
+      link.href = "javascript:void(0)";
 
-    genBtn.onclick = () => openVideoPayModal(imageUrl);
+      link.addEventListener("click", () => {
+        selectedImageDataUrl = img.dataset.imageDataUrl || img.src || "";
+        if (vidPrompt) vidPrompt.value = "";
+        openVideoPayModal();
+      });
 
-    genWrap.appendChild(genBtn);
-    bubble.appendChild(genWrap);
+      row.appendChild(link);
+      bubble.appendChild(row);
+    }
   }
-}
+
+  // video
+  if (videoUrl){
+    const v = document.createElement("video");
+    v.src = videoUrl;
+    v.controls = true;
+    v.playsInline = true;
+    bubble.appendChild(v);
+
+    // ✅ download button
+    const act = document.createElement("div");
+    act.className = "videoActionsRow";
+
+    const a = document.createElement("a");
+    a.className = "dlBtn";
+    a.textContent = "Download";
+    a.href = videoUrl;
+    a.download = `roleplay-video-${Date.now()}.mp4`;
+    a.style.textDecoration = "none";
+    a.style.display = "inline-flex";
+    a.style.alignItems = "center";
+    a.style.justifyContent = "center";
+
+    act.appendChild(a);
+    bubble.appendChild(act);
+  }
 
   msg.appendChild(who);
   msg.appendChild(bubble);
@@ -942,28 +1285,25 @@ function appendMsg(role, text, imageUrl, opts = {}){
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
 }
 
-
 function renderHistory(){
   if (!Array.isArray(history)) history = [];
   for (const m of history){
-    // 지금 history에는 text만 있음 (content)
     appendMsg(
-  m.role === "assistant" ? "assistant" : "user",
-  m.content,
-  m.imageUrl,
-  { animate: false } // ✅ 히스토리는 그냥 즉시 표시
-);
+      m.role === "assistant" ? "assistant" : "user",
+      m.content,
+      m.imageUrl,
+      m.videoUrl,
+      { animate: false }
+    );
   }
 }
 renderHistory();
 
 async function bootstrapFirstMessage(){
-  // 이미 대화가 있으면(새로고침 등) 첫 인사 다시 안 함
   if (history.length > 0) return;
 
   const payload = {
     paymentStatus: paid ? "paid" : "unpaid",
-    // ✅ 서버가 "첫 인사 요청"임을 알 수 있게 특수 플래그/메시지
     message: "__INIT__",
     session: {
       name: session.name,
@@ -989,16 +1329,14 @@ async function bootstrapFirstMessage(){
   };
 
   try{
-
-const res = await fetch("/api/imagechat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload),
-});
+    const res = await fetch("/api/imagechat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.detail || data.error || `HTTP ${res.status}`);
-
 
     const reply = (data && typeof data.reply === "string") ? data.reply : "(no text)";
 
@@ -1007,7 +1345,7 @@ const res = await fetch("/api/imagechat", {
       imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
     }
 
-    appendMsg("assistant", reply, imageUrl || undefined, { animate: true });
+    appendMsg("assistant", reply, imageUrl || undefined, undefined, { animate: true });
     history.push({ role: "assistant", content: reply, imageUrl });
     saveHistory(history);
 
@@ -1020,9 +1358,7 @@ const res = await fetch("/api/imagechat", {
   }
 }
 
-// ✅ 렌더 후 첫 인사 요청
 bootstrapFirstMessage();
-
 
 /* =========================
    Send flow (REAL API)
@@ -1040,29 +1376,24 @@ async function send(){
 
   input.value = "";
   appendMsg("user", text);
-requestAnimationFrame(() => {
-  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+
   requestAnimationFrame(() => {
     chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+    requestAnimationFrame(() => {
+      chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+    });
   });
-});
-
-  
 
   history.push({ role: "user", content: text });
   saveHistory(history);
 
-  // Basic session hardening
   if (!session || !session.name){
     appendMsg("assistant", "Error: No character session found. Please create a character first.");
     return;
   }
 
-  // We will always use:
-  // - text model: venice-uncensored
-  // - image model: lustify-sdxl
   const slimHistory = Array.isArray(history) ? history.slice(-50) : [];
-  
+
   const payload = {
     paymentStatus: paid ? "paid" : "unpaid",
     message: text,
@@ -1082,59 +1413,42 @@ requestAnimationFrame(() => {
       avatarDataUrl: session.avatarDataUrl || "",
       tier: "uncensored"
     },
-    history: slimHistory, 
+    history: slimHistory,
     models: {
       text: "venice-uncensored",
       image: "lustify-sdxl"
     }
   };
-  
 
   try{
     setBusy(true);
 
-  // ✅ 입력창 disabled 등 레이아웃 확정된 다음에 한 번 더 바닥 고정
-requestAnimationFrame(() => {
-  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
-});
+    requestAnimationFrame(() => {
+      chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+    });
 
+    const res = await fetch("/api/imagechat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.detail || data.error || `HTTP ${res.status}`);
+    }
 
-const res = await fetch("/api/imagechat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload),
-});
-
-
-const data = await res.json().catch(() => ({}));
-
-if (!res.ok) {
-  // ✅ 서버에서 내려준 진짜 에러 메시지 확인용
-  throw new Error(data.detail || data.error || `HTTP ${res.status}`);
-}
-
-
-
-    // Expected server response shape (you’ll implement in /functions/api/imagechat.ts):
-    // {
-    //   reply: "text reply",
-    //   imageUrl?: "https://...." OR "data:image/...",
-    //   imageCaption?: "optional caption"
-    // }
     const reply = (data && typeof data.reply === "string") ? data.reply : "";
 
-// ✅ server(imagechat.ts)가 주는 형식: { image: { mime, b64 } }
-let imageUrl = "";
-if (data && data.image && typeof data.image.b64 === "string" && typeof data.image.mime === "string"){
-  imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
-}
+    let imageUrl = "";
+    if (data && data.image && typeof data.image.b64 === "string" && typeof data.image.mime === "string"){
+      imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
+    }
 
-const shownText = reply || "(no text)";
-appendMsg("assistant", shownText, imageUrl || undefined, { animate: true });
-history.push({ role: "assistant", content: shownText, imageUrl }); // ✅ imageUrl 추가
-saveHistory(history);
-
+    const shownText = reply || "(no text)";
+    appendMsg("assistant", shownText, imageUrl || undefined, undefined, { animate: true });
+    history.push({ role: "assistant", content: shownText, imageUrl });
+    saveHistory(history);
 
   }catch(e){
     appendMsg("assistant", `Error: ${String(e?.message || e)}`);
@@ -1150,7 +1464,7 @@ input.onkeydown = (e) => {
   if (e.key === "Enter") send();
 };
 
- // Share button
+// Share button
 const shareBtn = document.querySelector("#shareBtn");
 if (shareBtn){
   shareBtn.addEventListener("click", async () => {
@@ -1160,7 +1474,6 @@ if (shareBtn){
         await navigator.share({ title: document.title, url });
       }else{
         await navigator.clipboard.writeText(url);
-        // optional tiny feedback
         shareBtn.title = "Copied!";
         setTimeout(() => (shareBtn.title = "Share"), 900);
       }
@@ -1170,7 +1483,7 @@ if (shareBtn){
   });
 }
 
-    // Info button dropdown ✅ (여기!)
+// Info dropdown
 const infoBtn = document.querySelector("#infoBtn");
 const infoMenu = document.querySelector("#infoMenu");
 
@@ -1227,23 +1540,19 @@ function showToast(msg){
   setTimeout(() => (secretToast.style.display = "none"), 900);
 }
 
-// Close actions
 if (secretCloseX) secretCloseX.addEventListener("click", closeSecretModal);
 if (secretThankBtn) secretThankBtn.addEventListener("click", closeSecretModal);
 
-// Click outside to close
 if (secretModal){
   secretModal.addEventListener("click", (e) => {
     if (e.target === secretModal) closeSecretModal();
   });
 }
 
-// Esc to close
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeSecretModal();
 });
 
-// Copy button
 if (secretCopyBtn){
   secretCopyBtn.addEventListener("click", async () => {
     try{
@@ -1255,7 +1564,6 @@ if (secretCopyBtn){
   });
 }
 
-// Share button
 if (secretShareBtn){
   secretShareBtn.addEventListener("click", async () => {
     try{
@@ -1271,217 +1579,23 @@ if (secretShareBtn){
   });
 }
 
-// Set link text (no anchor, just text)
 if (secretLinkText){
   secretLinkText.textContent = SECRET_LINK;
 }
 
-/* Show once per tab, only if paid */
 const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 (function maybeShowSecretGift(){
   try{
-    if (!paid) return; // ✅ paid일 때만
+    if (!paid) return;
     if (sessionStorage.getItem(SECRET_POPUP_SHOWN_KEY) === "1") return;
     sessionStorage.setItem(SECRET_POPUP_SHOWN_KEY, "1");
     openSecretModal();
   }catch(e){
-    // if storage blocked, still try showing
     if (paid) openSecretModal();
   }
 })();
-
-/* =========================
-   Video payment logic
-   ========================= */
-
-let currentImageForVideo = "";
-
-function openVideoPayModal(imageUrl){
-  currentImageForVideo = imageUrl;
-  document.getElementById("videoPayModal").classList.add("active");
-}
-
-function closeVideoPayModal(){
-  document.getElementById("videoPayModal").classList.remove("active");
-}
-
-
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeVideoPayModal();
-});
-
-window.addEventListener("load", () => {
-
-  const videoPayModal = document.getElementById("videoPayModal");
-
-  if (videoPayModal){
-    videoPayModal.addEventListener("click", (e) => {
-      if (e.target === videoPayModal) closeVideoPayModal();
-    });
-  }
-  
-  paypal.Buttons({
-    createOrder: function(data, actions){
-      const len = document.querySelector('input[name="videoLen"]:checked').value;
-      const price = len === "5" ? "1.5" : "2";
-
-      return actions.order.create({
-        purchase_units: [{
-          description: "video game",
-          amount: { value: price }
-        }]
-      });
-    },
-
-    onApprove: async function(data, actions){
-      await actions.order.capture();
-      closeVideoPayModal();
-      generateVideo(currentImageForVideo);
-    }
-  }).render("#paypal-button-container");
-});
-
-
-/* =========================
-   Video generation
-   ========================= */
-
-async function generateVideo(imageUrl){
-  appendMsg("assistant", "Generating video...");
-
-  try{
-    const len = document.querySelector('input[name="videoLen"]:checked').value;
-
-    // 1) queue + try
-    let res = await fetch("/api/video", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: imageUrl, duration: Number(len) })
-    });
-
-    // 2) if 202, poll with queue_id
-    while (res.status === 202){
-      const j = await res.json().catch(()=> ({}));
-      const qid = j.queue_id;
-      if (!qid) throw new Error("No queue_id to poll");
-
-      await new Promise(r => setTimeout(r, 2000));
-
-      res = await fetch("/api/video", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ queue_id: qid })
-      });
-    }
-
-    if (!res.ok){
-      const t = await res.text().catch(()=> "");
-      throw new Error(`Video API failed: HTTP ${res.status} ${t}`);
-    }
-
-    const ct = (res.headers.get("content-type") || "").toLowerCase();
-
-    // A) 서버가 video/mp4 바이너리를 직접 주는 경우 (우리 TS가 이렇게 바뀜)
-    if (ct.startsWith("video/")) {
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      appendVideoBubble(url);
-      return;
-    }
-
-    // B) 서버가 JSON으로 URL을 주는 경우(벤더가 video_url 같은 걸 줄 때)
-    if (ct.includes("application/json")) {
-      const data = await res.json().catch(() => ({}));
-      if (!data.videoUrl) throw new Error("No videoUrl in JSON response");
-      appendVideoBubble(data.videoUrl);
-      return;
-    }
-
-    // C) 예상 못한 응답
-    const t = await res.text().catch(()=> "");
-    throw new Error(`Unexpected response type: ${ct || "(no content-type)"} ${t}`);
-
-  }catch(e){
-    appendMsg("assistant", `Video error: ${String(e?.message || e)}`);
-  }
-}
-
-
-function appendVideoBubble(videoUrl){
-  const msg = document.createElement("div");
-  msg.className = "chatMsg";
-
-  const who = document.createElement("div");
-  who.className = "who";
-  who.textContent = "🎬";
-
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
-
-  const video = document.createElement("video");
-  video.src = videoUrl;
-  video.controls = true;
-  video.style.width = "100%";
-  video.style.borderRadius = "12px";
-
-  const dl = document.createElement("a");
-  dl.href = videoUrl;
-  dl.download = "video.mp4";
-  dl.textContent = "Download video";
-  dl.style.display = "inline-block";
-  dl.style.marginTop = "6px";
-  dl.style.color = "#ffcc00";
-  dl.style.fontWeight = "800";
-  dl.style.fontSize = "11px";
-  dl.style.textDecoration = "none";
-
-  bubble.appendChild(video);
-  bubble.appendChild(dl);
-
-  msg.appendChild(who);
-  msg.appendChild(bubble);
-  chatBox.appendChild(msg);
-  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
-}
-  
-
 </script>
-
-<!-- =========================
-     Video Payment Modal
-     ========================= -->
-<div class="secretModal" id="videoPayModal">
-  <div class="secretCard">
-
-    <div class="secretTop">
-      <div class="secretTitle">🎬 Generate video</div>
-      <button class="secretX" onclick="closeVideoPayModal()">✕</button>
-    </div>
-
-    <div class="secretBody">
-
-      <label style="display:block; margin-bottom:8px;">
-        <input type="radio" name="videoLen" value="5" checked>
-        5 seconds — <b>$1.5</b>
-      </label>
-
-      <label style="display:block; margin-bottom:12px;">
-        <input type="radio" name="videoLen" value="10">
-        10 seconds — <b>$2</b>
-      </label>
-
-      <div id="paypal-button-container"></div>
-
-    </div>
-  </div>
-</div>
-
 
 </body>
 </html>
-
-
-
-
