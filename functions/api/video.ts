@@ -66,7 +66,7 @@ export default async function handler(req: any, res: any) {
 
       // Model from docs example (image-to-video)
       // :contentReference[oaicite:8]{index=8}
-      const model = "wan-2.5-preview-image-to-video";
+      const model = "grok-imagine-image-to-video";
 
       const userPrompt = (typeof body.prompt === "string" ? body.prompt.trim() : "");
       const prompt =
@@ -152,3 +152,4 @@ export default async function handler(req: any, res: any) {
     return json(res, 500, { error: "Server error", detail: String(e?.message || e) });
   }
 }
+
