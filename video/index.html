@@ -46,14 +46,20 @@
     /* ---------- Header ---------- */
     header{ display:flex; justify-content:space-between; padding:4px 6px 0; }
     .logo{
-      font-family:"Baloo 2";
-      font-weight:700;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 10px 22px rgba(0,0,0,.45);
-    }
+  text-decoration: none;
+  font-family: "Baloo 2", Inter, sans-serif;
+  font-weight: 700;
+  letter-spacing: .3px;
+  font-size: clamp(16px, 3.6vw, 24px);
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 10px 22px rgba(0,0,0,.45);
+  user-select:none;
+  white-space: nowrap;
+}
+
     .logoRole{ color:var(--accent); }
 
     .sub{
@@ -298,4 +304,5 @@ async function generateVideo(){
 
 </body>
 </html>
+
 
