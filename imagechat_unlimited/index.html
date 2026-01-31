@@ -957,9 +957,21 @@ function loadHistory(){
 }
 
 function saveHistory(list){
-  try { sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, JSON.stringify(list)); }
-  catch(e){ console.error(e); }
+  try {
+    const sanitized = Array.isArray(list)
+      ? list.map(m => {
+          if (!m || typeof m !== "object") return m;
+          const { videoUrl, ...rest } = m; // ✅ videoUrl 제거
+          return rest;
+        })
+      : [];
+
+    sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, JSON.stringify(sanitized));
+  } catch(e){
+    console.error("saveHistory failed:", e);
+  }
 }
+
 
 if (!paid){
   alert("Image chat is locked. Please complete payment first.");
@@ -1091,7 +1103,6 @@ function renderPayPalButtons(){
         }]
       });
     },
-    
     onApprove: async (data, actions) => {
   let capture;
   try {
@@ -1144,7 +1155,18 @@ document.addEventListener("change", (e) => {
 /* =========================
    ✅ Venice video generation flow (via /api/video)
    ========================= */
-async function generateVideoFromSelectedImage({ duration, extraPrompt }){
+// ✅ base64 → Blob helper (video용)
+function b64ToBlob(b64, mime){
+  const byteChars = atob(b64);
+  const byteNums = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) {
+    byteNums[i] = byteChars.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNums);
+  return new Blob([byteArray], { type: mime });
+}
+  
+  async function generateVideoFromSelectedImage({ duration, extraPrompt }){
   if (!selectedImageDataUrl){
     throw new Error("No image selected.");
   }
@@ -1209,17 +1231,20 @@ if (!rRes.ok){
     }
 
     if (rData && rData.status === "COMPLETED" && rData.video && rData.video.b64 && rData.video.mime){
-      const videoUrl = `data:${rData.video.mime};base64,${rData.video.b64}`;
 
-      // ✅ show in a new bubble with download button
-      appendMsg("assistant", "Thanks for waiting", undefined, videoUrl, { animate: true });
+  const blob = b64ToBlob(rData.video.b64, rData.video.mime);
+  const objectUrl = URL.createObjectURL(blob);
 
-      // ✅ persist
-      history.push({ role: "assistant", content: "Thanks for waiting", videoUrl });
-      saveHistory(history);
+  // 화면에만 표시 (Blob URL)
+  appendMsg("assistant", "Here you are. Save your video now before it’s deleted.", undefined, objectUrl, { animate: true });
 
-      return;
-    }
+  // history에는 비디오 저장 금지 (텍스트만)
+  history.push({ role: "assistant", content: "Here you are. Save your video now before it’s deleted." });
+  saveHistory(history);
+
+  return;
+}
+
 
     // unknown response
     throw new Error("Unexpected retrieve response.");
@@ -1328,6 +1353,9 @@ function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
     v.src = videoUrl;
     v.controls = true;
     v.playsInline = true;
+    v.onended = () => {
+    URL.revokeObjectURL(videoUrl);
+  };
     bubble.appendChild(v);
 
     // ✅ download button
@@ -1668,8 +1696,4 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
-
-
-
-
 
