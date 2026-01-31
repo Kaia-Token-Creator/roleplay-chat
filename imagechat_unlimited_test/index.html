@@ -1354,11 +1354,27 @@ async function generateVideo(imageUrl){
   try{
     const len = document.querySelector('input[name="videoLen"]:checked').value;
 
-    const res = await fetch("/api/video", {
+    // 1) queue + try
+    let res = await fetch("/api/video", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image: imageUrl, duration: Number(len) })
     });
+
+    // 2) if 202, poll with queue_id
+    while (res.status === 202){
+      const j = await res.json().catch(()=> ({}));
+      const qid = j.queue_id;
+      if (!qid) throw new Error("No queue_id to poll");
+
+      await new Promise(r => setTimeout(r, 2000));
+
+      res = await fetch("/api/video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ queue_id: qid })
+      });
+    }
 
     if (!res.ok){
       const t = await res.text().catch(()=> "");
@@ -1447,5 +1463,6 @@ function appendVideoBubble(videoUrl){
 
 </body>
 </html>
+
 
 
