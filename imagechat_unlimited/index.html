@@ -1348,33 +1348,41 @@ function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
   }
 
   // video
-  if (videoUrl){
-    const v = document.createElement("video");
-    v.src = videoUrl;
-    v.controls = true;
-    v.playsInline = true;
-    v.onended = () => {
-    URL.revokeObjectURL(videoUrl);
-  };
-    bubble.appendChild(v);
+  // video
+if (videoUrl){
+  const v = document.createElement("video");
+  v.src = videoUrl;
+  v.controls = true;
+  v.playsInline = true;
+  bubble.appendChild(v);
 
-    // ✅ download button
-    const act = document.createElement("div");
-    act.className = "videoActionsRow";
+  // ✅ download button
+  const act = document.createElement("div");
+  act.className = "videoActionsRow";
 
-    const a = document.createElement("a");
-    a.className = "dlBtn";
-    a.textContent = "Download";
-    a.href = videoUrl;
-    a.download = `roleplay-video-${Date.now()}.mp4`;
-    a.style.textDecoration = "none";
-    a.style.display = "inline-flex";
-    a.style.alignItems = "center";
-    a.style.justifyContent = "center";
+  const a = document.createElement("a");
+  a.className = "dlBtn";
+  a.textContent = "Download";
+  a.href = videoUrl;
+  a.download = `roleplay-video-${Date.now()}.mp4`;
+  a.style.textDecoration = "none";
+  a.style.display = "inline-flex";
+  a.style.alignItems = "center";
+  a.style.justifyContent = "center";
 
-    act.appendChild(a);
-    bubble.appendChild(act);
-  }
+  // ✅ (핵심) 다운로드 클릭 후에 revoke — 너무 빨리 revoke하면 다운로드 실패함
+  a.addEventListener("click", () => {
+    setTimeout(() => {
+      try { URL.revokeObjectURL(videoUrl); } catch(e){}
+    }, 60_000); // 60초 후 메모리 해제 (안전)
+  });
+
+  act.appendChild(a);
+  bubble.appendChild(act);
+
+  // ❌ 여기서는 v.onended revoke 하지 마세요.
+  // v.onended = () => URL.revokeObjectURL(videoUrl);
+}
 
   msg.appendChild(who);
   msg.appendChild(bubble);
@@ -1696,8 +1704,6 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
-
-
 
 
 
