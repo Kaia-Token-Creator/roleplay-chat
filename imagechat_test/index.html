@@ -11,6 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
+  <!-- ✅ PayPal SDK (client-id provided) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=ASts4hxcd4-DkLEL8b-PbbawSaCD4G5pQiuJM9aZYawixhxWbQ2upSru10WQNZa4HzCqHUcGC8Z1RIrW&currency=USD&intent=capture"></script>
+
   <style>
     :root{
       --bg:#000;
@@ -19,6 +22,7 @@
       --border:rgba(255,255,255,.14);
       --chatColor:#ffffff;
       --shadow: 0 14px 36px rgba(0,0,0,.55);
+      --yellow:#ffcc00;
     }
 
     *{ box-sizing:border-box; }
@@ -53,7 +57,7 @@
       font-weight: 700;
       letter-spacing: .3px;
       font-size: clamp(16px, 3.6vw, 24px);
-padding: 5px 8px;
+      padding: 5px 8px;
       border-radius: 999px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
@@ -61,257 +65,231 @@ padding: 5px 8px;
       user-select:none;
     }
 
-    .logoRole{
-  color: #ffcc00; /* dark yellow */
-}
+    .logoRole{ color:#ffcc00; }
+    .logoDot{
+      color: rgba(255,255,255,.95);
+      font-size: 0.5em;
+      vertical-align: baseline;
+    }
+    .logo span{ opacity:.95; }
 
-
-.logoDot{
-  color: rgba(255,255,255,.95); /* keep white */
-  font-size: 0.5em;            /* half size */
-  vertical-align: baseline;
-}
-
-.logo span{ opacity:.95; }
-    .sub{
-      text-align:center;
-      margin-top: 0px;
-      color: var(--muted);
-      font-size: 12px;
+    .shareWrap{
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-.shareWrap{
-  display: flex;
-  align-items: center;
-  gap: 6px;               /* ← 여기서 거리 미세조정 */
-}
+    .bookmarkHint{
+      font-size: 10px;
+      line-height: 1.1;
+      text-align: right;
+      color: rgba(255,255,255,.55);
+      user-select: none;
+      white-space: nowrap;
+    }
 
-.bookmarkHint{
-  font-size: 10px;
-  line-height: 1.1;
-  text-align: right;      /* 버튼 쪽으로 붙는 느낌 */
-  color: rgba(255,255,255,.55);
-  user-select: none;
-  white-space: nowrap;
-}
+    .shareBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:.15s ease;
+      flex: 0 0 auto;
+    }
+    .shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+    .shareBtn:active{ transform: translateY(0px); }
 
-.shareBtn{
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  box-shadow: var(--shadow);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  transition:.15s ease;
-  flex: 0 0 auto;
-}
-.shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
-.shareBtn:active{ transform: translateY(0px); }
+    .shareBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
-.shareBtn svg{
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: rgba(255,255,255,.92);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+    .infoMenu{
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display: none;
+      z-index: 99999;
+    }
 
-.infoMenu{
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 220px;
-  background: rgba(10,10,10,.92);
-  border: 1px solid rgba(255,255,255,.16);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  padding: 6px;
-  display: none;
-  z-index: 99999;
-}
+    .infoMenu.active{ display: block; }
 
-.infoMenu.active{ display: block; }
+    .infoMenu a{
+      display: block;
+      padding: 10px 10px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+    }
 
-.infoMenu a{
-  display: block;
-  padding: 10px 10px;
-  border-radius: 12px;
-  text-decoration: none;
-  color: rgba(255,255,255,.92);
-  font-size: 13px;
-}
+    .infoMenu a:hover{
+      background: rgba(255,255,255,.08);
+    }
 
-.infoMenu a:hover{
-  background: rgba(255,255,255,.08);
-}
+    /* ===== Chat ===== */
+    .chatShell{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
 
-   /* ===== Chat ===== */
-.chatShell{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-}
+    .chatBox{
+      flex:1;
+      overflow:auto;
+      padding:14px;
+      font-size: 12px;
+      line-height: 1.25;
+    }
 
-/* 전체 채팅 글씨 더 작게 */
-.chatBox{
-  flex:1;
-  overflow:auto;
-  padding:14px;
-  font-size: 12px;        /* ✅ 더 작게 */
-  line-height: 1.25;
-}
+    .chatMsg{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+    }
 
-/* 메시지 간격 살짝 줄임 */
-.chatMsg{
-  display:flex;
-  gap:8px;                /* ✅ 더 촘촘 */
-  margin-bottom:10px;     /* ✅ 더 촘촘 */
-}
+    .chatMsg.me{ flex-direction:row-reverse; }
 
-.chatMsg.me{ flex-direction:row-reverse; }
+    .who{
+      width:30px;
+      height:30px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      font-size:8px;
+      font-weight:700;
+      color: rgba(255,255,255,.55);
+    }
 
-/* 아바타/You 영역도 더 작게 */
-.who{
-  width:30px;             /* ✅ 38 -> 30 */
-  height:30px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  font-size:8px;          /* ✅ YOU 글씨 더 작게 */
-  font-weight:700;
-  color: rgba(255,255,255,.55);
-}
+    .who img{ width:100%;height:100%;object-fit:cover; }
 
-.who img{ width:100%;height:100%;object-fit:cover; }
+    .whoLabel{
+      font-size:8px;
+      letter-spacing:.1px;
+      opacity:.7;
+    }
 
-/* JS에서 넣는 You 라벨 */
-.whoLabel{
-  font-size:8px;          /* ✅ 더 작게 */
-  letter-spacing:.1px;
-  opacity:.7;
-}
+    .bubble{
+      max-width:78%;
+      border-radius:14px;
+      border:1px solid var(--border);
+      padding:7px 9px;
+      background: var(--card);
+    }
 
-/* 말풍선도 살짝 컴팩트 */
-.bubble{
-  max-width:78%;
-  border-radius:14px;     /* ✅ 16 -> 14 */
-  border:1px solid var(--border);
-  padding:7px 9px;        /* ✅ 더 작게 */
-  background: var(--card);
-}
+    .bubble .name{
+      font-weight:800;
+      color: var(--chatColor);
+      margin-bottom:3px;
+      font-family:"Baloo 2",sans-serif;
+      font-size:12px;
+      line-height: 1.1;
+    }
 
-/* 이름(캐릭터/나) 둘 다 작게 */
-.bubble .name{
-  font-weight:800;
-  color: var(--chatColor);
-  margin-bottom:3px;      /* ✅ 간격 줄임 */
-  font-family:"Baloo 2",sans-serif;
-  font-size:12px;         /* ✅ 이름 더 작게 */
-  line-height: 1.1;
-}
+    .bubble .asstText{
+      color: var(--chatColor);
+      font-size:12px;
+      line-height: 1.25;
+    }
 
-/* assistant text color should follow character color */
-.bubble .asstText{
-  color: var(--chatColor);
-  font-size:12px;         /* ✅ 내용 더 작게 */
-  line-height: 1.25;
-}
+    .bubble .userText{
+      color:#fff;
+      font-size:12px;
+      line-height: 1.25;
+    }
 
-/* user text stays white */
-.bubble .userText{
-  color:#fff;
-  font-size:12px;         /* ✅ 내용 더 작게 */
-  line-height: 1.25;
-}
+    .bubble img{
+      width:100%;
+      border-radius:12px;
+      margin-top:6px;
+      border:1px solid var(--border);
+    }
 
-/* 이미지도 살짝 덜 두껍게 */
-.bubble img{
-  width:100%;
-  border-radius:12px;
-  margin-top:6px;         /* ✅ 8 -> 6 */
-  border:1px solid var(--border);
-}
+    /* ✅ video element */
+    .bubble video{
+      width:100%;
+      border-radius:12px;
+      margin-top:6px;
+      border:1px solid var(--border);
+      background:#000;
+    }
 
-/* 입력 영역 글씨도 줄임 */
-.chatControls{
-  display:flex;
-  gap:10px;
-  padding:10px;           /* ✅ 12 -> 10 */
-  border-top:1px solid var(--border);
-  background: rgba(0,0,0,.7);
-}
+    .chatControls{
+      display:flex;
+      gap:10px;
+      padding:10px;
+      border-top:1px solid var(--border);
+      background: rgba(0,0,0,.7);
+    }
 
-.chatInput{
-  flex:1;
-  height:40px;            /* ✅ 42 -> 40 */
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:#000;
-  color:#fff;
-  padding:0 10px;
-  font-size:12px;         /* ✅ 입력 글씨 줄임 */
-}
+    .chatInput{
+      flex:1;
+      height:40px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#000;
+      color:#fff;
+      padding:0 10px;
+      font-size:12px;
+    }
 
-.sendBtn{
-  width:40px;             /* ✅ 42 -> 40 */
-  height:40px;
-  border-radius:14px;
-  background:#e0b400;
-  border:none;
-  font-weight:800;
-  cursor:pointer;
-}
+    .sendBtn{
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      background:#e0b400;
+      border:none;
+      font-weight:800;
+      cursor:pointer;
+    }
 
-/* ===== Typing cursor (이미 JS에서 쓰고 있으니 CSS만 보강) ===== */
-.typeCursor{
-  display:inline-block;
-  width:8px;
-  opacity:.8;
-  animation: blink 1s steps(1) infinite;
-}
-@keyframes blink { 50% { opacity: 0; } }
+    .typeCursor{
+      display:inline-block;
+      width:8px;
+      opacity:.8;
+      animation: blink 1s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
 
+    .imgChatTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+    }
 
-    /* assistant text color should follow character color */
-.bubble .asstText{
-  color: var(--chatColor);
-}
+    .imgChatTitle{
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: #FFFFFF;
+    }
 
-/* user text stays white */
-.bubble .userText{
-  color: #fff;
-}
-
-/* ===== Image chat top bar ===== */
-.imgChatTop{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 8px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.65);
-  backdrop-filter: blur(8px);
-}
-
-
-.imgChatTitle{
-  font-family: "Baloo 2", Inter, sans-serif;
-  font-weight: 700;
-  font-size: 14px;
-  color: #FFFFFF;
-}
-
- .xBtn{
+    .xBtn{
       border:none;
       background: rgba(255,255,255,.08);
       color: var(--fg);
@@ -321,247 +299,345 @@ padding: 5px 8px;
       border: 1px solid rgba(255,255,255,.14);
     }
 
-/* ===== Image chat: New character button highlight ===== */
-#imgResetBtn{
-  background: #e0b400;          /* 노란 배경 */
-  border: 1px solid #c9a200;    /* 노란 테두리 */
-  color: #000;                  /* 검은 글씨 */
-  font-weight: 800;
-}
+    #imgResetBtn{
+      background: #e0b400;
+      border: 1px solid #c9a200;
+      color: #000;
+      font-weight: 800;
+    }
 
-#imgResetBtn:hover{
-  background: #f0c800;
-}
+    #imgResetBtn:hover{ background: #f0c800; }
+    #imgResetBtn:active{ background: #cfa600; }
 
-#imgResetBtn:active{
-  background: #cfa600;
-}
-
-
-/* ===== Image chat bubbles: glass separation ===== */
-.chatMsg .bubble{
-  background: rgba(255,255,255,.08);        /* ✅ 체감 올라감 */
-  border: 1px solid rgba(255,255,255,.22);
-  box-shadow: 0 12px 28px rgba(0,0,0,.45);  /* ✅ 떠있는 느낌 */
-  backdrop-filter: blur(12px);
-}
-
-
-#goUnlimitedLink:hover{ opacity:1; }
-#goUnlimitedLink:active{ opacity:.85; }
-
-.highlightCTA{
-  color:#ffcc00;
-  font-weight:800;
-}
-
-/* ===== Go Unlimited 강조 효과 ===== */
-#goUnlimitedLink{
-  position: relative;
-  color: #fff !important;
-  font-weight: 900;
-  text-shadow: 0 0 6px rgba(255,204,0,.6);
-  animation: unlimitedPulse 1.8s ease-in-out infinite;
-}
-
-/* 반짝이는 오라 */
-#goUnlimitedLink::after{
-  content:"";
-  position:absolute;
-  inset:-6px -10px;
-  border-radius:999px;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(255,204,0,.35),
-    transparent 70%
-  );
-  opacity:.6;
-  animation: unlimitedGlow 2.4s ease-in-out infinite;
-  pointer-events:none;
-}
-
-@keyframes unlimitedPulse{
-  0%   { transform: scale(1);   opacity:.9; }
-  50%  { transform: scale(1.06); opacity:1; }
-  100% { transform: scale(1);   opacity:.9; }
-}
-
-@keyframes unlimitedGlow{
-  0%   { opacity:.3; }
-  50%  { opacity:.7; }
-  100% { opacity:.3; }
-}
+    .chatMsg .bubble{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 12px 28px rgba(0,0,0,.45);
+      backdrop-filter: blur(12px);
+    }
 
     /* =========================
-   ✅ Generate video link (under image)
-   ========================= */
-.genVideoRow{
-  margin-top: 8px;
-  display:flex;
-  align-items:center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-.genVideoLink{
-  color: #ffcc00;
-  font-weight: 900;
-  font-size: 12px;
-  cursor: pointer;
-  text-decoration: none; /* ✅ no underline */
-  user-select:none;
-}
-.genVideoLink:hover{ opacity:.9; }
-.genVideoLink:active{ opacity:.75; }
+       Secret Gift Modal
+       ========================= */
+    .secretModal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100000;
+      backdrop-filter: blur(6px);
+    }
+    .secretModal.active{ display:flex; }
+    .secretCard{
+      width: min(520px, calc(100vw - 28px));
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px 14px 12px;
+    }
+    .secretTop{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .secretTitle{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      color: #ffcc00;
+    }
+    .giftIcon{
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      background: rgba(255,204,0,.12);
+      border: 1px solid rgba(255,204,0,.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .giftIcon svg{
+      width: 16px;
+      height: 16px;
+      stroke: #ffcc00;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .secretX{
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+      cursor:pointer;
+    }
+    .secretX:hover{ background: rgba(255,255,255,.10); }
+    .secretBody{
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(255,255,255,.88);
+    }
+    .secretLine{ margin: 8px 0 10px; color: rgba(255,255,255,.78); }
+    .secretLinkRow{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+    }
+    .secretLinkText{
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-all;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      color: #ffcc00;
+    }
+    .iconBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.35);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition: .15s ease;
+    }
+    .iconBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
+    .iconBtn:active{ transform: translateY(0px); }
+    .iconBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .secretNote{
+      margin-top: 10px;
+      color: #ffcc00;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .secretNote .offHighlight{
+      color: #ffffff;
+      font-weight: 900;
+    }
+    .secretActions{
+      margin-top: 12px;
+      display:flex;
+      justify-content: flex-end;
+    }
+    .thankBtn{
+      border: none;
+      background: #e0b400;
+      color: #000;
+      font-weight: 900;
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+    }
+    .thankBtn:hover{ background:#f0c800; }
+    .thankBtn:active{ background:#cfa600; }
+    .toastMini{
+      margin-left: 8px;
+      font-size: 11px;
+      color: rgba(255,255,255,.7);
+      user-select:none;
+    }
 
-/* =========================
-   ✅ video element + download button
-   ========================= */
-.bubble video{
-  width:100%;
-  border-radius:12px;
-  margin-top:6px;
-  border:1px solid rgba(255,255,255,.14);
-  background:#000;
-}
+    /* =========================
+       ✅ Generate video link (under image)
+       ========================= */
+    .genVideoRow{
+      margin-top: 8px;
+      display:flex;
+      align-items:center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .genVideoLink{
+      color: var(--yellow);
+      font-weight: 900;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: none; /* ✅ no underline */
+      user-select:none;
+    }
+    .genVideoLink:hover{ opacity:.9; }
+    .genVideoLink:active{ opacity:.75; }
 
-.videoActionsRow{
-  margin-top: 8px;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap: 10px;
-}
+    /* =========================
+       ✅ Video Download button
+       ========================= */
+    .videoActionsRow{
+      margin-top: 8px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap: 10px;
+    }
+    .dlBtn{
+      border:none;
+      background: rgba(255,204,0,.14);
+      color: var(--yellow);
+      border: 1px solid rgba(255,204,0,.35);
+      font-weight: 900;
+      padding: 8px 10px;
+      border-radius: 14px;
+      cursor:pointer;
+    }
+    .dlBtn:hover{ background: rgba(255,204,0,.20); transform: translateY(-1px); }
+    .dlBtn:active{ transform: translateY(0px); opacity:.9; }
 
-.dlBtn{
-  border:none;
-  background: rgba(255,204,0,.14);
-  color: #ffcc00;
-  border: 1px solid rgba(255,204,0,.35);
-  font-weight: 900;
-  padding: 8px 10px;
-  border-radius: 14px;
-  cursor:pointer;
-  text-decoration:none;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-}
-.dlBtn:hover{ background: rgba(255,204,0,.20); transform: translateY(-1px); }
-.dlBtn:active{ transform: translateY(0px); opacity:.9; }
+    /* =========================
+       ✅ PayPal Video Modal
+       ========================= */
+    .videoPayModal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 110000; /* secret modal보다 위 */
+      backdrop-filter: blur(6px);
+    }
+    .videoPayModal.active{ display:flex; }
 
-/* =========================
-   ✅ Video PayPal Modal
-   ========================= */
-.videoPayModal{
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.62);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 110000;
-  backdrop-filter: blur(6px);
-}
-.videoPayModal.active{ display:flex; }
+    .videoPayCard{
+      width: min(520px, calc(100vw - 28px));
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px 14px 12px;
+    }
 
-.videoPayCard{
-  width: min(520px, calc(100vw - 28px));
-  background: rgba(10,10,10,.92);
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 18px;
-  box-shadow: 0 14px 36px rgba(0,0,0,.55);
-  padding: 14px 14px 12px;
-}
+    .videoPayTop{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+    }
 
-.videoPayTop{
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 10px;
-}
-.videoPayTitle{
-  font-family: "Baloo 2", Inter, sans-serif;
-  font-weight: 900;
-  font-size: 16px;
-  color: #ffcc00;
-}
-.videoPayX{
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.9);
-  cursor:pointer;
-}
-.videoPayX:hover{ background: rgba(255,255,255,.10); }
+    .videoPayTitle{
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      color: var(--yellow);
+    }
 
-.videoPayBody{
-  margin-top: 10px;
-  font-size: 12px;
-  line-height: 1.35;
-  color: rgba(255,255,255,.88);
-}
+    .videoPayX{
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+      cursor:pointer;
+    }
+    .videoPayX:hover{ background: rgba(255,255,255,.10); }
 
-.optionBox{
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  display:flex;
-  flex-direction:column;
-  gap: 8px;
-}
-.optRow{
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 8px 8px;
-  border-radius: 12px;
-  background: rgba(0,0,0,.25);
-  border: 1px solid rgba(255,255,255,.10);
-}
-.optLeft{ display:flex; align-items:center; gap:10px; }
-.optLabel{ font-weight: 900; color:#fff; }
-.optPrice{ font-weight: 900; color:#ffcc00; }
+    .videoPayBody{
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(255,255,255,.88);
+    }
 
-.promptBox{
-  margin-top: 10px;
-  display:flex;
-  flex-direction:column;
-  gap: 6px;
-}
-.promptBox label{
-  color: rgba(255,255,255,.75);
-  font-size: 11px;
-}
-.promptInput{
-  width:100%;
-  height: 40px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: #000;
-  color:#fff;
-  padding: 0 10px;
-  font-size: 12px;
-}
+    .optionBox{
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
 
-.paypalArea{
-  margin-top: 12px;
-  padding: 10px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-}
-.smallHint{
-  margin-top: 10px;
-  font-size: 11px;
-  color: rgba(255,255,255,.65);
-}
+    .optRow{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 8px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .optLeft{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .optLabel{
+      font-weight: 900;
+      color: #fff;
+    }
+    .optPrice{
+      font-weight: 900;
+      color: var(--yellow);
+    }
 
-     
+    .promptBox{
+      margin-top: 10px;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+    }
+    .promptBox label{
+      color: rgba(255,255,255,.75);
+      font-size: 11px;
+    }
+    .promptInput{
+      width:100%;
+      height: 40px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: #000;
+      color:#fff;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
+    .paypalArea{
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+    }
+
+    .smallHint{
+      margin-top: 10px;
+      font-size: 11px;
+      color: rgba(255,255,255,.65);
+    }
+
+    .asstItalic {
+  font-style: italic;
+  opacity: 0.85; /* 살짝 부드럽게 */
+}
   </style>
 </head>
 
@@ -569,16 +645,13 @@ padding: 5px 8px;
 <div class="wrap">
 
 <header>
-  <!-- ✅ 2줄 스택 컨테이너 -->
   <div style="display:block; width:100%;">
 
-    <!-- ✅ 1줄: 기존 헤더 내용 (그대로, 단 1글자도 수정X) -->
     <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
       <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer" class="logo">
         <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
       </a>
 
-      <!-- ✅ 공유 영역 묶기 -->
       <div class="shareWrap" style="position:relative;">
         <div class="bookmarkHint">
           Bookmark<br>&amp; Share
@@ -594,7 +667,6 @@ padding: 5px 8px;
           </svg>
         </button>
 
-        <!-- ✅ 새 Info 버튼(최우측) -->
         <button class="shareBtn" id="infoBtn" type="button" aria-label="Info" title="Info">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="9"></circle>
@@ -603,7 +675,6 @@ padding: 5px 8px;
           </svg>
         </button>
 
-        <!-- ✅ Info 메뉴 -->
         <div class="infoMenu" id="infoMenu" role="menu" aria-label="Info menu">
           <a href="https://chat-with-stranger.com" target="_blank" rel="noopener noreferrer" style="color: #FF69B4; font-weight: bold; text-decoration: none;">Chat with stranger</a>
           <a href="https://roleplay-chat.com/human" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Chat with real human</a>
@@ -620,100 +691,107 @@ padding: 5px 8px;
       </div>
     </div>
 
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; width:100%;">
+      <sup style="color:#ffcc00; font-size:10px; font-weight:bold; user-select:none;">
+        Unlimited access while this tab is open.
+      </sup>
 
+      <div align="right">
+        <sup>
+          <a href="https://roleplay-chat.com/human" target="_blank" style="text-decoration:none">
+            <font size="1" color="#ffcc00"><b>Live user chat</b></font>
+          </a>
+        </sup>
 
-   <div style="display:flex; align-items:flex-start; justify-content:space-between; width:100%;">
-  <!-- ✅ 왼쪽: 타이머 + Go Unlimited -->
-  <div style="display:flex; align-items:center; gap:10px;">
-    <sup id="paidTimer" style="display:none;">
-      <font size="1" color="#ffcc00"><b></b></font>
-    </sup>
+        <script id="cid0020000430144912743" data-cfasync="false" async
+          src="https://st.chatango.com/js/gz/emb.js"
+          style="width:200px;height:300px;">
+          {"handle":"roleplay-chat-com","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"cv":1,"cvfntsz":"10px","cvbg":"000000","cvfg":"ffcc00","cvw":49,"cvh":18}}
+        </script>
+      </div>
+    </div>
 
-    <!-- ✅ Unlimited 전환 링크 (흰색, 밑줄 없음) -->
-    <a id="goUnlimitedLink" href="javascript:void(0)"
-       style="display:none; font-size:12px; color:#fff; text-decoration:none; opacity:.95; font-weight:700;">
-      Go Unlimited
-    </a>
-
-    <!-- ✅ 결제 완료 후 문구 -->
-    <sup id="unlimitedNote" style="display:none;">
-      <font size="1" color="#ffcc00"><b>Unlimited while this tab is open.</b></font>
-    </sup>
   </div>
-
-
-  <!-- ✅ 오른쪽: 기존 Live user chat (위치 유지) -->
-  <div align="right">
-    <sup>
-      <a href="https://roleplay-chat.com/human" target="_blank" style="text-decoration:none">
-        <font size="1" color="#ffcc00"><b>Live user chat</b></font>
-      </a>
-    </sup>
-
-    <script id="cid0020000430144912743" data-cfasync="false" async
-      src="https://st.chatango.com/js/gz/emb.js"
-      style="width:200px;height:300px;">
-      {"handle":"roleplay-chat-com","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"cv":1,"cvfntsz":"10px","cvbg":"000000","cvfg":"ffcc00","cvw":49,"cvh":18}}
-    </script>
-  </div>
-</div>
-
 </header>
 
-  <!-- Image chat top bar -->
 <div class="imgChatTop">
   <div class="imgChatTitle" id="imgChatTitle">Image chat</div>
   <button class="xBtn" id="imgResetBtn" type="button">New character</button>
 </div>
 
-  <!-- Chat -->
-  <div class="chatShell">
-    <div class="chatBox" id="chatBox"></div>
+<div class="chatShell">
+  <div class="chatBox" id="chatBox"></div>
 
-    <div class="chatControls">
-      <input id="chatInput" class="chatInput" placeholder="Type a message..." />
-      <button id="sendBtn" class="sendBtn">➤</button>
-    </div>
+  <div class="chatControls">
+    <input id="chatInput" class="chatInput" placeholder="Type a message..." />
+    <button id="sendBtn" class="sendBtn">➤</button>
   </div>
 </div>
 
-<!-- ✅ Go Unlimited PayPal Modal -->
-<div id="unlimitedModal" style="
-  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-  background:rgba(0,0,0,.65); z-index:999999;
-">
-  <div style="
-    width:min(420px, calc(100vw - 28px));
-    background:rgba(12,12,12,.96);
-    border:1px solid rgba(255,255,255,.16);
-    border-radius:18px;
-    box-shadow: 0 18px 60px rgba(0,0,0,.65);
-    padding:14px;
-  ">
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-      <div style="font-family:'Baloo 2', Inter, sans-serif; font-weight:800; font-size:16px; color:#fff;">
-        Go Unlimited keeping this chat($20)
+</div>
+
+<!-- =========================
+     Secret Gift Modal (in-page)
+     ========================= -->
+<div class="secretModal" id="secretModal" aria-hidden="true">
+  <div class="secretCard" role="dialog" aria-modal="true" aria-label="Secret Gift">
+    <div class="secretTop">
+      <div class="secretTitle">
+        <span class="giftIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"></path>
+            <path d="M2 7h20v5H2z"></path>
+            <path d="M12 7v15"></path>
+            <path d="M12 7c-2.5 0-4-1-4-2.5S9 2 10.7 2C12 2 12 4 12 7Z"></path>
+            <path d="M12 7c2.5 0 4-1 4-2.5S15 2 13.3 2C12 2 12 4 12 7Z"></path>
+          </svg>
+        </span>
+        <span>Secret Gift arrived!</span>
       </div>
-      <button id="unlimitedCloseBtn" type="button" class="xBtn">✕</button>
+
+      <button class="secretX" id="secretCloseX" type="button" aria-label="Close">✕</button>
     </div>
 
-    <div style="margin-top:10px; color:rgba(255,255,255,.75); font-size:13px; line-height:1.35;">
-          - <span class="highlightCTA">Go Unlimited image chat</span> (no time limit)<br>
-          - <span class="highlightCTA">Time limit will be removed</span><br>
-          - <span class="highlightCTA">Unlimited access</span><br>
-          - <span class="highlightCTA">as long as this tab stays open.</span><br>
-          - <span class="highlightCTA">Unlimited image generation during chat</span><br>
-          - <span class="highlightCTA">Fully uncensored</span><br>
-          - Image Gen matching the roleplay context.<br>
-          - Secure one-time payment.<br>
-          - No-login. Private and anonymous.<br>
-          - Payment = Auto age verification.<br>
-          - Shows as 'Playing game' on payment statement.<br>
-          - <span class="highlightCTA">Start now. Instant access.</span>
-    </div>
+    <div class="secretBody">
+      <div class="secretLine">Here is secret price link.</div>
 
-    <div style="margin-top:12px; padding:10px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);">
-      <div id="paypalUnlimitedButtons"></div>
+      <div class="secretLinkRow">
+        <div class="secretLinkText" id="secretLinkText">https://roleplay-chat.com/secret_price</div>
+
+        <button class="iconBtn" id="secretCopyBtn" type="button" aria-label="Copy link" title="Copy">
+          <svg viewBox="0 0 24 24">
+            <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+
+        <button class="iconBtn" id="secretShareBtn" type="button" aria-label="Share link" title="Share">
+          <svg viewBox="0 0 24 24">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <path d="M8.6 13.5l6.8 3.9"></path>
+            <path d="M15.4 6.6L8.6 10.5"></path>
+          </svg>
+        </button>
+
+        <span class="toastMini" id="secretToast" style="display:none;">Copied!</span>
+      </div>
+
+      <div class="secretNote">
+        <b style="font-size:13px;">Copy it now and keep it for later.</b><br><br>
+        You can use this secret price link <span class="offHighlight">50% off</span> forever to create a new character.<br><br>
+        This link must be used in a new tab.<br><br>
+        All prices are <span class="offHighlight">50% off</span> and you can use it unlimited times.<br><br>
+        Copy the link and use it when you create a new character.<br><br>
+        You may share this link with friends or on social media.<br>
+        Yeah, secretly.<br><br>
+        Enjoy your time
+      </div>
+
+      <div class="secretActions">
+        <button class="thankBtn" id="secretThankBtn" type="button">Thank you (Go to chat)</button>
+      </div>
     </div>
   </div>
 </div>
@@ -757,7 +835,7 @@ padding: 5px 8px;
       </div>
 
       <div class="paypalArea">
-        <div id="paypalVideoButtons"></div>
+        <div id="paypalButtons"></div>
       </div>
 
       <div class="smallHint">
@@ -767,16 +845,51 @@ padding: 5px 8px;
   </div>
 </div>
 
-  
 <script>
+  function prettyErr(e){
+  try{
+    if (!e) return "Unknown error";
+    if (e instanceof Error) return e.message || String(e);
+
+    // object 에러면 최대한 많은 정보를 표시
+    if (typeof e === "object"){
+      const code = e.code ? `code=${e.code}` : "";
+      const status = e.status ? `status=${e.status}` : "";
+
+      // venice 원본 에러에서 message 우선 노출
+      const veniceMsg =
+        (typeof e?.venice?.message === "string" && e.venice.message) ||
+        (typeof e?.venice?.error === "string" && e.venice.error) ||
+        (typeof e?.venice?.detail === "string" && e.venice.detail) ||
+        "";
+
+      const mainMsg =
+        (typeof e.message === "string" && e.message) ||
+        (typeof e.error === "string" && e.error) ||
+        (typeof e.detail === "string" && e.detail) ||
+        "";
+
+      // 우선순위: venice 메시지 > main 메시지 > stringify
+      const msg = veniceMsg || mainMsg || JSON.stringify(e);
+
+      // code/status 같이 보여주기
+      const meta = [code, status].filter(Boolean).join(", ");
+      return meta ? `${msg} (${meta})` : msg;
+    }
+
+    return String(e);
+  }catch(_){
+    return String(e);
+  }
+}
+
 /* =========================
    Load character from main
    ========================= */
 
 const STORAGE_KEY = "roleplay-chat_session_v1";
 const IMAGECHAT_HISTORY_KEY = "roleplay-chat_imagechat_history_v1";
-const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
-const IMAGECHAT_UNLIMITED_KEY = "roleplay-chat_imagechat_unlimited_v1";
+const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
 
 function readSession(){
   const raw = sessionStorage.getItem(STORAGE_KEY);
@@ -784,132 +897,45 @@ function readSession(){
   catch { return null; }
 }
 
-
 const session = readSession();
 
-  // ✅ Page title (browser tab)
 if (session?.name){
   document.title = `Image chat with ${session.name} | roleplay-chat.com`;
 } else {
   document.title = "Image chat | roleplay-chat.com";
 }
 
-  
-function setImagechatPaid24hLocal(){
-  const now = Date.now();
-  const payload = { status:"paid", paidAt: now, expiresAt: now + 24*60*60*1000 };
-  sessionStorage.setItem(IMAGECHAT_PAID_KEY, JSON.stringify(payload));
+function setPaidForever(){
+  const payload = { status: "paid", paidAt: Date.now() };
+  sessionStorage.setItem(
+    IMAGECHAT_UNLIMITED_PAID_KEY,
+    JSON.stringify(payload)
+  );
   return payload;
 }
 
-function readImagechatPaid(){
-  const raw = sessionStorage.getItem(IMAGECHAT_PAID_KEY);
+function readUnlimitedPaid(){
+  const raw = sessionStorage.getItem(IMAGECHAT_UNLIMITED_PAID_KEY);
   if (!raw) return null;
 
-  // ✅ 메인에서 "paid" 문자열만 저장해도: 첫 진입 순간 24h 티켓으로 업그레이드
-  if (raw === "paid") return setImagechatPaid24hLocal();
-
-  try { return JSON.parse(raw); } catch { return null; }
-}
-
-function isUnlimited(){
-  return sessionStorage.getItem(IMAGECHAT_UNLIMITED_KEY) === "1";
-}
-
-function setUnlimited(){
-  sessionStorage.setItem(IMAGECHAT_UNLIMITED_KEY, "1");
-  // 24h 티켓은 의미 없어지니 지워도 OK
-  sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
-}
-
-
-function isImagechatPaidValid(){
-  // ✅ Unlimited면 만료 개념 자체가 없음
-  if (isUnlimited()) return true;
-
-  const p = readImagechatPaid();
-  if (!p || p.status !== "paid" || !p.expiresAt) return false;
-
-  if (Date.now() >= p.expiresAt){
-    sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
-    return false;
-  }
-  return true;
-}
-
-// ✅ paid 상태 확정 (Unlimited 포함)
-const paid = isImagechatPaidValid();
-
-// ✅ 헤더 타이머/문구 UI 시작
-startHeaderCountdown();
-  
-
-function formatRemaining(ms){
-  const sec = Math.max(0, Math.floor(ms/1000));
-  const h = Math.floor(sec/3600);
-  const m = Math.floor((sec%3600)/60);
-  const s = sec%60;
-  const pad = (n)=>String(n).padStart(2,"0");
-  return `${pad(h)}:${pad(m)}:${pad(s)}`;
-}
-
-function startHeaderCountdown(){
-  const holder = document.getElementById("paidTimer");
-  const bold = holder?.querySelector("b");
-  const goLink = document.getElementById("goUnlimitedLink");
-  const note = document.getElementById("unlimitedNote");
-
-  // ✅ Unlimited면: 카운트 UI/링크 숨기고 문구만 표시
-  if (isUnlimited()){
-    if (holder) holder.style.display = "none";
-    if (goLink) goLink.style.display = "none";
-    if (note) note.style.display = "inline";
-    return;
+  if (raw === "paid"){
+    return setPaidForever();
   }
 
-  if (!holder || !bold) return;
-
-  function tick(){
-    const p = readImagechatPaid();
-    if (!p || p.status !== "paid" || !p.expiresAt){
-      holder.style.display = "none";
-      if (goLink) goLink.style.display = "none";
-      if (note) note.style.display = "none";
-      return false;
-    }
-
-    const remain = p.expiresAt - Date.now();
-    if (remain <= 0){
-      sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
-      holder.style.display = "none";
-      if (goLink) goLink.style.display = "none";
-      if (note) note.style.display = "none";
-      window.location.href = "/?expired=imagechat";
-      return false;
-    }
-
-    holder.style.display = "inline";
-    bold.textContent = `Available: ${formatRemaining(remain)}`;
-
-    // ✅ 카운트 중에는 Go Unlimited 보여주기
-    if (goLink) goLink.style.display = "inline";
-    if (note) note.style.display = "none";
-
-    return true;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
   }
-
-  tick();
-  const id = setInterval(() => { if (!tick()) clearInterval(id); }, 1000);
-
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) tick();
-  });
 }
 
+function isUnlimitedPaid(){
+  const p = readUnlimitedPaid();
+  return !!(p && p.status === "paid");
+}
 
+const paid = isUnlimitedPaid();
 
-
-  // ✅ Top bar title + New character button
 const titleEl = document.getElementById("imgChatTitle");
 if (titleEl){
   titleEl.textContent = session?.name
@@ -924,7 +950,6 @@ if (imgResetBtn){
   });
 }
 
-
 function loadHistory(){
   const raw = sessionStorage.getItem(IMAGECHAT_HISTORY_KEY);
   try { return raw ? JSON.parse(raw) : []; }
@@ -936,20 +961,16 @@ function saveHistory(list){
   catch(e){ console.error(e); }
 }
 
-
 if (!paid){
   alert("Image chat is locked. Please complete payment first.");
   location.href = "https://roleplay-chat.com/";
 }
-
 
 if (!session || !session.name){
   alert("No character session found. Please create a character first.");
   location.href = "https://roleplay-chat.com/";
 }
 
-
-/* Apply font color */
 if (session?.fontColor){
   document.documentElement.style.setProperty("--chatColor", session.fontColor);
 }
@@ -962,7 +983,7 @@ const chatBox = document.getElementById("chatBox");
 const input = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 
-let history = loadHistory(); // ✅ refresh에도 남음
+let history = loadHistory();
 
 function escapeText(s){
   return (s ?? "").toString();
@@ -975,9 +996,8 @@ async function typewriter(el, text, speed=14){
   cursor.textContent = "▍";
   el.appendChild(cursor);
 
-  // ✅ 사용자가 스크롤을 위로 올려서 읽는 중이면 자동 스크롤 방해 안 하려고 플래그
   const shouldAutoScroll = () => {
-    const threshold = 80; // 바닥에서 80px 이내면 "바닥에 붙어있다"고 판단
+    const threshold = 80;
     const distFromBottom = chatBox.scrollHeight - (chatBox.scrollTop + chatBox.clientHeight);
     return distFromBottom < threshold;
   };
@@ -987,7 +1007,6 @@ async function typewriter(el, text, speed=14){
     el.append(text[i]);
     el.appendChild(cursor);
 
-    // ✅ 타이핑 중 높이가 늘어날 때마다 바닥으로 따라가기
     if (shouldAutoScroll()){
       chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
     }
@@ -995,12 +1014,215 @@ async function typewriter(el, text, speed=14){
     await new Promise(r => setTimeout(r, speed));
   }
   cursor.remove();
-
-  // ✅ 끝났을 때도 한 번 확실히 바닥
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
 }
 
+/* =========================
+   ✅ Video Payment Modal logic
+   ========================= */
+const videoPayModal = document.getElementById("videoPayModal");
+const videoPayCloseX = document.getElementById("videoPayCloseX");
+const paypalButtonsWrap = document.getElementById("paypalButtons");
+const vidPrompt = document.getElementById("vidPrompt");
 
+let selectedImageDataUrl = "";
+let selectedImageCaption = ""; // optional future use
+
+function openVideoPayModal(){
+  if (!videoPayModal) return;
+  videoPayModal.classList.add("active");
+  videoPayModal.setAttribute("aria-hidden","false");
+  renderPayPalButtons();
+}
+
+function closeVideoPayModal(){
+  if (!videoPayModal) return;
+  videoPayModal.classList.remove("active");
+  videoPayModal.setAttribute("aria-hidden","true");
+}
+
+if (videoPayCloseX) videoPayCloseX.addEventListener("click", closeVideoPayModal);
+if (videoPayModal){
+  videoPayModal.addEventListener("click", (e) => {
+    if (e.target === videoPayModal) closeVideoPayModal();
+  });
+}
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeVideoPayModal();
+});
+
+function getSelectedDuration(){
+  const el = document.querySelector('input[name="vidLen"]:checked');
+  return el ? el.value : "5s";
+}
+function getSelectedPrice(){
+  const d = getSelectedDuration();
+  return (d === "10s") ? "2.00" : "1.50";
+}
+
+/* PayPal Buttons re-render safe */
+let paypalRendered = false;
+function renderPayPalButtons(){
+  if (!paypalButtonsWrap) return;
+
+  // wipe + re-render (keeps it simple and always correct)
+  paypalButtonsWrap.innerHTML = "";
+  paypalRendered = false;
+
+  if (!window.paypal || !window.paypal.Buttons){
+    paypalButtonsWrap.innerHTML = '<div style="color:rgba(255,255,255,.75); font-size:12px;">PayPal SDK not loaded.</div>';
+    return;
+  }
+
+  window.paypal.Buttons({
+    style: {
+      layout: 'vertical',
+      shape: 'pill',
+      label: 'pay'
+    },
+    createOrder: (data, actions) => {
+      const value = getSelectedPrice();
+      const duration = getSelectedDuration();
+      return actions.order.create({
+        purchase_units: [{
+          description: "video game", // ✅ requested
+          amount: { value },
+          custom_id: `video_${duration}`
+        }]
+      });
+    },
+    onApprove: async (data, actions) => {
+      const capture = await actions.order.capture();
+      // 결제 성공 → 모달 닫고 생성 시작
+      closeVideoPayModal();
+
+      const duration = getSelectedDuration();
+      const extraPrompt = (vidPrompt && vidPrompt.value ? String(vidPrompt.value).trim() : "");
+
+      // UX: user가 뭘 샀는지 보이게 한 줄
+      appendMsg(
+  "assistant",
+  `Generating ${duration} video...\n` +
+  `It may take a while.\n` +
+  `Please do not type until the video appears. Typing will pause the chat while we generate the video.`,
+  undefined,
+  undefined,
+  { animate: true, italic: true }
+);
+
+      try{
+  await generateVideoFromSelectedImage({ duration, extraPrompt });
+}catch(e){
+  appendMsg("assistant", `Error: ${prettyErr(e)}`);
+}
+
+    },
+    onError: (err) => {
+  appendMsg("assistant", `PayPal error: ${prettyErr(err)}`);
+}
+  }).render(paypalButtonsWrap);
+
+  paypalRendered = true;
+}
+
+// radio change → rerender 버튼 금액 반영
+document.addEventListener("change", (e) => {
+  if (e && e.target && e.target.name === "vidLen"){
+    // re-render to ensure amount updates
+    renderPayPalButtons();
+  }
+});
+
+/* =========================
+   ✅ Venice video generation flow (via /api/video)
+   ========================= */
+async function generateVideoFromSelectedImage({ duration, extraPrompt }){
+  if (!selectedImageDataUrl){
+    throw new Error("No image selected.");
+  }
+
+  // 1) queue
+  // 1) queue
+const qRes = await fetch("/api/video", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    action: "queue",
+    duration,
+    imageDataUrl: selectedImageDataUrl,
+    prompt: extraPrompt || ""
+  })
+});
+
+let qData = null;
+try { qData = await qRes.json(); } catch { qData = null; }
+
+if (!qRes.ok){
+  // 디버깅용: 서버가 준 전체 에러 객체를 그대로 보여줌
+  appendMsg("assistant", `Queue debug: ${JSON.stringify(qData)}`);
+  throw (qData || { error: `HTTP ${qRes.status}` });
+}
+
+
+  const model = qData.model;
+  const queue_id = qData.queue_id;
+  if (!model || !queue_id){
+    throw new Error("Queue failed: missing model/queue_id");
+  }
+
+  // 2) poll retrieve
+  const startedAt = Date.now();
+  const maxMs = 6 * 60 * 1000; // 6 minutes client-side
+  const pollEveryMs = 2500;
+
+  while (Date.now() - startedAt < maxMs){
+    await new Promise(r => setTimeout(r, pollEveryMs));
+
+    const rRes = await fetch("/api/video", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    action: "retrieve",
+    model,
+    queue_id
+  })
+});
+
+let rData = null;
+try { rData = await rRes.json(); } catch { rData = null; }
+
+if (!rRes.ok){
+  throw (rData || { error: `HTTP ${rRes.status}` });
+}
+
+    if (rData && rData.status === "PROCESSING"){
+      // keep waiting
+      continue;
+    }
+
+    if (rData && rData.status === "COMPLETED" && rData.video && rData.video.b64 && rData.video.mime){
+      const videoUrl = `data:${rData.video.mime};base64,${rData.video.b64}`;
+
+      // ✅ show in a new bubble with download button
+      appendMsg("assistant", "Thanks for waiting", undefined, videoUrl, { animate: true });
+
+      // ✅ persist
+      history.push({ role: "assistant", content: "Thanks for waiting", videoUrl });
+      saveHistory(history);
+
+      return;
+    }
+
+    // unknown response
+    throw new Error("Unexpected retrieve response.");
+  }
+
+  throw new Error("Video generation timed out.");
+}
+
+/* =========================
+   appendMsg (updated: supports video + generate link under image)
+   ========================= */
 function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
   const { animate = false } = opts;
 
@@ -1036,6 +1258,10 @@ function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
     const body = document.createElement("div");
     body.className = "asstText";
 
+    if (opts.italic){
+  body.classList.add("asstItalic");
+}
+
     bubble.appendChild(name);
     bubble.appendChild(body);
 
@@ -1059,13 +1285,15 @@ function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
   }
 
   // image
+  let imgEl = null;
   if (imageUrl){
     const img = document.createElement("img");
     img.src = imageUrl;
-    img.dataset.imageDataUrl = imageUrl; // ✅ for video modal
+    img.dataset.imageDataUrl = imageUrl; // ✅ capture for modal
+    imgEl = img;
     bubble.appendChild(img);
 
-    // ✅ Only assistant bubble with image: add Generate video link
+    // ✅ Only for assistant bubble with image: add Generate video link
     if (role === "assistant"){
       const row = document.createElement("div");
       row.className = "genVideoRow";
@@ -1094,6 +1322,7 @@ function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
     v.playsInline = true;
     bubble.appendChild(v);
 
+    // ✅ download button
     const act = document.createElement("div");
     act.className = "videoActionsRow";
 
@@ -1102,6 +1331,10 @@ function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
     a.textContent = "Download";
     a.href = videoUrl;
     a.download = `roleplay-video-${Date.now()}.mp4`;
+    a.style.textDecoration = "none";
+    a.style.display = "inline-flex";
+    a.style.alignItems = "center";
+    a.style.justifyContent = "center";
 
     act.appendChild(a);
     bubble.appendChild(act);
@@ -1113,29 +1346,25 @@ function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
 }
 
-
 function renderHistory(){
   if (!Array.isArray(history)) history = [];
   for (const m of history){
-    // 지금 history에는 text만 있음 (content)
     appendMsg(
-  m.role === "assistant" ? "assistant" : "user",
-  m.content,
-  m.imageUrl,
-  m.videoUrl,
-  { animate: false } // ✅ 히스토리는 그냥 즉시 표시
-);
+      m.role === "assistant" ? "assistant" : "user",
+      m.content,
+      m.imageUrl,
+      m.videoUrl,
+      { animate: false }
+    );
   }
 }
 renderHistory();
 
 async function bootstrapFirstMessage(){
-  // 이미 대화가 있으면(새로고침 등) 첫 인사 다시 안 함
   if (history.length > 0) return;
 
   const payload = {
     paymentStatus: paid ? "paid" : "unpaid",
-    // ✅ 서버가 "첫 인사 요청"임을 알 수 있게 특수 플래그/메시지
     message: "__INIT__",
     session: {
       name: session.name,
@@ -1161,14 +1390,11 @@ async function bootstrapFirstMessage(){
   };
 
   try{
-    setBusy(true);
-
     const res = await fetch("/api/imagechat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload),
-});
-
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.detail || data.error || `HTTP ${res.status}`);
@@ -1185,24 +1411,15 @@ async function bootstrapFirstMessage(){
     saveHistory(history);
 
   } catch(e){
-    appendMsg(
-  "assistant",
-  `Error: ${String(e?.message || e)}`,
-  undefined,
-  undefined,
-  { animate: true }
-);
-
-    history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
+    appendMsg("assistant", `Error: ${prettyErr(e)}`);
+    history.push({ role: "assistant", content: `Error: ${prettyErr(e)}` });
     saveHistory(history);
   } finally {
     setBusy(false);
   }
 }
 
-// ✅ 렌더 후 첫 인사 요청
 bootstrapFirstMessage();
-
 
 /* =========================
    Send flow (REAL API)
@@ -1219,28 +1436,25 @@ async function send(){
   if (!text) return;
 
   input.value = "";
-  appendMsg("user", text, undefined, undefined, {});
-requestAnimationFrame(() => {
-  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+  appendMsg("user", text);
+
   requestAnimationFrame(() => {
     chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+    requestAnimationFrame(() => {
+      chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+    });
   });
-});
-
-  
 
   history.push({ role: "user", content: text });
   saveHistory(history);
 
-  // Basic session hardening
   if (!session || !session.name){
     appendMsg("assistant", "Error: No character session found. Please create a character first.");
     return;
   }
 
-  // We will always use:
-  // - text model: venice-uncensored
-  // - image model: lustify-sdxl
+  const slimHistory = Array.isArray(history) ? history.slice(-50) : [];
+
   const payload = {
     paymentStatus: paid ? "paid" : "unpaid",
     message: text,
@@ -1260,7 +1474,7 @@ requestAnimationFrame(() => {
       avatarDataUrl: session.avatarDataUrl || "",
       tier: "uncensored"
     },
-    history,
+    history: slimHistory,
     models: {
       text: "venice-uncensored",
       image: "lustify-sdxl"
@@ -1270,58 +1484,35 @@ requestAnimationFrame(() => {
   try{
     setBusy(true);
 
-  // ✅ 입력창 disabled 등 레이아웃 확정된 다음에 한 번 더 바닥 고정
-requestAnimationFrame(() => {
-  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
-});
+    requestAnimationFrame(() => {
+      chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
+    });
 
+    const res = await fetch("/api/imagechat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-   const res = await fetch("/api/imagechat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload),
-});
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.detail || data.error || `HTTP ${res.status}`);
+    }
 
-
-const data = await res.json().catch(() => ({}));
-
-if (!res.ok) {
-  // ✅ 서버에서 내려준 진짜 에러 메시지 확인용
-  throw new Error(data.detail || data.error || `HTTP ${res.status}`);
-}
-// ✅ 서버가 내려준 appearanceProfile 저장
-if (typeof data.appearanceProfile === "string" && data.appearanceProfile.trim()) {
-  sessionStorage.setItem("appearanceProfile", data.appearanceProfile.trim());
-}
-
-    // Expected server response shape (you’ll implement in /functions/api/imagechat.ts):
-    // {
-    //   reply: "text reply",
-    //   imageUrl?: "https://...." OR "data:image/...",
-    //   imageCaption?: "optional caption"
-    // }
     const reply = (data && typeof data.reply === "string") ? data.reply : "";
 
-// ✅ server(imagechat.ts)가 주는 형식: { image: { mime, b64 } }
-let imageUrl = "";
-if (data && data.image && typeof data.image.b64 === "string" && typeof data.image.mime === "string"){
-  imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
-}
+    let imageUrl = "";
+    if (data && data.image && typeof data.image.b64 === "string" && typeof data.image.mime === "string"){
+      imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
+    }
 
-const shownText = reply || "(no text)";
-appendMsg("assistant", shownText, imageUrl || undefined, { animate: true });
-history.push({ role: "assistant", content: shownText, imageUrl }); // ✅ imageUrl 추가
-saveHistory(history);
-
+    const shownText = reply || "(no text)";
+    appendMsg("assistant", shownText, imageUrl || undefined, undefined, { animate: true });
+    history.push({ role: "assistant", content: shownText, imageUrl });
+    saveHistory(history);
 
   }catch(e){
-    appendMsg(
-  "assistant",
-  `Error: ${String(e?.message || e)}`,
-  undefined,
-  undefined,
-  { animate: true }
-);
+    appendMsg("assistant", `Error: ${prettyErr(e)}`);
     history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
     saveHistory(history);
   }finally{
@@ -1334,7 +1525,7 @@ input.onkeydown = (e) => {
   if (e.key === "Enter") send();
 };
 
- // Share button
+// Share button
 const shareBtn = document.querySelector("#shareBtn");
 if (shareBtn){
   shareBtn.addEventListener("click", async () => {
@@ -1344,7 +1535,6 @@ if (shareBtn){
         await navigator.share({ title: document.title, url });
       }else{
         await navigator.clipboard.writeText(url);
-        // optional tiny feedback
         shareBtn.title = "Copied!";
         setTimeout(() => (shareBtn.title = "Share"), 900);
       }
@@ -1354,7 +1544,7 @@ if (shareBtn){
   });
 }
 
-    // Info button dropdown ✅ (여기!)
+// Info dropdown
 const infoBtn = document.querySelector("#infoBtn");
 const infoMenu = document.querySelector("#infoMenu");
 
@@ -1380,345 +1570,97 @@ if (infoBtn && infoMenu){
 }
 
 /* =========================
-   Go Unlimited ($20) PayPal Modal
+   Secret Gift popup (paid only)
    ========================= */
+const SECRET_LINK = "https://roleplay-chat.com/secret_price";
 
-const goUnlimitedLink = document.getElementById("goUnlimitedLink");
-const unlimitedModal = document.getElementById("unlimitedModal");
-const unlimitedCloseBtn = document.getElementById("unlimitedCloseBtn");
-const paypalMount = document.getElementById("paypalUnlimitedButtons");
+const secretModal = document.getElementById("secretModal");
+const secretCloseX = document.getElementById("secretCloseX");
+const secretThankBtn = document.getElementById("secretThankBtn");
+const secretCopyBtn = document.getElementById("secretCopyBtn");
+const secretShareBtn = document.getElementById("secretShareBtn");
+const secretToast = document.getElementById("secretToast");
+const secretLinkText = document.getElementById("secretLinkText");
 
-function openUnlimitedModal(){
-  if (!unlimitedModal) return;
-  unlimitedModal.style.display = "flex";
+function openSecretModal(){
+  if (!secretModal) return;
+  secretModal.classList.add("active");
+  secretModal.setAttribute("aria-hidden", "false");
 }
 
-function closeUnlimitedModal(){
-  if (!unlimitedModal) return;
-  unlimitedModal.style.display = "none";
+function closeSecretModal(){
+  if (!secretModal) return;
+  secretModal.classList.remove("active");
+  secretModal.setAttribute("aria-hidden", "true");
 }
 
-// 모달 닫기
-if (unlimitedCloseBtn) unlimitedCloseBtn.addEventListener("click", closeUnlimitedModal);
-if (unlimitedModal){
-  unlimitedModal.addEventListener("click", (e) => {
-    if (e.target === unlimitedModal) closeUnlimitedModal();
+function showToast(msg){
+  if (!secretToast) return;
+  secretToast.textContent = msg || "Done";
+  secretToast.style.display = "inline";
+  setTimeout(() => (secretToast.style.display = "none"), 900);
+}
+
+if (secretCloseX) secretCloseX.addEventListener("click", closeSecretModal);
+if (secretThankBtn) secretThankBtn.addEventListener("click", closeSecretModal);
+
+if (secretModal){
+  secretModal.addEventListener("click", (e) => {
+    if (e.target === secretModal) closeSecretModal();
   });
 }
 
-// 링크 클릭 -> 모달 오픈
-if (goUnlimitedLink){
-  goUnlimitedLink.addEventListener("click", () => {
-    openUnlimitedModal();
-    ensurePayPalUnlimitedButtons();
-  });
-}
-
-/* ✅ PayPal SDK 로드 + 버튼 생성
-   IMPORTANT: 아래 YOUR_PAYPAL_CLIENT_ID 를 너의 Live client-id로 교체해야 함 */
-let paypalUnlimitedReady = false;
-let paypalSdkLoading = false;
-
-function loadPayPalSdkOnce(){
-  return new Promise((resolve, reject) => {
-    if (window.paypal) return resolve();
-    if (paypalSdkLoading) {
-      const check = setInterval(() => {
-        if (window.paypal){ clearInterval(check); resolve(); }
-      }, 80);
-      setTimeout(() => { clearInterval(check); reject(new Error("PayPal SDK load timeout")); }, 12000);
-      return;
-    }
-
-    paypalSdkLoading = true;
-    const s = document.createElement("script");
-    s.src = "https://www.paypal.com/sdk/js?client-id=ASts4hxcd4-DkLEL8b-PbbawSaCD4G5pQiuJM9aZYawixhxWbQ2upSru10WQNZa4HzCqHUcGC8Z1RIrW&currency=USD&intent=capture";
-    s.async = true;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error("Failed to load PayPal SDK"));
-    document.head.appendChild(s);
-  });
-}
-
-async function ensurePayPalUnlimitedButtons(){
-  if (paypalUnlimitedReady) return;
-  if (!paypalMount) return;
-
-  await loadPayPalSdkOnce();
-
-  if (!window.paypal) throw new Error("PayPal SDK not available");
-
-  // 중복 렌더 방지
-  paypalMount.innerHTML = "";
-
-  window.paypal.Buttons({
-    style: { layout: "vertical" },
-
-    createOrder: (data, actions) => {
-      return actions.order.create({
-        purchase_units: [{
-          amount: { value: "20.00", currency_code: "USD" },
-          description: "Upgrade game"
-        }]
-      });
-    },
-
-    onApprove: async (data, actions) => {
-      const details = await actions.order.capture();
-
-      // ✅ 결제 성공 -> Unlimited 전환
-      setUnlimited();
-
-      // ✅ UI 갱신: 카운트/링크 숨기고 문구 표시
-      const holder = document.getElementById("paidTimer");
-      const note = document.getElementById("unlimitedNote");
-      const link = document.getElementById("goUnlimitedLink");
-
-      if (holder) holder.style.display = "none";
-      if (link) link.style.display = "none";
-      if (note) note.style.display = "inline";
-
-      closeUnlimitedModal();
-    },
-
-    onError: (err) => {
-      alert("Payment error. Please try again.");
-      console.error(err);
-    },
-
-    onCancel: () => {
-      // 유저가 닫은 경우 조용히
-    }
-
-  }).render("#paypalUnlimitedButtons");
-
-  paypalUnlimitedReady = true;
-}
-
-  /* =========================
-   ✅ Video Payment Modal logic + Venice video flow
-   ========================= */
-const videoPayModal = document.getElementById("videoPayModal");
-const videoPayCloseX = document.getElementById("videoPayCloseX");
-const paypalVideoMount = document.getElementById("paypalVideoButtons");
-const vidPrompt = document.getElementById("vidPrompt");
-
-let selectedImageDataUrl = "";
-
-function openVideoPayModal(){
-  if (!videoPayModal) return;
-  videoPayModal.classList.add("active");
-  videoPayModal.setAttribute("aria-hidden","false");
-  renderPayPalVideoButtons();
-}
-
-function closeVideoPayModal(){
-  if (!videoPayModal) return;
-  videoPayModal.classList.remove("active");
-  videoPayModal.setAttribute("aria-hidden","true");
-}
-
-if (videoPayCloseX) videoPayCloseX.addEventListener("click", closeVideoPayModal);
-if (videoPayModal){
-  videoPayModal.addEventListener("click", (e) => {
-    if (e.target === videoPayModal) closeVideoPayModal();
-  });
-}
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeVideoPayModal();
+  if (e.key === "Escape") closeSecretModal();
 });
 
-function getSelectedDuration(){
-  const el = document.querySelector('input[name="vidLen"]:checked');
-  return el ? el.value : "5s";
-}
-function getSelectedPrice(){
-  const d = getSelectedDuration();
-  return (d === "10s") ? "2.00" : "1.50";
-}
-
-function prettyErr(e){
-  try{
-    if (!e) return "Unknown error";
-    if (e instanceof Error) return e.message || String(e);
-
-    if (typeof e === "object"){
-      const code = e.code ? `code=${e.code}` : "";
-      const status = e.status ? `status=${e.status}` : "";
-
-      const veniceMsg =
-        (typeof e?.venice?.message === "string" && e.venice.message) ||
-        (typeof e?.venice?.error === "string" && e.venice.error) ||
-        (typeof e?.venice?.detail === "string" && e.venice.detail) ||
-        "";
-
-      const mainMsg =
-        (typeof e.message === "string" && e.message) ||
-        (typeof e.error === "string" && e.error) ||
-        (typeof e.detail === "string" && e.detail) ||
-        "";
-
-      const msg = veniceMsg || mainMsg || JSON.stringify(e);
-      const meta = [code, status].filter(Boolean).join(", ");
-      return meta ? `${msg} (${meta})` : msg;
+if (secretCopyBtn){
+  secretCopyBtn.addEventListener("click", async () => {
+    try{
+      await navigator.clipboard.writeText(SECRET_LINK);
+      showToast("Copied!");
+    }catch(e){
+      showToast("Copy failed");
     }
-
-    return String(e);
-  }catch(_){
-    return String(e);
-  }
+  });
 }
 
-/* PayPal Buttons (Video) */
-function renderPayPalVideoButtons(){
-  if (!paypalVideoMount) return;
-
-  // PayPal SDK ensure
-  loadPayPalSdkOnce().then(() => {
-    if (!window.paypal || !window.paypal.Buttons){
-      paypalVideoMount.innerHTML = '<div style="color:rgba(255,255,255,.75); font-size:12px;">PayPal SDK not loaded.</div>';
-      return;
-    }
-
-    // wipe + re-render
-    paypalVideoMount.innerHTML = "";
-
-    window.paypal.Buttons({
-      style: { layout: "vertical", shape: "pill", label: "pay" },
-
-      createOrder: (data, actions) => {
-        const value = getSelectedPrice();
-        const duration = getSelectedDuration();
-        return actions.order.create({
-          purchase_units: [{
-            description: "video game",          // ✅ requested
-            amount: { value },
-            custom_id: `video_${duration}`
-          }]
-        });
-      },
-
-      onApprove: async (data, actions) => {
-        await actions.order.capture();
-        closeVideoPayModal();
-
-        const duration = getSelectedDuration();
-        const extraPrompt = (vidPrompt && vidPrompt.value ? String(vidPrompt.value).trim() : "");
-
-        // ✅ 결제 성공 안내 (UX)
-        appendMsg(
-          "assistant",
-          `Generating ${duration} video...\nIt may take a while.\nPlease do not type until the video appears.`,
-          undefined,
-          undefined,
-          { animate: true }
-        );
-
-        try{
-          await generateVideoFromSelectedImage({ duration, extraPrompt });
-        }catch(e){
-          appendMsg("assistant", `Error: ${prettyErr(e)}`, undefined, undefined, { animate: true });
-        }
-      },
-
-      onError: (err) => {
-        appendMsg("assistant", `PayPal error: ${prettyErr(err)}`, undefined, undefined, { animate: true });
+if (secretShareBtn){
+  secretShareBtn.addEventListener("click", async () => {
+    try{
+      if (navigator.share){
+        await navigator.share({ title: "Secret price link", url: SECRET_LINK });
+      }else{
+        await navigator.clipboard.writeText(SECRET_LINK);
+        showToast("Copied!");
       }
-    }).render(paypalVideoMount);
-
-  }).catch((e) => {
-    paypalVideoMount.innerHTML = `<div style="color:rgba(255,255,255,.75); font-size:12px;">${prettyErr(e)}</div>`;
+    }catch(e){
+      // user cancelled or blocked
+    }
   });
 }
 
-// radio change -> rerender to update amount
-document.addEventListener("change", (e) => {
-  if (e && e.target && e.target.name === "vidLen"){
-    renderPayPalVideoButtons();
-  }
-});
-
-/* =========================
-   ✅ Venice video generation flow (via /api/video)
-   ========================= */
-async function generateVideoFromSelectedImage({ duration, extraPrompt }){
-  if (!selectedImageDataUrl){
-    throw new Error("No image selected.");
-  }
-
-  // 1) queue
-  const qRes = await fetch("/api/video", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "queue",
-      duration,
-      imageDataUrl: selectedImageDataUrl,
-      prompt: extraPrompt || ""
-    })
-  });
-
-  let qData = null;
-  try { qData = await qRes.json(); } catch { qData = null; }
-
-  if (!qRes.ok){
-    throw (qData || { error: `HTTP ${qRes.status}` });
-  }
-
-  const model = qData.model;
-  const queue_id = qData.queue_id;
-  if (!model || !queue_id){
-    throw new Error("Queue failed: missing model/queue_id");
-  }
-
-  // 2) poll retrieve
-  const startedAt = Date.now();
-  const maxMs = 6 * 60 * 1000;
-  const pollEveryMs = 2500;
-
-  while (Date.now() - startedAt < maxMs){
-    await new Promise(r => setTimeout(r, pollEveryMs));
-
-    const rRes = await fetch("/api/video", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "retrieve", model, queue_id })
-    });
-
-    let rData = null;
-    try { rData = await rRes.json(); } catch { rData = null; }
-
-    if (!rRes.ok){
-      throw (rData || { error: `HTTP ${rRes.status}` });
-    }
-
-    if (rData && rData.status === "PROCESSING"){
-      continue;
-    }
-
-    if (rData && rData.status === "COMPLETED" && rData.video && rData.video.b64 && rData.video.mime){
-      const videoUrl = `data:${rData.video.mime};base64,${rData.video.b64}`;
-
-      // ✅ show bubble with video + download
-      appendMsg("assistant", "Here is your video.", undefined, videoUrl, { animate: true });
-
-      // ✅ persist
-      history.push({ role: "assistant", content: "Here is your video.", videoUrl });
-      saveHistory(history);
-
-      return;
-    }
-
-    throw new Error("Unexpected retrieve response.");
-  }
-
-  throw new Error("Video generation timed out.");
+if (secretLinkText){
+  secretLinkText.textContent = SECRET_LINK;
 }
 
-  
+const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
+
+(function maybeShowSecretGift(){
+  try{
+    if (!paid) return;
+    if (sessionStorage.getItem(SECRET_POPUP_SHOWN_KEY) === "1") return;
+    sessionStorage.setItem(SECRET_POPUP_SHOWN_KEY, "1");
+    openSecretModal();
+  }catch(e){
+    if (paid) openSecretModal();
+  }
+})();
 </script>
 
 </body>
 </html>
+
+
 
 
