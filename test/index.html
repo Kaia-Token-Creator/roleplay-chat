@@ -2017,6 +2017,57 @@ function mountPayPalButtons(onSuccess, priceUsd = "2.00", description = "Playing
     const PAYMENT_KEY = "roleplay-chat_paid_v1";
     let paymentStatus = sessionStorage.getItem(PAYMENT_KEY) || "unpaid"; // refresh-safe within this tab
 
+    // ✅ sex/sext 트리거 감지 (원하는 단어 더 추가/삭제 가능)
+const SEX_TRIGGER_RE = new RegExp(
+  [
+    // English
+    "\\bsex\\b",
+    "\\bsext\\b",
+    "\\bnude\\b",
+    "\\bnudes\\b",
+    "\\bblowjob\\b",
+    "\\bhandjob\\b",
+    "\\bfuck\\b",
+    "\\bfucking\\b",
+    "\\bforeplay\\b",
+    "\\borgasm\\b",
+    "\\bnsfw\\b",
+    "\\bboobs?\\b",
+    "\\bpussy\\b",
+    "\\bdick\\b",
+    "\\bpenis\\b",
+    "\\bvagina\\b"
+  ].join("|"),
+  "i"
+);
+
+function containsSexTrigger(text){
+  if (!text) return false;
+  return SEX_TRIGGER_RE.test(text);
+}
+
+// ✅ “결제 안 됨” 상태인지 판단 (general 채팅 + 아직 paid 아님)
+function isUnpaidGeneral(){
+  const s = loadSession();
+  const isPaid = sessionStorage.getItem(PAYMENT_KEY) === "paid";
+  return !!(s && s.tier === "general" && !isPaid);
+}
+
+function appendLockedInnerThought(){
+  const inner = "(I wanna sext with you but I can't. Please unlock me.)";
+  const msgEl = appendMsg("assistant", ""); // 빈 말풍선 생성
+  const textEl = msgEl.querySelector(".text div:last-child");
+
+  // ✅ 속마음 느낌(선택): 살짝 흐리게/이탤릭
+  if (textEl){
+    textEl.style.opacity = "0.78";
+    textEl.style.fontStyle = "italic";
+  }
+
+  // 타자기 효과로 출력하고 싶으면 typeWriter 사용
+  return typeWriter(textEl, inner, 14);
+}
+
     
     function appendMsg(role, content){
       const currentSession = loadSession();
@@ -2568,6 +2619,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
