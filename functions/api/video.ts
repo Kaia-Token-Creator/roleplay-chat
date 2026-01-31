@@ -6,6 +6,8 @@ type QueueBody = {
   duration?: "5s" | "10s";
   imageDataUrl: string;
   prompt?: string;
+  // 네가 원하면 모델도 프론트에서 넘겨서 쓰게 할 수 있음:
+  model?: string;
 };
 
 type RetrieveBody = {
@@ -15,7 +17,6 @@ type RetrieveBody = {
 };
 
 function cors(origin?: string) {
-  // same-origin이면 사실 없어도 되지만, preflight/환경차로 405 나는 거 방지용
   return {
     "Access-Control-Allow-Origin": origin || "*",
     "Access-Control-Allow-Methods": "POST,OPTIONS",
@@ -42,7 +43,16 @@ function isDataUrl(s: any): s is string {
   return typeof s === "string" && s.startsWith("data:");
 }
 
-// ✅ OPTIONS preflight 대응 (없으면 405 뜨는 경우 많음)
+function bestErrMsg(data: any, fallback: string) {
+  return (
+    (typeof data?.message === "string" && data.message) ||
+    (typeof data?.error === "string" && data.error) ||
+    (typeof data?.detail === "string" && data.detail) ||
+    fallback
+  );
+}
+
+// ✅ OPTIONS preflight
 export const onRequestOptions: PagesFunction = async (ctx) => {
   const origin = ctx.request.headers.get("Origin") || undefined;
   return new Response(null, { status: 204, headers: cors(origin) });
@@ -65,7 +75,7 @@ export const onRequestPost: PagesFunction = async (ctx) => {
 
   const baseURL = "https://api.venice.ai/api/v1";
   const headers = {
-    "Authorization": `Bearer ${apiKey}`,
+    Authorization: `Bearer ${apiKey}`,
     "Content-Type": "application/json",
   };
 
@@ -81,8 +91,11 @@ export const onRequestPost: PagesFunction = async (ctx) => {
         return json({ error: "imageDataUrl must be a data: URL" }, { status: 400, headers: cors(origin) });
       }
 
-      // Venice image-to-video 모델 (docs 예시)
-      const model = "wan-2.5-preview-image-to-video";
+      // ✅ 모델은 두 가지 방식 중 하나로:
+      // 1) 서버에서 고정
+      // 2) 프론트에서 model 넘기면 그걸 사용
+      // (원하는 모델을 “찾아 붙여넣기” 했으면, 아래 default를 네 모델로 바꾸면 됨)
+      const model = (typeof b.model === "string" && b.model.trim()) || "wan-2.5-preview-image-to-video";
 
       const userPrompt = typeof b.prompt === "string" ? b.prompt.trim() : "";
       const prompt =
@@ -90,11 +103,13 @@ export const onRequestPost: PagesFunction = async (ctx) => {
           ? userPrompt.slice(0, 2500)
           : "Animate this image into a short cinematic video. Smooth camera motion, natural movement.";
 
+      // Venice video queue payload
+      // docs: POST /video/queue :contentReference[oaicite:2]{index=2}
       const payload = {
         model,
         prompt,
-        duration,                 // "5s" | "10s"
-        image_url: b.imageDataUrl, // data URL OK
+        duration,                  // "5s" | "10s"
+        image_url: b.imageDataUrl, // URL or data URL (docs)
         aspect_ratio: "16:9",
         resolution: "720p",
         audio: true,
@@ -108,28 +123,21 @@ export const onRequestPost: PagesFunction = async (ctx) => {
       });
 
       const data = await r.json().catch(() => ({} as any));
-if (!r.ok) {
-  // Venice는 보통 { code, message } 형태로 에러를 줌
-  const errMsg =
-    (typeof data?.message === "string" && data.message) ||
-    (typeof data?.error === "string" && data.error) ||
-    (typeof data?.detail === "string" && data.detail) ||
-    "Queue failed";
 
-  return json(
-    {
-      error: errMsg,
-      code: data?.code || null,
-      status: r.status,
-      venice: data, // 원본 그대로 내려주기
-    },
-    { status: r.status, headers: cors(origin) }
-  );
-}
+      if (!r.ok) {
+        return json(
+          {
+            error: bestErrMsg(data, "Queue failed"),
+            code: data?.code || null,
+            status: r.status,
+            venice: data,
+          },
+          { status: r.status, headers: cors(origin) }
+        );
+      }
 
-
-      // expected: { model, queue_id }
-      return json({ model: data.model, queue_id: data.queue_id }, { status: 200, headers: cors(origin) });
+      // ✅ success: should include queue_id (docs)
+      return json({ model: data.model || model, queue_id: data.queue_id }, { status: 200, headers: cors(origin) });
     }
 
     // ---------------------------
@@ -145,6 +153,7 @@ if (!r.ok) {
         return json({ error: "Missing queue_id" }, { status: 400, headers: cors(origin) });
       }
 
+      // docs: poll /video/retrieve with queue_id :contentReference[oaicite:3]{index=3}
       const payload = {
         model: b.model,
         queue_id: b.queue_id,
@@ -159,50 +168,41 @@ if (!r.ok) {
 
       const ct = (r.headers.get("content-type") || "").toLowerCase();
 
-      // JSON이면 그대로 전달 (PROCESSING 등)
+      // 대부분 JSON (PROCESSING / COMPLETED with urls 등). JSON이면 그대로 전달
       if (ct.includes("application/json")) {
         const data = await r.json().catch(() => ({} as any));
-if (!r.ok) {
-  // Venice는 보통 { code, message } 형태로 에러를 줌
-  const errMsg =
-    (typeof data?.message === "string" && data.message) ||
-    (typeof data?.error === "string" && data.error) ||
-    (typeof data?.detail === "string" && data.detail) ||
-    "Queue failed";
 
-  return json(
-    {
-      error: errMsg,
-      code: data?.code || null,
-      status: r.status,
-      venice: data, // 원본 그대로 내려주기
-    },
-    { status: r.status, headers: cors(origin) }
-  );
-}
+        if (!r.ok) {
+          return json(
+            {
+              error: bestErrMsg(data, "Retrieve failed"),
+              code: data?.code || null,
+              status: r.status,
+              venice: data,
+            },
+            { status: r.status, headers: cors(origin) }
+          );
+        }
 
         return json(data, { status: 200, headers: cors(origin) });
       }
 
-      // 완료되면 바이너리(mp4 등)일 수 있음 → base64로 감싸서 프론트에 전달
+      // 만약 바이너리로 오는 케이스도 대비 (mp4 등)
       if (!r.ok) {
         const txt = await r.text().catch(() => "");
-        return json({ error: "Retrieve failed (non-json)", detail: txt }, { status: r.status, headers: cors(origin) });
+        return json({ error: "Retrieve failed (non-json)", detail: txt, status: r.status }, { status: r.status, headers: cors(origin) });
       }
 
       const ab = await r.arrayBuffer();
       const mime = ct && ct.includes("/") ? ct : "video/mp4";
 
-      // Cloudflare 환경에선 Buffer가 없을 수 있어 직접 b64 변환
+      // Cloudflare에서 안전한 base64 변환
       const bytes = new Uint8Array(ab);
       let binary = "";
       for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
       const b64 = btoa(binary);
 
-      return json(
-        { status: "COMPLETED", video: { mime, b64 } },
-        { status: 200, headers: cors(origin) }
-      );
+      return json({ status: "COMPLETED", video: { mime, b64 } }, { status: 200, headers: cors(origin) });
     }
 
     return json({ error: "Unknown action. Use 'queue' or 'retrieve'." }, { status: 400, headers: cors(origin) });
@@ -210,4 +210,3 @@ if (!r.ok) {
     return json({ error: "Server error", detail: String(e?.message || e) }, { status: 500, headers: cors(origin) });
   }
 };
-
