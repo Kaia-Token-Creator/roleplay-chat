@@ -1095,7 +1095,15 @@ function renderPayPalButtons(){
       const extraPrompt = (vidPrompt && vidPrompt.value ? String(vidPrompt.value).trim() : "");
 
       // UX: user가 뭘 샀는지 보이게 한 줄
-      appendMsg("assistant", `Payment complete. Generating ${duration} video...`, undefined, undefined, { animate: true });
+      appendMsg(
+  "assistant",
+  `Payment complete. Generating ${duration} video...\n` +
+  `It may take a while.\n` +
+  `Please do not type until the video appears. Typing will pause the chat while we generate the video.`,
+  undefined,
+  undefined,
+  { animate: true }
+);
 
       try{
   await generateVideoFromSelectedImage({ duration, extraPrompt });
@@ -1191,10 +1199,10 @@ if (!rRes.ok){
       const videoUrl = `data:${rData.video.mime};base64,${rData.video.b64}`;
 
       // ✅ show in a new bubble with download button
-      appendMsg("assistant", "Here is your video.", undefined, videoUrl, { animate: true });
+      appendMsg("assistant", "Thanks for waiting", undefined, videoUrl, { animate: true });
 
       // ✅ persist
-      history.push({ role: "assistant", content: "Here is your video.", videoUrl });
+      history.push({ role: "assistant", content: "Thanks for waiting", videoUrl });
       saveHistory(history);
 
       return;
@@ -1643,6 +1651,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
