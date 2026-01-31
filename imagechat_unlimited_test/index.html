@@ -1092,31 +1092,38 @@ function renderPayPalButtons(){
       });
     },
     onApprove: async (data, actions) => {
-      const capture = await actions.order.capture();
-      // 결제 성공 → 모달 닫고 생성 시작
-      closeVideoPayModal();
+  let capture;
+  try {
+    capture = await actions.order.capture();
+  } catch (e) {
+    appendMsg("assistant", `Capture error: ${prettyErr(e)}`);
+    throw e; // PayPal에 실패로 알려줌
+  }
 
-      const duration = getSelectedDuration();
-      const extraPrompt = (vidPrompt && vidPrompt.value ? String(vidPrompt.value).trim() : "");
+  // 여기까지만 PayPal 플로우에 묶어두고 즉시 UI 복귀
+  closeVideoPayModal();
 
-      // UX: user가 뭘 샀는지 보이게 한 줄
-      appendMsg(
-  "assistant",
-  `Generating ${duration} video...\n` +
-  `It may take a while.\n` +
-  `Please do not type until the video appears. Typing will pause the chat while we generate the video.`,
-  undefined,
-  undefined,
-  { animate: true, italic: true }
-);
+  const duration = getSelectedDuration();
+  const extraPrompt = (vidPrompt && vidPrompt.value ? String(vidPrompt.value).trim() : "");
 
-      try{
-  await generateVideoFromSelectedImage({ duration, extraPrompt });
-}catch(e){
-  appendMsg("assistant", `Error: ${prettyErr(e)}`);
-}
+  appendMsg(
+    "assistant",
+    `Generating ${duration} video...\nIt may take a while.\nPlease do not type until the video appears.`,
+    undefined,
+    undefined,
+    { animate: true, italic: true }
+  );
 
-    },
+  // ✅ 중요한 포인트: await 하지 말고 "따로" 돌리기
+  setTimeout(() => {
+    generateVideoFromSelectedImage({ duration, extraPrompt })
+      .catch(e => appendMsg("assistant", `Error: ${prettyErr(e)}`));
+  }, 0);
+
+  // ✅ onApprove는 빨리 끝내기
+  return capture;
+},
+
     onError: (err) => {
   appendMsg("assistant", `PayPal error: ${prettyErr(err)}`);
 }
@@ -1660,6 +1667,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
