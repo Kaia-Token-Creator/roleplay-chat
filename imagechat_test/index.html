@@ -391,6 +391,176 @@ padding: 5px 8px;
   50%  { opacity:.7; }
   100% { opacity:.3; }
 }
+
+    /* =========================
+   ✅ Generate video link (under image)
+   ========================= */
+.genVideoRow{
+  margin-top: 8px;
+  display:flex;
+  align-items:center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.genVideoLink{
+  color: #ffcc00;
+  font-weight: 900;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none; /* ✅ no underline */
+  user-select:none;
+}
+.genVideoLink:hover{ opacity:.9; }
+.genVideoLink:active{ opacity:.75; }
+
+/* =========================
+   ✅ video element + download button
+   ========================= */
+.bubble video{
+  width:100%;
+  border-radius:12px;
+  margin-top:6px;
+  border:1px solid rgba(255,255,255,.14);
+  background:#000;
+}
+
+.videoActionsRow{
+  margin-top: 8px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap: 10px;
+}
+
+.dlBtn{
+  border:none;
+  background: rgba(255,204,0,.14);
+  color: #ffcc00;
+  border: 1px solid rgba(255,204,0,.35);
+  font-weight: 900;
+  padding: 8px 10px;
+  border-radius: 14px;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.dlBtn:hover{ background: rgba(255,204,0,.20); transform: translateY(-1px); }
+.dlBtn:active{ transform: translateY(0px); opacity:.9; }
+
+/* =========================
+   ✅ Video PayPal Modal
+   ========================= */
+.videoPayModal{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.62);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 110000;
+  backdrop-filter: blur(6px);
+}
+.videoPayModal.active{ display:flex; }
+
+.videoPayCard{
+  width: min(520px, calc(100vw - 28px));
+  background: rgba(10,10,10,.92);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 18px;
+  box-shadow: 0 14px 36px rgba(0,0,0,.55);
+  padding: 14px 14px 12px;
+}
+
+.videoPayTop{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.videoPayTitle{
+  font-family: "Baloo 2", Inter, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  color: #ffcc00;
+}
+.videoPayX{
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.9);
+  cursor:pointer;
+}
+.videoPayX:hover{ background: rgba(255,255,255,.10); }
+
+.videoPayBody{
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: rgba(255,255,255,.88);
+}
+
+.optionBox{
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+}
+.optRow{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 8px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.25);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.optLeft{ display:flex; align-items:center; gap:10px; }
+.optLabel{ font-weight: 900; color:#fff; }
+.optPrice{ font-weight: 900; color:#ffcc00; }
+
+.promptBox{
+  margin-top: 10px;
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+}
+.promptBox label{
+  color: rgba(255,255,255,.75);
+  font-size: 11px;
+}
+.promptInput{
+  width:100%;
+  height: 40px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: #000;
+  color:#fff;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.paypalArea{
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+}
+.smallHint{
+  margin-top: 10px;
+  font-size: 11px;
+  color: rgba(255,255,255,.65);
+}
+
      
   </style>
 </head>
@@ -548,6 +718,56 @@ padding: 5px 8px;
   </div>
 </div>
 
+<!-- =========================
+     ✅ Video PayPal Modal
+     ========================= -->
+<div class="videoPayModal" id="videoPayModal" aria-hidden="true">
+  <div class="videoPayCard" role="dialog" aria-modal="true" aria-label="Generate Video Payment">
+    <div class="videoPayTop">
+      <div class="videoPayTitle">Generate video</div>
+      <button class="videoPayX" id="videoPayCloseX" type="button" aria-label="Close">✕</button>
+    </div>
+
+    <div class="videoPayBody">
+      <div style="color:rgba(255,255,255,.75); font-size:12px; margin-top:4px;">
+        Choose video length and pay with PayPal.
+      </div>
+
+      <div class="optionBox" role="radiogroup" aria-label="Video length options">
+        <div class="optRow">
+          <div class="optLeft">
+            <input type="radio" name="vidLen" id="vid5" value="5s" checked />
+            <label for="vid5" class="optLabel">5s</label>
+          </div>
+          <div class="optPrice">$1.5</div>
+        </div>
+
+        <div class="optRow">
+          <div class="optLeft">
+            <input type="radio" name="vidLen" id="vid10" value="10s" />
+            <label for="vid10" class="optLabel">10s</label>
+          </div>
+          <div class="optPrice">$2</div>
+        </div>
+      </div>
+
+      <div class="promptBox">
+        <label for="vidPrompt">Additional prompt (optional)</label>
+        <input id="vidPrompt" class="promptInput" placeholder="e.g. cinematic camera move, gentle wind, etc." />
+      </div>
+
+      <div class="paypalArea">
+        <div id="paypalVideoButtons"></div>
+      </div>
+
+      <div class="smallHint">
+        After payment, we’ll generate a video from the image in the selected bubble.
+      </div>
+    </div>
+  </div>
+</div>
+
+  
 <script>
 /* =========================
    Load character from main
@@ -781,7 +1001,7 @@ async function typewriter(el, text, speed=14){
 }
 
 
-function appendMsg(role, text, imageUrl, opts = {}){
+function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
   const { animate = false } = opts;
 
   const msg = document.createElement("div");
@@ -838,10 +1058,53 @@ function appendMsg(role, text, imageUrl, opts = {}){
     bubble.appendChild(body);
   }
 
+  // image
   if (imageUrl){
     const img = document.createElement("img");
     img.src = imageUrl;
+    img.dataset.imageDataUrl = imageUrl; // ✅ for video modal
     bubble.appendChild(img);
+
+    // ✅ Only assistant bubble with image: add Generate video link
+    if (role === "assistant"){
+      const row = document.createElement("div");
+      row.className = "genVideoRow";
+
+      const link = document.createElement("a");
+      link.className = "genVideoLink";
+      link.textContent = "Generate video";
+      link.href = "javascript:void(0)";
+
+      link.addEventListener("click", () => {
+        selectedImageDataUrl = img.dataset.imageDataUrl || img.src || "";
+        if (vidPrompt) vidPrompt.value = "";
+        openVideoPayModal();
+      });
+
+      row.appendChild(link);
+      bubble.appendChild(row);
+    }
+  }
+
+  // video
+  if (videoUrl){
+    const v = document.createElement("video");
+    v.src = videoUrl;
+    v.controls = true;
+    v.playsInline = true;
+    bubble.appendChild(v);
+
+    const act = document.createElement("div");
+    act.className = "videoActionsRow";
+
+    const a = document.createElement("a");
+    a.className = "dlBtn";
+    a.textContent = "Download";
+    a.href = videoUrl;
+    a.download = `roleplay-video-${Date.now()}.mp4`;
+
+    act.appendChild(a);
+    bubble.appendChild(act);
   }
 
   msg.appendChild(who);
@@ -859,6 +1122,7 @@ function renderHistory(){
   m.role === "assistant" ? "assistant" : "user",
   m.content,
   m.imageUrl,
+  m.videoUrl,
   { animate: false } // ✅ 히스토리는 그냥 즉시 표시
 );
   }
@@ -916,12 +1180,19 @@ async function bootstrapFirstMessage(){
       imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
     }
 
-    appendMsg("assistant", reply, imageUrl || undefined, { animate: true });
+    appendMsg("assistant", reply, imageUrl || undefined, undefined, { animate: true });
     history.push({ role: "assistant", content: reply, imageUrl });
     saveHistory(history);
 
   } catch(e){
-    appendMsg("assistant", `Error: ${String(e?.message || e)}`);
+    appendMsg(
+  "assistant",
+  `Error: ${String(e?.message || e)}`,
+  undefined,
+  undefined,
+  { animate: true }
+);
+
     history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
     saveHistory(history);
   } finally {
@@ -948,7 +1219,7 @@ async function send(){
   if (!text) return;
 
   input.value = "";
-  appendMsg("user", text);
+  appendMsg("user", text, undefined, undefined, {});
 requestAnimationFrame(() => {
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
   requestAnimationFrame(() => {
@@ -1044,7 +1315,13 @@ saveHistory(history);
 
 
   }catch(e){
-    appendMsg("assistant", `Error: ${String(e?.message || e)}`);
+    appendMsg(
+  "assistant",
+  `Error: ${String(e?.message || e)}`,
+  undefined,
+  undefined,
+  { animate: true }
+);
     history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
     saveHistory(history);
   }finally{
@@ -1155,7 +1432,7 @@ function loadPayPalSdkOnce(){
 
     paypalSdkLoading = true;
     const s = document.createElement("script");
-    s.src = "https://www.paypal.com/sdk/js?client-id=AW41UQ3EzJV10FZHqYPy8yqdlDbklB4VjuT6hzu7DVoS-G9cJgKx9nHfxCRZpVSgs1dczhkPj4oM0VXv&currency=USD&intent=capture";
+    s.src = "https://www.paypal.com/sdk/js?client-id=ASts4hxcd4-DkLEL8b-PbbawSaCD4G5pQiuJM9aZYawixhxWbQ2upSru10WQNZa4HzCqHUcGC8Z1RIrW&currency=USD&intent=capture";
     s.async = true;
     s.onload = () => resolve();
     s.onerror = () => reject(new Error("Failed to load PayPal SDK"));
@@ -1217,9 +1494,231 @@ async function ensurePayPalUnlimitedButtons(){
 
   paypalUnlimitedReady = true;
 }
+
+  /* =========================
+   ✅ Video Payment Modal logic + Venice video flow
+   ========================= */
+const videoPayModal = document.getElementById("videoPayModal");
+const videoPayCloseX = document.getElementById("videoPayCloseX");
+const paypalVideoMount = document.getElementById("paypalVideoButtons");
+const vidPrompt = document.getElementById("vidPrompt");
+
+let selectedImageDataUrl = "";
+
+function openVideoPayModal(){
+  if (!videoPayModal) return;
+  videoPayModal.classList.add("active");
+  videoPayModal.setAttribute("aria-hidden","false");
+  renderPayPalVideoButtons();
+}
+
+function closeVideoPayModal(){
+  if (!videoPayModal) return;
+  videoPayModal.classList.remove("active");
+  videoPayModal.setAttribute("aria-hidden","true");
+}
+
+if (videoPayCloseX) videoPayCloseX.addEventListener("click", closeVideoPayModal);
+if (videoPayModal){
+  videoPayModal.addEventListener("click", (e) => {
+    if (e.target === videoPayModal) closeVideoPayModal();
+  });
+}
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeVideoPayModal();
+});
+
+function getSelectedDuration(){
+  const el = document.querySelector('input[name="vidLen"]:checked');
+  return el ? el.value : "5s";
+}
+function getSelectedPrice(){
+  const d = getSelectedDuration();
+  return (d === "10s") ? "2.00" : "1.50";
+}
+
+function prettyErr(e){
+  try{
+    if (!e) return "Unknown error";
+    if (e instanceof Error) return e.message || String(e);
+
+    if (typeof e === "object"){
+      const code = e.code ? `code=${e.code}` : "";
+      const status = e.status ? `status=${e.status}` : "";
+
+      const veniceMsg =
+        (typeof e?.venice?.message === "string" && e.venice.message) ||
+        (typeof e?.venice?.error === "string" && e.venice.error) ||
+        (typeof e?.venice?.detail === "string" && e.venice.detail) ||
+        "";
+
+      const mainMsg =
+        (typeof e.message === "string" && e.message) ||
+        (typeof e.error === "string" && e.error) ||
+        (typeof e.detail === "string" && e.detail) ||
+        "";
+
+      const msg = veniceMsg || mainMsg || JSON.stringify(e);
+      const meta = [code, status].filter(Boolean).join(", ");
+      return meta ? `${msg} (${meta})` : msg;
+    }
+
+    return String(e);
+  }catch(_){
+    return String(e);
+  }
+}
+
+/* PayPal Buttons (Video) */
+function renderPayPalVideoButtons(){
+  if (!paypalVideoMount) return;
+
+  // PayPal SDK ensure
+  loadPayPalSdkOnce().then(() => {
+    if (!window.paypal || !window.paypal.Buttons){
+      paypalVideoMount.innerHTML = '<div style="color:rgba(255,255,255,.75); font-size:12px;">PayPal SDK not loaded.</div>';
+      return;
+    }
+
+    // wipe + re-render
+    paypalVideoMount.innerHTML = "";
+
+    window.paypal.Buttons({
+      style: { layout: "vertical", shape: "pill", label: "pay" },
+
+      createOrder: (data, actions) => {
+        const value = getSelectedPrice();
+        const duration = getSelectedDuration();
+        return actions.order.create({
+          purchase_units: [{
+            description: "video game",          // ✅ requested
+            amount: { value },
+            custom_id: `video_${duration}`
+          }]
+        });
+      },
+
+      onApprove: async (data, actions) => {
+        await actions.order.capture();
+        closeVideoPayModal();
+
+        const duration = getSelectedDuration();
+        const extraPrompt = (vidPrompt && vidPrompt.value ? String(vidPrompt.value).trim() : "");
+
+        // ✅ 결제 성공 안내 (UX)
+        appendMsg(
+          "assistant",
+          `Generating ${duration} video...\nIt may take a while.\nPlease do not type until the video appears.`,
+          undefined,
+          undefined,
+          { animate: true }
+        );
+
+        try{
+          await generateVideoFromSelectedImage({ duration, extraPrompt });
+        }catch(e){
+          appendMsg("assistant", `Error: ${prettyErr(e)}`, undefined, undefined, { animate: true });
+        }
+      },
+
+      onError: (err) => {
+        appendMsg("assistant", `PayPal error: ${prettyErr(err)}`, undefined, undefined, { animate: true });
+      }
+    }).render(paypalVideoMount);
+
+  }).catch((e) => {
+    paypalVideoMount.innerHTML = `<div style="color:rgba(255,255,255,.75); font-size:12px;">${prettyErr(e)}</div>`;
+  });
+}
+
+// radio change -> rerender to update amount
+document.addEventListener("change", (e) => {
+  if (e && e.target && e.target.name === "vidLen"){
+    renderPayPalVideoButtons();
+  }
+});
+
+/* =========================
+   ✅ Venice video generation flow (via /api/video)
+   ========================= */
+async function generateVideoFromSelectedImage({ duration, extraPrompt }){
+  if (!selectedImageDataUrl){
+    throw new Error("No image selected.");
+  }
+
+  // 1) queue
+  const qRes = await fetch("/api/video", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "queue",
+      duration,
+      imageDataUrl: selectedImageDataUrl,
+      prompt: extraPrompt || ""
+    })
+  });
+
+  let qData = null;
+  try { qData = await qRes.json(); } catch { qData = null; }
+
+  if (!qRes.ok){
+    throw (qData || { error: `HTTP ${qRes.status}` });
+  }
+
+  const model = qData.model;
+  const queue_id = qData.queue_id;
+  if (!model || !queue_id){
+    throw new Error("Queue failed: missing model/queue_id");
+  }
+
+  // 2) poll retrieve
+  const startedAt = Date.now();
+  const maxMs = 6 * 60 * 1000;
+  const pollEveryMs = 2500;
+
+  while (Date.now() - startedAt < maxMs){
+    await new Promise(r => setTimeout(r, pollEveryMs));
+
+    const rRes = await fetch("/api/video", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "retrieve", model, queue_id })
+    });
+
+    let rData = null;
+    try { rData = await rRes.json(); } catch { rData = null; }
+
+    if (!rRes.ok){
+      throw (rData || { error: `HTTP ${rRes.status}` });
+    }
+
+    if (rData && rData.status === "PROCESSING"){
+      continue;
+    }
+
+    if (rData && rData.status === "COMPLETED" && rData.video && rData.video.b64 && rData.video.mime){
+      const videoUrl = `data:${rData.video.mime};base64,${rData.video.b64}`;
+
+      // ✅ show bubble with video + download
+      appendMsg("assistant", "Here is your video.", undefined, videoUrl, { animate: true });
+
+      // ✅ persist
+      history.push({ role: "assistant", content: "Here is your video.", videoUrl });
+      saveHistory(history);
+
+      return;
+    }
+
+    throw new Error("Unexpected retrieve response.");
+  }
+
+  throw new Error("Video generation timed out.");
+}
+
   
 </script>
 
 </body>
 </html>
+
 
