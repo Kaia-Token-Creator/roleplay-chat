@@ -1351,21 +1351,29 @@ window.addEventListener("load", () => {
 async function generateVideo(imageUrl){
   appendMsg("assistant", "Generating video...");
 
-  const len = document.querySelector('input[name="videoLen"]:checked').value;
+  try{
+    const len = document.querySelector('input[name="videoLen"]:checked').value;
 
-  const res = await fetch("/api/video", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      image: imageUrl,
-      duration: Number(len)
-    })
-  });
+    const res = await fetch("/api/video", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: imageUrl, duration: Number(len) })
+    });
 
-  const data = await res.json();
+    if (!res.ok){
+      const t = await res.text().catch(()=> "");
+      throw new Error(`Video API failed: HTTP ${res.status} ${t}`);
+    }
 
-  appendVideoBubble(data.videoUrl);
+    const data = await res.json().catch(() => ({}));
+    if (!data.videoUrl) throw new Error("No videoUrl in response");
+
+    appendVideoBubble(data.videoUrl);
+  }catch(e){
+    appendMsg("assistant", `Video error: ${String(e?.message || e)}`);
+  }
 }
+
 
 function appendVideoBubble(videoUrl){
   const msg = document.createElement("div");
@@ -1439,4 +1447,5 @@ function appendVideoBubble(videoUrl){
 
 </body>
 </html>
+
 
