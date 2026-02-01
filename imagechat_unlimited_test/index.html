@@ -1020,26 +1020,25 @@ let history = loadHistory();
 pruneHistoryAndUI();
 
 function pruneHistoryAndUI(){
-  // 1) in-memory history prune
+  // 1) history prune
   if (Array.isArray(history) && history.length > MAX_HISTORY){
     history = history.slice(-MAX_HISTORY);
   }
 
-  // 2) DOM prune: chatBox의 말풍선도 MAX_HISTORY개로 유지
+  // 2) DOM prune: ✅ persist=1 인 말풍선만 60개 유지
   if (chatBox){
-    while (chatBox.children.length > MAX_HISTORY){
-      const first = chatBox.firstElementChild;
-      if (!first) break;
-
-      // ✅ 혹시 남아있는 비디오 objectURL이 있으면 여기서 해제하고 싶다면,
-      // (추가 구현 가능) first 안의 video/src 검사해서 revoke 가능.
-      first.remove();
+    const persisted = () => Array.from(chatBox.children).filter(el => el.dataset.persist !== "0");
+    while (persisted().length > MAX_HISTORY){
+      const list = persisted();
+      if (!list[0]) break;
+      list[0].remove();
     }
   }
 
   // 3) persist
   saveHistory(history);
 }
+
 
   
 function escapeText(s){
@@ -1153,7 +1152,7 @@ function renderPayPalButtons(){
   try {
     capture = await actions.order.capture();
   } catch (e) {
-    appendMsg("assistant", `Capture error: ${prettyErr(e)}`);
+    appendMsg("assistant", `Capture error: ${prettyErr(e)}`, undefined, undefined, { persist: false });
     throw e; // PayPal에 실패로 알려줌
   }
 
@@ -1174,7 +1173,7 @@ function renderPayPalButtons(){
   // ✅ 중요한 포인트: await 하지 말고 "따로" 돌리기
   setTimeout(() => {
     generateVideoFromSelectedImage({ duration, extraPrompt })
-      .catch(e => appendMsg("assistant", `Error: ${prettyErr(e)}`));
+      .catch(e => appendMsg("assistant", `Error: ${prettyErr(e)}`, undefined, undefined, { persist: false }));
   }, 0);
 
   // ✅ onApprove는 빨리 끝내기
@@ -1182,7 +1181,7 @@ function renderPayPalButtons(){
 },
 
     onError: (err) => {
-  appendMsg("assistant", `PayPal error: ${prettyErr(err)}`);
+  appendMsg("assistant", `PayPal error: ${prettyErr(err)}`, undefined, undefined, { persist: false });
 }
   }).render(paypalButtonsWrap);
 
@@ -1234,7 +1233,7 @@ try { qData = await qRes.json(); } catch { qData = null; }
 
 if (!qRes.ok){
   // 디버깅용: 서버가 준 전체 에러 객체를 그대로 보여줌
-  appendMsg("assistant", `Queue debug: ${JSON.stringify(qData)}`);
+  appendMsg("assistant", `Queue debug: ${JSON.stringify(qData)}`, undefined, undefined, { persist: false });
   throw (qData || { error: `HTTP ${qRes.status}` });
 }
 
@@ -1281,7 +1280,13 @@ if (!rRes.ok){
   const objectUrl = URL.createObjectURL(blob);
 
   // 화면에만 표시 (Blob URL)
-  appendMsg("assistant", "Here you are. Save your video now before it’s deleted. Video is available for 3 min", undefined, objectUrl, { animate: true });
+  appendMsg(
+  "assistant",
+  "Here you are. Save your video now before it’s deleted. Video is available for 3 min",
+  undefined,
+  objectUrl,
+  { animate: true, persist: false } // ✅ 임시
+);
 
   // history에는 비디오 저장 금지 (텍스트만)
   history.push({ role: "assistant", content: "Expired video (03:00 passed)👻" });
@@ -1349,8 +1354,13 @@ function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
   const msg = document.createElement("div");
   msg.className = "chatMsg" + (role === "user" ? " me" : "");
 
+  // ✅ 여기다 넣기 (이 줄!)
+  // persist 기본 true, video/에러 같은 임시는 false
+  msg.dataset.persist = (opts.persist === false) ? "0" : "1";
+
   const who = document.createElement("div");
   who.className = "who";
+
 
   if (role === "assistant"){
     if (session.avatarDataUrl){
@@ -1578,10 +1588,13 @@ try {
 if (!res.ok) {
   appendMsg(
     "assistant",
-    `Error ${res.status}: ${JSON.stringify(data)}`
+    `Error ${res.status}: ${JSON.stringify(data)}`,
+    undefined,
+    undefined,
+    { persist: false }
   );
   throw new Error(data.detail || data.error || `HTTP ${res.status}`);
-};
+}
 
     const reply = (data && typeof data.reply === "string") ? data.reply : "(no text)";
 let imageUrl = "";
@@ -1593,19 +1606,24 @@ if (data && data.image && typeof data.image.b64 === "string" && typeof data.imag
 appendMsg("assistant", reply, imageUrl || undefined, undefined, { animate: true });
 
 if (!imageUrl && data && data.image_error){
-  appendMsg("assistant", `Image failed (debug): ${JSON.stringify(data.image_error)}`);
+  appendMsg("assistant", `Image failed (debug): ${JSON.stringify(data.image_error)}`, undefined, undefined, { persist: false });
 }
+
 
 // ✅ history 저장도 같이 (지금 bootstrapFirstMessage에도 있어야 함)
 history.push({ role: "assistant", content: reply, imageUrl });
 pruneHistoryAndUI();
 
 
-  } catch(e){
-    appendMsg("assistant", `Error: ${prettyErr(e)}`);
-    history.push({ role: "assistant", content: `Error: ${prettyErr(e)}` });
-    saveHistory(history);
-  } finally {
+} catch(e){
+  appendMsg("assistant", `Error: ${prettyErr(e)}`, undefined, undefined, { persist: false });
+
+  // ✅ 에러는 보존 대상 아님 → history.push 제거
+  // history.push({ role: "assistant", content: `Error: ${prettyErr(e)}` });
+
+  saveHistory(history);
+}
+ finally {
     setBusy(false);
   }
 }
@@ -1697,7 +1715,10 @@ try {
 if (!res.ok) {
   appendMsg(
     "assistant",
-    `Error ${res.status}: ${JSON.stringify(data)}`
+    `Error ${res.status}: ${JSON.stringify(data)}`,
+    undefined,
+    undefined,
+    { persist: false }
   );
   throw new Error(data.detail || data.error || `HTTP ${res.status}`);
 }
@@ -1712,8 +1733,9 @@ if (data && data.image && typeof data.image.b64 === "string" && typeof data.imag
 appendMsg("assistant", reply, imageUrl || undefined, undefined, { animate: true });
 
 if (!imageUrl && data && data.image_error){
-  appendMsg("assistant", `Image failed (debug): ${JSON.stringify(data.image_error)}`);
+  appendMsg("assistant", `Image failed (debug): ${JSON.stringify(data.image_error)}`, undefined, undefined, { persist: false });
 }
+
 
 // ✅ history 저장도 같이 (지금 bootstrapFirstMessage에도 있어야 함)
 history.push({ role: "assistant", content: reply, imageUrl });
@@ -1721,11 +1743,15 @@ pruneHistoryAndUI();
 
 
 
-  }catch(e){
-    appendMsg("assistant", `Error: ${prettyErr(e)}`);
-    history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
-    saveHistory(history);
-  }finally{
+}catch(e){
+  appendMsg("assistant", `Error: ${prettyErr(e)}`, undefined, undefined, { persist: false });
+
+  // ✅ 에러는 보존 대상 아님
+  // history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
+
+  saveHistory(history);
+}
+finally{
     setBusy(false);
   }
 }
@@ -1870,6 +1896,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
