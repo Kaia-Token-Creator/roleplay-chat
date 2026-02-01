@@ -472,24 +472,31 @@
 
 <div class="modalPrice">$99 <small>one-time · lifetime on this browser</small></div>
 
-<div class="modalText">
-  - <strong>Lifetime ALL access on this browser.</strong><br>
-  - Unlimited character creation<br>
-  - Fully uncensored<br>
-  - No login · Private · Unlimited<br><br>
+<!-- PayPal Modal -->
+<div class="modal" id="payModal">
+  <div class="modalBox">
+    <div class="modalTitle">All-access Pass</div>
 
-  - Your access remains active even after closing the tab or browser.<br>
-  - <strong>(Do not clear browser data. Access will be blocked)</strong><br><br>
-  - All features are free to use.(except for video)
-  - Appears as <strong>“Playing All games”</strong> on payment statements.
-  - <strong>Start now. Instant access.</strong></div>
-  
+    <div class="modalPrice">$99 <small>one-time · lifetime on this browser</small></div>
+
+    <div class="modalText">
+      - <strong>Lifetime ALL access on this browser.</strong><br>
+      - Unlimited character creation<br>
+      - Fully uncensored<br>
+      - No login · Private · Unlimited<br><br>
+
+      - Your access remains active even after closing the tab or browser.<br>
+      - <strong>(Do not clear browser data. Access will be blocked)</strong><br><br>
+      - All features are free to use.(except for video)<br>
+      - Appears as <strong>“Playing All games”</strong> on payment statements.<br>
+      - <strong>Start now. Instant access.</strong>
+    </div>
+
+    <!-- ✅ PayPal 버튼은 반드시 modalBox 안에 -->
+    <div id="paypal-button-container"></div>
+  </div>
 </div>
 
-<div id="paypal-button-container"></div>
-
-    </div>
-  </div>
 
   <script>
     /* ✅ HEADER JS (from Blank header) — unchanged */
@@ -576,6 +583,7 @@
   </script>
 </body>
 </html>
+
 
 
 
