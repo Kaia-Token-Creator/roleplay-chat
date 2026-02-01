@@ -1255,10 +1255,10 @@ if (!rRes.ok){
   const objectUrl = URL.createObjectURL(blob);
 
   // 화면에만 표시 (Blob URL)
-  appendMsg("assistant", "Here you are. Save your video now before it’s deleted.", undefined, objectUrl, { animate: true });
+  appendMsg("assistant", "Here you are. Save your video now before it’s deleted. Video is available for 3 min", undefined, objectUrl, { animate: true });
 
   // history에는 비디오 저장 금지 (텍스트만)
-  history.push({ role: "assistant", content: "Here you are. Save your video now before it’s deleted." });
+  history.push({ role: "assistant", content: "Expired video (03:00 passed)👻" });
   saveHistory(history);
 
   return;
