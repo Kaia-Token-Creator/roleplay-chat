@@ -159,6 +159,28 @@ body{
 </head>
 
 <body>
+<script>
+(function enforceAllAccessGuard(){
+  const ALL_ACCESS_KEY = "ROLEPLAY_CHAT_ALL_ACCESS_V1";
+
+  try{
+    const paid = localStorage.getItem(ALL_ACCESS_KEY);
+
+    if (paid !== "paid"){
+      alert(
+        "🔒 All-access Pass required.\n\n" +
+        "This page is only available after purchasing the All-access Pass.\n\n" +
+        "You will be redirected to the homepage."
+      );
+      window.location.replace("https://roleplay-chat.com");
+    }
+  }catch(e){
+    // localStorage 접근 자체가 막힌 경우도 차단
+    window.location.replace("https://roleplay-chat.com");
+  }
+})();
+</script>
+  
 <div class="wrap">
   <div class="ticket">
 
@@ -262,3 +284,4 @@ paypal.Buttons({
 </script>
 </body>
 </html>
+
