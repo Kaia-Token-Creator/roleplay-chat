@@ -1566,9 +1566,22 @@ async function bootstrapFirstMessage(){
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+// ✅ 여기부터 디버그용
+const raw = await res.text().catch(() => "");
+let data = {};
+try {
+  data = raw ? JSON.parse(raw) : {};
+} catch {
+  data = { raw };
+}
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.detail || data.error || `HTTP ${res.status}`);
+if (!res.ok) {
+  appendMsg(
+    "assistant",
+    `Error ${res.status}: ${JSON.stringify(data)}`
+  );
+  throw new Error(data.detail || data.error || `HTTP ${res.status}`);
+};
 
     const reply = (data && typeof data.reply === "string") ? data.reply : "(no text)";
 
@@ -1665,10 +1678,22 @@ pruneHistoryAndUI(); // ✅ 여기서 저장까지 함
       body: JSON.stringify(payload),
     });
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      throw new Error(data.detail || data.error || `HTTP ${res.status}`);
-    }
+// ✅ 여기부터 디버그용
+const raw = await res.text().catch(() => "");
+let data = {};
+try {
+  data = raw ? JSON.parse(raw) : {};
+} catch {
+  data = { raw };
+}
+
+if (!res.ok) {
+  appendMsg(
+    "assistant",
+    `Error ${res.status}: ${JSON.stringify(data)}`
+  );
+  throw new Error(data.detail || data.error || `HTTP ${res.status}`);
+}
 
     const reply = (data && typeof data.reply === "string") ? data.reply : "";
 
@@ -1832,6 +1857,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
