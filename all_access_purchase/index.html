@@ -466,13 +466,6 @@
   </div>
 
   <!-- PayPal Modal -->
-  <div class="modal" id="payModal">
-    <div class="modalBox">
-      <div class="modalTitle">All-access Pass</div>
-
-<div class="modalPrice">$99 <small>one-time · lifetime on this browser</small></div>
-
-<!-- PayPal Modal -->
 <div class="modal" id="payModal">
   <div class="modalBox">
     <div class="modalTitle">All-access Pass</div>
@@ -487,15 +480,16 @@
 
       - Your access remains active even after closing the tab or browser.<br>
       - <strong>(Do not clear browser data. Access will be blocked)</strong><br><br>
-      - All features are free to use.(except for video)<br>
+
+      - All features are free to use. <strong>(except for video)</strong><br>
       - Appears as <strong>“Playing All games”</strong> on payment statements.<br>
       - <strong>Start now. Instant access.</strong>
     </div>
 
-    <!-- ✅ PayPal 버튼은 반드시 modalBox 안에 -->
     <div id="paypal-button-container"></div>
   </div>
 </div>
+
 
 
   <script>
@@ -573,7 +567,7 @@
       onApprove: async (data, actions) => {
         await actions.order.capture();
 
-        const paidKey = paid
+        const paidKey = "paid";
         localStorage.setItem(STORAGE_KEY, paidKey);
 
         const url = "https://roleplay-chat.com/all_access?key=" + encodeURIComponent(paidKey);
@@ -583,6 +577,7 @@
   </script>
 </body>
 </html>
+
 
 
 
