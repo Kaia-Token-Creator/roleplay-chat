@@ -951,8 +951,13 @@ if (session?.name){
   document.title = "Image chat | roleplay-chat.com";
 }
 
-sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sessionObj));
-localStorage.setItem(LS_SESSION, JSON.stringify(sessionObj)); // 최초 무조건
+// FIX session for this tab (anchor)
+if (session && !sessionStorage.getItem(STORAGE_KEY)){
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+}
+if (session && !localStorage.getItem(LS_SESSION)){
+  localStorage.setItem(LS_SESSION, JSON.stringify(session));
+}
 
 
 function setPaidForever(){
@@ -2015,6 +2020,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
