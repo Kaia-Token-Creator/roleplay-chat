@@ -945,22 +945,7 @@ function getOrCreateTabId(){
   return gen;
 }
 
-const TAB_ID = getOrCreateTabId();
-
-// ✅ FORCE: 무조건 URL에 tabId를 박아둠 (디버그용)
-(function forceTabIdInUrl(){
-  try{
-    const u = new URL(location.href);
-
-    // 기존에 tab= 이 붙어있으면 정리하고 tabId만 쓰고 싶을 때 (선택)
-    // u.searchParams.delete("tab");
-
-    u.searchParams.set("tabId", TAB_ID);
-    history.replaceState(null, "", u.toString());
-  }catch(e){}
-})();
-  
-  
+const TAB_ID = getOrCreateTabId();  
 const LS_BACKUP_KEY = LS_BACKUP_PREFIX + TAB_ID;
 
 function readBackup(){
@@ -2029,6 +2014,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
