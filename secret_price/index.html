@@ -1465,6 +1465,45 @@ const chatAvatar = $("#chatAvatar");
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
     const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
 
+    // =========================
+// TAB ID (per-tab identifier)
+// =========================
+const TAB_PARAM = "tab";
+const TAB_ID_KEY = "roleplay_tab_id_v1";
+
+function getOrCreateTabId(){
+  const url = new URL(window.location.href);
+
+  // 1) URL 우선
+  let tabId = url.searchParams.get(TAB_PARAM);
+
+  // 2) sessionStorage 보조
+  if (!tabId){
+    tabId = sessionStorage.getItem(TAB_ID_KEY);
+  }
+
+  // 3) 없으면 새로 생성
+  if (!tabId){
+    tabId = (crypto?.randomUUID
+      ? crypto.randomUUID()
+      : Date.now() + "_" + Math.random().toString(16).slice(2)
+    );
+  }
+
+  // session에 고정
+  sessionStorage.setItem(TAB_ID_KEY, tabId);
+
+  // URL에도 고정 (복원용)
+  if (url.searchParams.get(TAB_PARAM) !== tabId){
+    url.searchParams.set(TAB_PARAM, tabId);
+    history.replaceState(null, "", url.toString());
+  }
+
+  return tabId;
+}
+
+const TAB_ID = getOrCreateTabId();
+
     // Share button
 const shareBtn = document.querySelector("#shareBtn");
 if (shareBtn){
@@ -2466,7 +2505,8 @@ if (!nicknameVal){
       }
 
       clearPending();
-      window.location.href = "/imagechat_unlimited";
+window.location.href =
+  "/imagechat_unlimited?tab=" + encodeURIComponent(TAB_ID);
     }, "12.50", "Upgrade game");
     return;
   }
@@ -2708,6 +2748,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
