@@ -866,17 +866,15 @@
 </div>
 
 <script>
-  function prettyErr(e){
+function prettyErr(e){
   try{
     if (!e) return "Unknown error";
     if (e instanceof Error) return e.message || String(e);
 
-    // object 에러면 최대한 많은 정보를 표시
     if (typeof e === "object"){
       const code = e.code ? `code=${e.code}` : "";
       const status = e.status ? `status=${e.status}` : "";
 
-      // venice 원본 에러에서 message 우선 노출
       const veniceMsg =
         (typeof e?.venice?.message === "string" && e.venice.message) ||
         (typeof e?.venice?.error === "string" && e.venice.error) ||
@@ -889,10 +887,7 @@
         (typeof e.detail === "string" && e.detail) ||
         "";
 
-      // 우선순위: venice 메시지 > main 메시지 > stringify
       const msg = veniceMsg || mainMsg || JSON.stringify(e);
-
-      // code/status 같이 보여주기
       const meta = [code, status].filter(Boolean).join(", ");
       return meta ? `${msg} (${meta})` : msg;
     }
@@ -902,7 +897,47 @@
     return String(e);
   }
 }
+</script>
 
+
+<script>
+/* =========================
+   TAB_ID bootstrap (URL → session → generate)
+   ========================= */
+
+function getTabIdFromUrl(){
+  try{
+    const u = new URL(location.href);
+    return (u.searchParams.get("tabId") || u.searchParams.get("tabID") || "").trim();
+  }catch(e){
+    return "";
+  }
+}
+
+function genTabId(){
+  return "tab_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
+}
+
+// ✅ 이 페이지에서 TAB_ID를 확정
+const TAB_ID =
+  getTabIdFromUrl() ||
+  sessionStorage.getItem("rp_tab_id_v1") ||
+  (() => {
+    const id = genTabId();
+    sessionStorage.setItem("rp_tab_id_v1", id);
+    return id;
+  })();
+
+// (선택) URL에 tabId가 없으면 주소에 박아두기
+(function ensureTabIdInUrl(){
+  const u = new URL(location.href);
+  if (!u.searchParams.get("tabId")){
+    u.searchParams.set("tabId", TAB_ID);
+    history.replaceState(null, "", u.toString());
+  }
+})();
+</script>
+  
 /* =========================
    Load character from main
    ========================= */
@@ -2020,6 +2055,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
