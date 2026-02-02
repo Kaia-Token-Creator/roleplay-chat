@@ -910,12 +910,38 @@
 const STORAGE_KEY = "roleplay-chat_session_v1";
 const IMAGECHAT_HISTORY_KEY = "roleplay-chat_imagechat_history_v1";
 const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
+  
+// tabId는 옵션A 방식으로 이미 만든다고 가정: const TAB_ID = getOrCreateTabId();
+
+function LS(base){ return `${base}::${TAB_ID}`; }
+
+const LS_SESSION = LS("rp_session_backup_v1");
+const LS_PAID    = LS("rp_paid_backup_v1");
+const LS_SNAP    = LS("rp_snapshot_v1"); // paid+session+textHistory 묶음
 
 function readSession(){
-  const raw = sessionStorage.getItem(STORAGE_KEY);
-  try { return raw ? JSON.parse(raw) : null; }
-  catch { return null; }
+  // 1) sessionStorage 우선
+  const rawS = sessionStorage.getItem(STORAGE_KEY);
+  if (rawS){
+    try { return JSON.parse(rawS); } catch {}
+  }
+
+  // 2) localStorage(tabId) 복구
+  const rawL = localStorage.getItem(LS_SESSION) || localStorage.getItem(LS_SNAP);
+  if (rawL){
+    try {
+      const obj = JSON.parse(rawL);
+      const sess = obj?.session ? obj.session : obj; // LS_SNAP이면 obj.session
+      if (sess){
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sess));
+        return sess;
+      }
+    } catch {}
+  }
+
+  return null;
 }
+
 
 const session = readSession();
 
@@ -925,29 +951,95 @@ if (session?.name){
   document.title = "Image chat | roleplay-chat.com";
 }
 
+sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sessionObj));
+localStorage.setItem(LS_SESSION, JSON.stringify(sessionObj)); // 최초 무조건
+
+
 function setPaidForever(){
   const payload = { status: "paid", paidAt: Date.now() };
-  sessionStorage.setItem(
-    IMAGECHAT_UNLIMITED_PAID_KEY,
-    JSON.stringify(payload)
-  );
+  const str = JSON.stringify(payload);
+
+  sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, str);
+  localStorage.setItem(LS_PAID, str); // ✅ 최초 무조건
+
   return payload;
 }
 
-function readUnlimitedPaid(){
-  const raw = sessionStorage.getItem(IMAGECHAT_UNLIMITED_PAID_KEY);
-  if (!raw) return null;
+function getTextHistorySlice(max=40){
+  if (!Array.isArray(history)) return [];
+  return history
+    .filter(m => m && typeof m === "object")
+    .map(m => ({ role: m.role, content: String(m.content || "") }))
+    .slice(-max);
+}
 
-  if (raw === "paid"){
-    return setPaidForever();
-  }
 
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
+let lastSnapAt = 0;
+function maybeSaveSnapshot(reason=""){
+  const now = Date.now();
+
+  // ✅ 너무 자주 쓰지 말기: 10초에 1번 or 메시지 n개마다 등
+  if (now - lastSnapAt < 10_000) return; 
+  lastSnapAt = now;
+
+  try{
+    const sess = readSession(); // 이미 sessionStorage 우선 로드됨
+    const paid = readUnlimitedPaid();
+
+    const snap = {
+      v: 1,
+      tabId: TAB_ID,
+      ts: now,
+      reason,
+      paid: paid || null,
+      session: sess || null,
+      historyText: getTextHistorySlice(40),
+    };
+
+    localStorage.setItem(LS_SNAP, JSON.stringify(snap));
+  }catch(e){
+    // 조용히 실패
   }
 }
+
+// =========================
+// Snapshot hooks (once)
+// =========================
+if (!window.__rp_snap_hooks_added){
+  window.__rp_snap_hooks_added = true;
+
+  window.addEventListener("beforeunload", () => {
+    maybeSaveSnapshot("beforeunload");
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden"){
+      maybeSaveSnapshot("hidden");
+    }
+  });
+}
+  
+function readUnlimitedPaid(){
+  const rawS = sessionStorage.getItem(IMAGECHAT_UNLIMITED_PAID_KEY);
+  if (rawS){
+    try { return JSON.parse(rawS); } catch {}
+  }
+
+  const rawL = localStorage.getItem(LS_PAID) || localStorage.getItem(LS_SNAP);
+  if (rawL){
+    try {
+      const obj = JSON.parse(rawL);
+      const paid = obj?.paid ? obj.paid : obj; // LS_SNAP이면 obj.paid
+      if (paid){
+        sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, JSON.stringify(paid));
+        return paid;
+      }
+    } catch {}
+  }
+
+  return null;
+}
+
 
 function isUnlimitedPaid(){
   const p = readUnlimitedPaid();
@@ -972,9 +1064,21 @@ if (imgResetBtn){
 
 function loadHistory(){
   const raw = sessionStorage.getItem(IMAGECHAT_HISTORY_KEY);
-  try { return raw ? JSON.parse(raw) : []; }
-  catch { return []; }
+  if (raw){
+    try { return JSON.parse(raw) || []; } catch {}
+  }
+
+  const snapRaw = localStorage.getItem(LS_SNAP);
+  if (snapRaw){
+    try {
+      const snap = JSON.parse(snapRaw);
+      return Array.isArray(snap?.historyText) ? snap.historyText : [];
+    } catch {}
+  }
+
+  return [];
 }
+
 
 function saveHistory(list){
   try {
@@ -1003,6 +1107,17 @@ if (!session || !session.name){
   location.href = "https://roleplay-chat.com/";
 }
 
+// =========================
+// FIX session for this tab (anchor)
+// =========================
+if (!sessionStorage.getItem(STORAGE_KEY)){
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+}
+
+if (!localStorage.getItem(LS_SESSION)){
+  localStorage.setItem(LS_SESSION, JSON.stringify(session)); // ✅ 최초 1회 확정
+}
+  
 if (session?.fontColor){
   document.documentElement.style.setProperty("--chatColor", session.fontColor);
 }
@@ -1657,6 +1772,8 @@ async function send(){
 
   history.push({ role: "user", content: text });
 pruneHistoryAndUI(); // ✅ 여기서 저장까지 함
+  maybeSaveSnapshot("user_msg");
+
 
   if (!session || !session.name){
     appendMsg("assistant", "Error: No character session found. Please create a character first.");
@@ -1741,6 +1858,7 @@ if (!imageUrl && data && data.image_error){
 // ✅ history 저장도 같이 (지금 bootstrapFirstMessage에도 있어야 함)
 history.push({ role: "assistant", content: reply, imageUrl });
 pruneHistoryAndUI();
+    maybeSaveSnapshot("assistant_msg");
 
 
 
@@ -1897,6 +2015,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
