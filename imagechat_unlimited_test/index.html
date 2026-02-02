@@ -946,6 +946,19 @@ function getOrCreateTabId(){
 }
 
 const TAB_ID = getOrCreateTabId();
+
+// ✅ URL에 tabId가 없으면 주소창에 붙여서 고정 (새로고침해도 유지)
+(function ensureTabIdInUrl(){
+  try{
+    const u = new URL(location.href);
+    if (!u.searchParams.get("tabId") && !u.searchParams.get("tab")){
+      u.searchParams.set("tabId", TAB_ID);
+      history.replaceState(null, "", u.toString());
+    }
+  }catch(e){}
+})();
+  
+  
 const LS_BACKUP_KEY = LS_BACKUP_PREFIX + TAB_ID;
 
 function readBackup(){
@@ -2014,6 +2027,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
