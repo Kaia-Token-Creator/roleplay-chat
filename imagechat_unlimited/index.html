@@ -910,12 +910,88 @@
 const STORAGE_KEY = "roleplay-chat_session_v1";
 const IMAGECHAT_HISTORY_KEY = "roleplay-chat_imagechat_history_v1";
 const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
+/* =========================
+   ✅ TAB_ID + Local backup keys
+   ========================= */
+const TAB_ID_KEY = "roleplay-chat_tab_id_v1"; // per-tab in sessionStorage
+const LS_BACKUP_PREFIX = "roleplay-chat_backup_v1:"; // + TAB_ID
+
+function getQueryParam(name){
+  try{
+    return new URLSearchParams(location.search).get(name);
+  }catch(e){
+    return null;
+  }
+}
+
+// ✅ URL 우선(tabId > tab) → 없으면 이 탭에서만 새로 생성
+function getOrCreateTabId(){
+  const fromUrl = getQueryParam("tabId") || getQueryParam("tab");
+  if (fromUrl) {
+    // URL로 들어온 탭꼬리표는 이 탭 sessionStorage에도 고정
+    try { sessionStorage.setItem(TAB_ID_KEY, fromUrl); } catch(e){}
+    return fromUrl;
+  }
+
+  // URL에 없으면 현재 탭 sessionStorage에 있나 확인
+  const existing = (() => {
+    try { return sessionStorage.getItem(TAB_ID_KEY); } catch(e){ return null; }
+  })();
+  if (existing) return existing;
+
+  // 이 탭 전용 생성
+  const gen = "tab_" + Math.random().toString(36).slice(2) + "_" + Date.now().toString(36);
+  try { sessionStorage.setItem(TAB_ID_KEY, gen); } catch(e){}
+  return gen;
+}
+
+const TAB_ID = getOrCreateTabId();  
+const LS_BACKUP_KEY = LS_BACKUP_PREFIX + TAB_ID;
+
+function readBackup(){
+  try{
+    const raw = localStorage.getItem(LS_BACKUP_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function writeBackup(patch){
+  try{
+    const cur = readBackup() || {};
+    const next = { ...cur, ...patch, updatedAt: Date.now(), tabId: TAB_ID };
+    localStorage.setItem(LS_BACKUP_KEY, JSON.stringify(next));
+    return next;
+  }catch(e){
+    return null;
+  }
+}
 
 function readSession(){
-  const raw = sessionStorage.getItem(STORAGE_KEY);
-  try { return raw ? JSON.parse(raw) : null; }
-  catch { return null; }
+  // 1) sessionStorage 우선
+  try{
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw){
+      const s = JSON.parse(raw);
+      // ✅ local 백업 갱신 (session이 살아있을 때도 최신화)
+      if (s && s.name) writeBackup({ session: s });
+      return s;
+    }
+  }catch(e){}
+
+  // 2) sessionStorage가 비었으면 local 백업에서 복구
+  const b = readBackup();
+  if (b && b.session && b.session.name){
+    try{
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(b.session));
+    }catch(e){}
+    return b.session;
+  }
+
+  return null;
 }
+
 
 const session = readSession();
 
@@ -927,26 +1003,36 @@ if (session?.name){
 
 function setPaidForever(){
   const payload = { status: "paid", paidAt: Date.now() };
-  sessionStorage.setItem(
-    IMAGECHAT_UNLIMITED_PAID_KEY,
-    JSON.stringify(payload)
-  );
+  try{
+    sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, JSON.stringify(payload));
+  }catch(e){}
+  // ✅ local에도 백업
+  writeBackup({ paid: payload });
   return payload;
 }
 
 function readUnlimitedPaid(){
-  const raw = sessionStorage.getItem(IMAGECHAT_UNLIMITED_PAID_KEY);
-  if (!raw) return null;
+  // 1) sessionStorage 우선
+  try{
+    const raw = sessionStorage.getItem(IMAGECHAT_UNLIMITED_PAID_KEY);
+    if (raw){
+      if (raw === "paid") return setPaidForever();
+      const p = JSON.parse(raw);
+      if (p && p.status) writeBackup({ paid: p });
+      return p;
+    }
+  }catch(e){}
 
-  if (raw === "paid"){
-    return setPaidForever();
+  // 2) local 백업에서 복구
+  const b = readBackup();
+  if (b && b.paid && b.paid.status === "paid"){
+    try{
+      sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, JSON.stringify(b.paid));
+    }catch(e){}
+    return b.paid;
   }
 
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 function isUnlimitedPaid(){
@@ -971,26 +1057,57 @@ if (imgResetBtn){
 }
 
 function loadHistory(){
-  const raw = sessionStorage.getItem(IMAGECHAT_HISTORY_KEY);
-  try { return raw ? JSON.parse(raw) : []; }
-  catch { return []; }
+  // 1) sessionStorage 우선
+  try{
+    const raw = sessionStorage.getItem(IMAGECHAT_HISTORY_KEY);
+    if (raw){
+      const h = JSON.parse(raw);
+      // 너무 자주 local 백업하지 말고, 여기서는 건드리지 않음(성능)
+      return Array.isArray(h) ? h : [];
+    }
+  }catch(e){}
+
+  // 2) sessionStorage가 비었으면 local 백업에서 복구
+  const b = readBackup();
+  if (b && Array.isArray(b.history)){
+    try{
+      sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, JSON.stringify(b.history));
+    }catch(e){}
+    return b.history;
+  }
+
+  return [];
 }
 
 function saveHistory(list){
-  try {
+  try{
     const sanitized = Array.isArray(list)
       ? list.map(m => {
           if (!m || typeof m !== "object") return m;
           const { videoUrl, ...rest } = m; // ✅ videoUrl 제거
+          // ✅ 에러/시스템 메시지 섞일 수 있으면 여기서 더 필터 가능
           return rest;
         })
       : [];
 
-    sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, JSON.stringify(sanitized));
-  } catch(e){
+    // sessionStorage 저장
+    try{
+      sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, JSON.stringify(sanitized));
+    }catch(e){}
+
+    // ✅ local 백업(탭ID별): 텍스트만 + 최대 60개 정도
+    const slim = sanitized.slice(-60).map(m => ({
+      role: m.role,
+      content: m.content,
+      imageUrl: m.imageUrl || "" // 원하면 이미지도 빼도 됨. (텍스트만 원하면 삭제)
+    }));
+    writeBackup({ history: slim });
+
+  }catch(e){
     console.error("saveHistory failed:", e);
   }
 }
+
 
 
 if (!paid){
@@ -1897,6 +2014,8 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
+
 
 
 
