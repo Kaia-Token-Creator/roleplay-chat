@@ -1097,11 +1097,10 @@ function saveHistory(list){
 
     // ✅ local 백업(탭ID별): 텍스트만 + 최대 60개 정도
     const slim = sanitized.slice(-60).map(m => ({
-      role: m.role,
-      content: m.content,
-      imageUrl: m.imageUrl || "" // 원하면 이미지도 빼도 됨. (텍스트만 원하면 삭제)
-    }));
-    writeBackup({ history: slim });
+  role: m.role,
+  content: m.content
+}));
+writeBackup({ history: slim });
 
   }catch(e){
     console.error("saveHistory failed:", e);
@@ -2014,8 +2013,6 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
-
-
 
 
 
