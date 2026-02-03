@@ -1134,15 +1134,15 @@ const sendBtn = document.getElementById("sendBtn");
 const MAX_HISTORY = 60; // ✅ 유저 + assistant 말풍선 합쳐서 최대 60개
 
 let history = loadHistory();
-pruneHistoryAndUI();
+Promise.resolve().then(pruneHistoryAndUI);
 
-function pruneHistoryAndUI(){
+async function pruneHistoryAndUI(){
   // 1) history prune
   if (Array.isArray(history) && history.length > MAX_HISTORY){
     history = history.slice(-MAX_HISTORY);
   }
 
-  // 2) DOM prune: ✅ persist=1 인 말풍선만 60개 유지
+  // 2) DOM prune: persist=1 인 말풍선만 60개 유지
   if (chatBox){
     const persisted = () => Array.from(chatBox.children).filter(el => el.dataset.persist !== "0");
     while (persisted().length > MAX_HISTORY){
@@ -1152,8 +1152,19 @@ function pruneHistoryAndUI(){
     }
   }
 
-  // 3) persist
-  saveHistory(history);
+  // ✅ 3) sessionStorage에 저장될 이미지들을 300x300으로 변환
+  const sessionSafe = [];
+  for (const m of (Array.isArray(history) ? history : [])){
+    if (m && m.imageUrl && typeof m.imageUrl === "string" && m.imageUrl.startsWith("data:image/")){
+      const tiny = await compressDataUrlFixedSquare(m.imageUrl, { size: 300, quality: 0.72, mime: "image/webp" });
+      sessionSafe.push({ ...m, imageUrl: tiny });
+    } else {
+      sessionSafe.push(m);
+    }
+  }
+
+  // ✅ sessionStorage 저장 (history 자체는 유지)
+  saveHistory(sessionSafe);
 }
 
 
@@ -1162,6 +1173,50 @@ function escapeText(s){
   return (s ?? "").toString();
 }
 
+async function compressDataUrlFixedSquare(dataUrl, {
+  size = 300,
+  quality = 0.72,
+  mime = "image/webp"
+} = {}) {
+  if (!dataUrl || typeof dataUrl !== "string" || !dataUrl.startsWith("data:image/")) return dataUrl;
+
+  const img = new Image();
+  img.decoding = "async";
+
+  const loaded = new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = () => reject(new Error("Image load failed"));
+  });
+  img.src = dataUrl;
+  await loaded;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d", { alpha: false });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  const iw = img.width, ih = img.height;
+  const scale = Math.max(size / iw, size / ih);
+  const sw = size / scale;
+  const sh = size / scale;
+  const sx = (iw - sw) / 2;
+  const sy = (ih - sh) / 2;
+
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
+
+  let out = "";
+  try {
+    out = canvas.toDataURL(mime, quality);
+  } catch {
+    out = canvas.toDataURL("image/jpeg", quality);
+  }
+  return out || dataUrl;
+}
+
+  
 async function typewriter(el, text, speed=14){
   el.textContent = "";
   const cursor = document.createElement("span");
@@ -1688,6 +1743,7 @@ async function bootstrapFirstMessage(){
   };
 
   try{
+    setBusy(true); 
     const res = await fetch("/api/imagechat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1727,9 +1783,8 @@ if (!imageUrl && data && data.image_error){
 }
 
 
-// ✅ history 저장도 같이 (지금 bootstrapFirstMessage에도 있어야 함)
 history.push({ role: "assistant", content: reply, imageUrl });
-pruneHistoryAndUI();
+await pruneHistoryAndUI();
 
 
 } catch(e){
@@ -1771,8 +1826,9 @@ async function send(){
     });
   });
 
-  history.push({ role: "user", content: text });
-pruneHistoryAndUI(); // ✅ 여기서 저장까지 함
+history.push({ role: "user", content: text });
+await pruneHistoryAndUI();
+
 
   if (!session || !session.name){
     appendMsg("assistant", "Error: No character session found. Please create a character first.");
@@ -1854,9 +1910,8 @@ if (!imageUrl && data && data.image_error){
 }
 
 
-// ✅ history 저장도 같이 (지금 bootstrapFirstMessage에도 있어야 함)
 history.push({ role: "assistant", content: reply, imageUrl });
-pruneHistoryAndUI();
+await pruneHistoryAndUI();
 
 
 
@@ -2013,6 +2068,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
