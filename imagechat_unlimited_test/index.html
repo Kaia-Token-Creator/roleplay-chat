@@ -1451,21 +1451,49 @@ if (!rRes.ok){
   const blob = b64ToBlob(rData.video.b64, rData.video.mime);
   const objectUrl = URL.createObjectURL(blob);
 
-  // 화면에만 표시 (Blob URL)
+  // 1) 비디오 말풍선 (임시)
   appendMsg(
-  "assistant",
-  "Here you are. Save your video now before it’s deleted. Video is available for 3 min",
-  undefined,
-  objectUrl,
-  { animate: true, persist: false } // ✅ 임시
-);
+    "assistant",
+    "Here you are. Save your video now before it’s deleted. Video is available for 3 min",
+    undefined,
+    objectUrl,
+    { animate: true, persist: false }
+  );
 
-  // history에는 비디오 저장 금지 (텍스트만)
+  // 2) ✅ 마지막 프레임 → 이미지로 캡쳐해서 새 말풍선 추가
+  try{
+    const lastFrame = await captureLastFrameDataUrl(objectUrl, {
+      mime: "image/jpeg",
+      quality: 0.92,
+      epsilon: 0.08
+    });
+
+    appendMsg(
+      "assistant",
+      "Wanna continue? 👀",
+      lastFrame,
+      undefined,
+      {
+        animate: true,
+        genVideoText: "▶️ Continue watching? (generate next clip)"
+      }
+    );
+
+    // history에는 이 이미지 말풍선은 저장 OK
+    history.push({ role: "assistant", content: "Wanna continue? 👀", imageUrl: lastFrame });
+    await pruneHistoryAndUI();
+
+  }catch(e){
+    appendMsg("assistant", `Frame capture failed: ${prettyErr(e)}`, undefined, undefined, { persist: false });
+  }
+
+  // 3) 기존대로 비디오는 저장 금지(텍스트만)
   history.push({ role: "assistant", content: "Expired video (03:00 passed)👻" });
-pruneHistoryAndUI();
+  await pruneHistoryAndUI();
 
   return;
 }
+
 
 
     // unknown response
@@ -1483,6 +1511,78 @@ function fmtMMSS(ms){
   return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
 }
 
+
+ // ✅ videoUrl(objectURL/blob URL)에서 마지막 프레임을 dataURL 이미지로 추출
+async function captureLastFrameDataUrl(videoUrl, {
+  mime = "image/jpeg",
+  quality = 0.92,
+  epsilon = 0.08
+} = {}){
+  return new Promise((resolve, reject) => {
+    const v = document.createElement("video");
+    v.preload = "auto";
+    v.muted = true;
+    v.playsInline = true;
+    v.crossOrigin = "anonymous";
+
+    const cleanup = () => {
+      v.removeAttribute("src");
+      try { v.load(); } catch(e){}
+    };
+
+    v.onerror = () => {
+      cleanup();
+      reject(new Error("Video load failed"));
+    };
+
+    v.onloadedmetadata = async () => {
+      try{
+        const dur = Number(v.duration);
+        if (!isFinite(dur) || dur <= 0) throw new Error("Invalid video duration");
+
+        const target = Math.max(0, dur - epsilon);
+
+        const seek = () => new Promise((res, rej) => {
+          const onSeeked = () => {
+            v.removeEventListener("seeked", onSeeked);
+            v.removeEventListener("error", onErr);
+            res();
+          };
+          const onErr = () => {
+            v.removeEventListener("seeked", onSeeked);
+            v.removeEventListener("error", onErr);
+            rej(new Error("Video seek failed"));
+          };
+          v.addEventListener("seeked", onSeeked);
+          v.addEventListener("error", onErr);
+          v.currentTime = target;
+        });
+
+        await seek();
+
+        const w = v.videoWidth || 0;
+        const h = v.videoHeight || 0;
+        if (!w || !h) throw new Error("No video frame size");
+
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(v, 0, 0, w, h);
+
+        const dataUrl = canvas.toDataURL(mime, quality);
+        cleanup();
+        resolve(dataUrl);
+      }catch(e){
+        cleanup();
+        reject(e);
+      }
+    };
+
+    v.src = videoUrl;
+  });
+}
+ 
 /**
  * videoUrl(objectURL)을 확실히 메모리에서 놓아주기 위한 만료 처리
  * - 버튼 비활성 + 텍스트 변경
@@ -1602,7 +1702,7 @@ function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
 
       const link = document.createElement("a");
       link.className = "genVideoLink";
-      link.textContent = "▶️ Click 👀Wanna see more than just a photo… a video?";
+      link.textContent = opts.genVideoText || "▶️ Click 👀Wanna see more than just a photo… a video?";
       link.href = "javascript:void(0)";
 
       link.addEventListener("click", () => {
@@ -2074,6 +2174,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
