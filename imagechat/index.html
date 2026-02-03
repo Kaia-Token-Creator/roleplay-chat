@@ -782,8 +782,8 @@ function escapeText(s){
 }
 
 async function compressDataUrl(dataUrl, {
-  maxW = 768,      // 저장용 최대 가로폭 (추천: 512~1024)
-  maxH = 768,      // 저장용 최대 세로폭
+  maxW = 300,      // 저장용 최대 가로폭 (추천: 512~1024)
+  maxH = 300,      // 저장용 최대 세로폭
   quality = 0.72,  // JPEG/WebP 품질 (0~1)
   mime = "image/webp" // "image/jpeg" 또는 "image/webp"
 } = {}) {
@@ -1139,8 +1139,8 @@ appendMsg("assistant", shownText, imageUrl || undefined, { animate: true });
 
 // ✅ 저장용만 압축
 const storedImageUrl = imageUrl ? await compressDataUrl(imageUrl, {
-  maxW: 512,
-  maxH: 512,
+  maxW: 300,
+  maxH: 300,
   quality: 0.72,
   mime: "image/webp"
 }) : "";
@@ -1333,6 +1333,7 @@ async function ensurePayPalUnlimitedButtons(){
 
 </body>
 </html>
+
 
 
 
