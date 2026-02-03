@@ -1782,7 +1782,11 @@ if (!imageUrl && data && data.image_error){
   appendMsg("assistant", `Image failed (debug): ${JSON.stringify(data.image_error)}`, undefined, undefined, { persist: false });
 }
 
-
+// ✅ 저장용은 300x300으로 압축
+const storedImageUrl = imageUrl
+  ? await compressDataUrlFixedSquare(imageUrl, { size: 300, quality: 0.72, mime: "image/webp" })
+  : "";
+    
 history.push({ role: "assistant", content: reply, imageUrl });
 await pruneHistoryAndUI();
 
@@ -1793,7 +1797,6 @@ await pruneHistoryAndUI();
   // ✅ 에러는 보존 대상 아님 → history.push 제거
   // history.push({ role: "assistant", content: `Error: ${prettyErr(e)}` });
 
-  saveHistory(history);
 }
  finally {
     setBusy(false);
@@ -1909,6 +1912,10 @@ if (!imageUrl && data && data.image_error){
   appendMsg("assistant", `Image failed (debug): ${JSON.stringify(data.image_error)}`, undefined, undefined, { persist: false });
 }
 
+// ✅ 저장용은 300x300으로 압축
+const storedImageUrl = imageUrl
+  ? await compressDataUrlFixedSquare(imageUrl, { size: 300, quality: 0.72, mime: "image/webp" })
+  : "";    
 
 history.push({ role: "assistant", content: reply, imageUrl });
 await pruneHistoryAndUI();
@@ -1921,7 +1928,6 @@ await pruneHistoryAndUI();
   // ✅ 에러는 보존 대상 아님
   // history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
 
-  saveHistory(history);
 }
 finally{
     setBusy(false);
@@ -2068,6 +2074,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
