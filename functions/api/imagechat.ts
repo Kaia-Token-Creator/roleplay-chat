@@ -233,17 +233,24 @@ const history: Msg[] = isSexTrigger
 
         image = { mime: "image/webp", b64: imgB64 };
       } catch (imgErr) {
-        // ✅ 여기서 이제 “진짜 에러”가 프론트로 간다 (직렬화 가능한 형태로)
-        return json(
-          {
-            reply,
-            image: null,
-            image_error: serializeErr(imgErr),
-          },
-          200,
-          CORS
-        );
-      }
+  const serialized = serializeErr(imgErr);
+
+  return json(
+    {
+      // ✅ 유저에게 보여줄 말은 여기서 이미 사람처럼
+      reply: humanizeImageErrorServer(serialized),
+
+      // ✅ 이미지 없음
+      image: null,
+
+      // ✅ 디버그는 그대로 유지 (프론트가 안 쓰면 무시됨)
+      image_error: serialized,
+    },
+    200,
+    CORS
+  );
+}
+
     }
 
     return json(
@@ -292,6 +299,38 @@ function serializeErr(e: any) {
   }
 
   return { message: String(e) };
+}
+
+
+function humanizeImageErrorServer(err: any): string {
+  if (!err || typeof err !== "object") {
+    return "Hmm… something didn’t come through. Say that again?";
+  }
+
+  const status = Number(err.status);
+
+  // 서버 바쁨 / 일시 장애
+  if (status === 503 || status === 502 || status === 504) {
+    return "I’m a bit busy right now… give me a second and try again.";
+  }
+
+  // rate limit
+  if (status === 429) {
+    return "Hey—slow down a little. Try again in a moment.";
+  }
+
+  // non-json / 깨진 응답
+  if (err.body_raw && !err.body_json) {
+    return "Pardon? I didn’t quite catch that—say it again.";
+  }
+
+  // 파싱 실패
+  if (err.where === "venice_image_parse") {
+    return "That didn’t come out right… want me to try again?";
+  }
+
+  // 기본값
+  return "Hmm… can you say that again?";
 }
 
 // ---------------- validators/sanitizers ----------------
@@ -879,4 +918,5 @@ async function callVeniceImageGenerate(
 
   return images[0];
 }
+
 
