@@ -1026,7 +1026,7 @@
       setStatus("warn", "Loading Stitch engine… (first run can take a moment)");
 
       try{
-        const { createFFmpeg, fetchFile } = FFmpeg;
+        const { createFFmpeg, fetchFile } = FFmpegWASM;
         ffmpeg = createFFmpeg({ log: true });
 
         ffmpeg.setProgress(({ ratio }) => {
@@ -1193,5 +1193,6 @@ await ff.run(
   </script>
 </body>
 </html>
+
 
 
