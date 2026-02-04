@@ -710,9 +710,9 @@
   </div>
 
   <!-- FFmpeg (loaded only when needed in JS, but script tag keeps it simple) -->
-  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.min.js"></script>
+<script data-cfasync="false" src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.min.js"></script>
 
-  <script>
+  <script data-cfasync="false">
     // =========================
     // Header: Share + Info menu (unchanged behavior)
     // =========================
@@ -1162,6 +1162,7 @@ async function ensureFFmpeg(){
   </script>
 </body>
 </html>
+
 
 
 
