@@ -1027,7 +1027,7 @@
 
       try{
         const { createFFmpeg, fetchFile } = FFmpeg;
-        ffmpeg = createFFmpeg({ log: false });
+        ffmpeg = createFFmpeg({ log: true });
 
         ffmpeg.setProgress(({ ratio }) => {
           // ratio is 0..1
@@ -1161,9 +1161,9 @@ await ff.run(
         for (let n = 0; n < ordered.length; n++){
           try { ff.FS("unlink", `input_${n+1}.mp4`); } catch {}
         }
-      }catch(err){
-        console.error(err);
-        setStatus("bad", "Stitch failed. Try using fewer clips, or re-export clips as MP4 (H.264 + AAC).");
+            }catch(err){
+        console.error("Stitch error:", err);
+        setStatus("bad", "Stitch failed. Open DevTools Console to see the exact FFmpeg error.");
       }finally{
         stitchBtn.disabled = false;
         // keep progress visible briefly if success; otherwise hide
@@ -1193,4 +1193,5 @@ await ff.run(
   </script>
 </body>
 </html>
+
 
