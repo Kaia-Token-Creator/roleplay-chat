@@ -1007,59 +1007,65 @@
     // Stitch with FFmpeg.wasm
     // =========================
     let ffmpeg = null;
-    let ffmpegLoading = false;
+let ffmpegLoading = false;
 
-    async function ensureFFmpeg(){
-      if (ffmpeg) return ffmpeg;
-      if (ffmpegLoading) {
-        setStatus("warn", "Stitch engine is loading… please wait.");
-        // simple wait loop
-        while (ffmpegLoading) await new Promise(r => setTimeout(r, 120));
-        return ffmpeg;
-      }
+async function ensureFFmpeg(){
+  if (ffmpeg) return ffmpeg;
+  if (ffmpegLoading){
+    while (ffmpegLoading) await new Promise(r => setTimeout(r, 120));
+    return ffmpeg;
+  }
 
-      ffmpegLoading = true;
-      enginePill.textContent = "Loading…";
-      enginePill.classList.remove("ok","bad","warn");
-      enginePill.classList.add("warn");
+  ffmpegLoading = true;
+  enginePill.textContent = "Loading…";
+  enginePill.classList.remove("ok","bad","warn");
+  enginePill.classList.add("warn");
 
-      setStatus("warn", "Loading Stitch engine… (first run can take a moment)");
+  setStatus("warn", "Loading Stitch engine… (first run can take a moment)");
 
-      try{
-        const API = window.FFmpeg || window.FFmpegWASM;
-if (!API) {
-  throw new Error("FFmpeg library not loaded. Check the CDN script tag.");
-}
-const { createFFmpeg, fetchFile } = API;
+  try{
+    const API = window.FFmpegWASM || window.FFmpeg;
+    if (!API) throw new Error("FFmpeg library not loaded (window.FFmpegWASM / window.FFmpeg missing).");
 
-        ffmpeg = createFFmpeg({ log: true });
+    // New API: class-based
+    const { FFmpeg } = API;
+    const { fetchFile } = API;
 
-        ffmpeg.setProgress(({ ratio }) => {
-          // ratio is 0..1
-          setProgress((ratio || 0) * 100);
-        });
-
-        await ffmpeg.load();
-
-        // store helpers on instance
-        ffmpeg._fetchFile = fetchFile;
-
-        enginePill.textContent = "Engine ready";
-        enginePill.classList.remove("warn","bad");
-        enginePill.classList.add("ok");
-        setStatus("warn", "Engine ready. Press <b>Stitch</b> to combine your clips.");
-        return ffmpeg;
-      }catch(err){
-        console.error(err);
-        enginePill.textContent = "Engine failed";
-        enginePill.classList.remove("warn","ok");
-        enginePill.classList.add("bad");
-        setStatus("bad", "Failed to load the Stitch engine. Try refreshing the page.");
-        throw err;
-      }finally{
-        ffmpegLoading = false;
-      }
+    if (typeof FFmpeg !== "function") {
+      throw new Error("FFmpeg class not found in loaded library. Check CDN path/version.");
     }
+
+    ffmpeg = new FFmpeg();
+
+    // Progress
+    ffmpeg.on("progress", ({ progress }) => {
+      // progress: 0..1
+      setProgress((progress || 0) * 100);
+    });
+
+    await ffmpeg.load();
+
+    // keep fetchFile helper
+    ffmpeg._fetchFile = fetchFile;
+
+    enginePill.textContent = "Engine ready";
+    enginePill.classList.remove("warn","bad");
+    enginePill.classList.add("ok");
+    setStatus("warn", "Engine ready. Press <b>Stitch</b> to combine your clips.");
+    return ffmpeg;
+
+  }catch(err){
+    console.error(err);
+    enginePill.textContent = "Engine failed";
+    enginePill.classList.remove("warn","ok");
+    enginePill.classList.add("bad");
+    setStatus("bad", "Failed to load the Stitch engine. Try refreshing the page.");
+    throw err;
+  }finally{
+    ffmpegLoading = false;
+  }
+}
+
 
     function getOrderedFiles(){
       // Only take opened slots, keep order
@@ -1118,44 +1124,29 @@ const { createFFmpeg, fetchFile } = API;
         setProgress(6);
 
         // 1) Normalize each clip to identical spec
-const normNames = [];
+// Write input files
+const listLines = [];
 for (let n = 0; n < ordered.length; n++){
-  const inName = `input_${n+1}.mp4`;
-  const outName = `norm_${n+1}.mp4`;
-  normNames.push(outName);
-
-  // Force same fps, same size, always has audio (silent if missing)
-  await ff.run(
-    "-i", inName,
-    "-vf", "scale=trunc(iw/2)*2:trunc(ih/2)*2,fps=30",
-    "-c:v", "libx264",
-    "-preset", "veryfast",
-    "-crf", "23",
-    "-c:a", "aac",
-    "-b:a", "192k",
-    "-ar", "44100",
-    "-ac", "2",
-    "-movflags", "+faststart",
-    outName
-  );
+  const name = `input_${n+1}.mp4`;
+  const data = await ff._fetchFile(ordered[n].file);
+  await ff.writeFile(name, data);
+  listLines.push(`file ${name}`);
 }
 
-// 2) Concat normalized clips
-const listLines2 = normNames.map(nm => `file ${nm}`).join("\n");
-ff.FS("writeFile", "list2.txt", new TextEncoder().encode(listLines2));
+await ff.writeFile("list.txt", new TextEncoder().encode(listLines.join("\n")));
 
-await ff.run(
+await ff.exec([
   "-f","concat","-safe","0",
-  "-i","list2.txt",
-  "-c","copy",
+  "-i","list.txt",
+  "-c:v","libx264","-preset","veryfast","-crf","23",
+  "-c:a","aac","-b:a","192k",
+  "-movflags","+faststart",
   "output.mp4"
-);
+]);
 
+const out = await ff.readFile("output.mp4");
+const blob = new Blob([out.buffer], { type: "video/mp4" });
 
-        setProgress(100);
-
-        const out = ff.FS("readFile", "output.mp4");
-        const blob = new Blob([out.buffer], { type: "video/mp4" });
 
         setStatus("ok", "Completed. Your stitched video is downloading now.");
         downloadBlob(blob, "stitched.mp4");
@@ -1198,6 +1189,7 @@ await ff.run(
   </script>
 </body>
 </html>
+
 
 
 
