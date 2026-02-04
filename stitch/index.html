@@ -543,7 +543,7 @@
 
         <div class="slotsWrap">
           <div class="slotsRow" id="slotsRow" aria-label="Upload slots"></div>
-          <input class="hiddenInput" id="filePicker" type="file" accept="video/mp4" />
+          <input class="hiddenInput" id="filePicker" type="file" accept="video/mp4" multiple />
         </div>
 
         <div class="controls">
@@ -610,8 +610,9 @@
   <script type="module">
     // FFmpeg (ESM) via CDN — avoids window.FFmpeg UMD issues.
     // Note: If your site CSP blocks wasm/CDN, stitching will fail (we show a clear status message).
-    import { FFmpeg } from "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js";
-    import { fetchFile } from "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js";
+    const { FFmpeg } = await import("/assets/ffmpeg/ffmpeg.js");
+const { fetchFile } = await import("/assets/ffmpeg/util.js");
+
 
     const MAX = 10;
 
@@ -1035,4 +1036,5 @@
   </script>
 </body>
 </html>
+
 
