@@ -1003,6 +1003,24 @@
     render();
     updateCountPill();
 
+
+ async function loadFFmpegUMD(){
+  if (window.FFmpeg) return;
+
+  await new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.min.js";
+    s.async = true;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error("Failed to load ffmpeg.min.js from CDN"));
+    document.head.appendChild(s);
+  });
+
+  if (!window.FFmpeg) {
+    throw new Error("FFmpeg script loaded but window.FFmpeg is still missing (likely blocked by CSP).");
+  }
+}
+   
     // =========================
     // Stitch with FFmpeg.wasm
     // =========================
@@ -1023,7 +1041,9 @@ async function ensureFFmpeg(){
   enginePill.classList.add("warn");
   setStatus("warn", "Loading Stitch engine… (first run can take a moment)");
 
+  
   try{
+    await loadFFmpegUMD();
     const API = window.FFmpeg;
     if (!API) throw new Error("FFmpeg library not loaded (window.FFmpeg missing).");
 
@@ -1162,6 +1182,7 @@ async function ensureFFmpeg(){
   </script>
 </body>
 </html>
+
 
 
 
