@@ -869,9 +869,9 @@
       try{
         // corePath points to the ffmpeg-core bundle (contains wasm)
         await ffmpeg.load({
-          coreURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js",
-          wasmURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.wasm",
-        });
+  coreURL: "/assets/ffmpeg/ffmpeg-core.js",
+  wasmURL: "/assets/ffmpeg/ffmpeg-core.wasm",
+});
         ffmpegLoaded = true;
         setStatus("");
         return true;
@@ -1035,3 +1035,4 @@
   </script>
 </body>
 </html>
+
