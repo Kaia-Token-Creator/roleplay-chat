@@ -1011,6 +1011,7 @@ let ffmpegLoading = false;
 
 async function ensureFFmpeg(){
   if (ffmpeg) return ffmpeg;
+
   if (ffmpegLoading){
     while (ffmpegLoading) await new Promise(r => setTimeout(r, 120));
     return ffmpeg;
@@ -1020,32 +1021,22 @@ async function ensureFFmpeg(){
   enginePill.textContent = "Loading…";
   enginePill.classList.remove("ok","bad","warn");
   enginePill.classList.add("warn");
-
   setStatus("warn", "Loading Stitch engine… (first run can take a moment)");
 
   try{
-    const API = window.FFmpegWASM || window.FFmpeg;
-    if (!API) throw new Error("FFmpeg library not loaded (window.FFmpegWASM / window.FFmpeg missing).");
+    const API = window.FFmpeg;
+    if (!API) throw new Error("FFmpeg library not loaded (window.FFmpeg missing).");
 
-    // New API: class-based
-    const { FFmpeg } = API;
-    const { fetchFile } = API;
-
-    if (typeof FFmpeg !== "function") {
-      throw new Error("FFmpeg class not found in loaded library. Check CDN path/version.");
-    }
+    const { FFmpeg, fetchFile } = API;
+    if (typeof FFmpeg !== "function") throw new Error("FFmpeg class not found.");
 
     ffmpeg = new FFmpeg();
 
-    // Progress
     ffmpeg.on("progress", ({ progress }) => {
-      // progress: 0..1
       setProgress((progress || 0) * 100);
     });
 
     await ffmpeg.load();
-
-    // keep fetchFile helper
     ffmpeg._fetchFile = fetchFile;
 
     enginePill.textContent = "Engine ready";
@@ -1053,13 +1044,12 @@ async function ensureFFmpeg(){
     enginePill.classList.add("ok");
     setStatus("warn", "Engine ready. Press <b>Stitch</b> to combine your clips.");
     return ffmpeg;
-
   }catch(err){
-    console.error(err);
+    console.error("FFmpeg load error:", err);
     enginePill.textContent = "Engine failed";
     enginePill.classList.remove("warn","ok");
     enginePill.classList.add("bad");
-    setStatus("bad", "Failed to load the Stitch engine. Try refreshing the page.");
+    setStatus("bad", "Failed to load the Stitch engine. Open Console for details.");
     throw err;
   }finally{
     ffmpegLoading = false;
@@ -1088,84 +1078,67 @@ async function ensureFFmpeg(){
     }
 
     async function stitchNow(){
-      const ordered = getOrderedFiles();
-      if (ordered.length < 2){
-        setStatus("bad", "You need at least <b>2</b> MP4 clips to Stitch.");
-        return;
-      }
+  const ordered = getOrderedFiles();
+  if (ordered.length < 2){
+    setStatus("bad", "You need at least <b>2</b> MP4 clips to Stitch.");
+    return;
+  }
 
-      // UX lock
-      stitchBtn.disabled = true;
-      hideProgress();
-      setProgress(0);
+  stitchBtn.disabled = true;
+  hideProgress();
+  setProgress(0);
 
-      try{
-        const ff = await ensureFFmpeg();
+  try{
+    const ff = await ensureFFmpeg();
 
-        setStatus("warn", "Preparing clips…");
-        setProgress(2);
+    setStatus("warn", "Preparing clips…");
+    setProgress(2);
 
-        // Clean any previous FS remnants (best-effort)
-        try { ff.FS("unlink", "list.txt"); } catch {}
-        try { ff.FS("unlink", "output.mp4"); } catch {}
+    // 1) write inputs
+    const listLines = [];
+    for (let n = 0; n < ordered.length; n++){
+      const name = `input_${n+1}.mp4`;
+      const data = await ff._fetchFile(ordered[n].file);
+      await ff.writeFile(name, data);
+      listLines.push(`file ${name}`);
+    }
+    await ff.writeFile("list.txt", new TextEncoder().encode(listLines.join("\n")));
 
-        // Write input files
-        const listLines = [];
-        for (let n = 0; n < ordered.length; n++){
-          const name = `input_${n+1}.mp4`;
-          const data = await ff._fetchFile(ordered[n].file);
-          ff.FS("writeFile", name, data);
-          listLines.push(`file ${name}`);
-        }
+    setStatus("warn", "Stitching… (this runs locally in your browser)");
+    setProgress(6);
 
-        ff.FS("writeFile", "list.txt", new TextEncoder().encode(listLines.join("\n")));
+    // 2) stitch (re-encode for compatibility)
+    await ff.exec([
+      "-f","concat","-safe","0",
+      "-i","list.txt",
+      "-c:v","libx264","-preset","veryfast","-crf","23",
+      "-c:a","aac","-b:a","192k",
+      "-movflags","+faststart",
+      "output.mp4"
+    ]);
 
-        setStatus("warn", "Stitching… (this runs locally in your browser)");
-        setProgress(6);
+    const out = await ff.readFile("output.mp4");
+    const blob = new Blob([out.buffer], { type: "video/mp4" });
 
-        // 1) Normalize each clip to identical spec
-// Write input files
-const listLines = [];
-for (let n = 0; n < ordered.length; n++){
-  const name = `input_${n+1}.mp4`;
-  const data = await ff._fetchFile(ordered[n].file);
-  await ff.writeFile(name, data);
-  listLines.push(`file ${name}`);
+    setStatus("ok", "Completed. Your stitched video is downloading now.");
+    downloadBlob(blob, "stitched.mp4");
+
+    // 3) cleanup (best-effort)
+    try { await ff.deleteFile("output.mp4"); } catch {}
+    try { await ff.deleteFile("list.txt"); } catch {}
+    for (let n = 0; n < ordered.length; n++){
+      try { await ff.deleteFile(`input_${n+1}.mp4`); } catch {}
+    }
+
+  }catch(err){
+    console.error("Stitch error:", err);
+    setStatus("bad", "Stitch failed. Open DevTools Console to see the exact FFmpeg error.");
+  }finally{
+    stitchBtn.disabled = false;
+    setTimeout(() => hideProgress(), 1400);
+  }
 }
 
-await ff.writeFile("list.txt", new TextEncoder().encode(listLines.join("\n")));
-
-await ff.exec([
-  "-f","concat","-safe","0",
-  "-i","list.txt",
-  "-c:v","libx264","-preset","veryfast","-crf","23",
-  "-c:a","aac","-b:a","192k",
-  "-movflags","+faststart",
-  "output.mp4"
-]);
-
-const out = await ff.readFile("output.mp4");
-const blob = new Blob([out.buffer], { type: "video/mp4" });
-
-
-        setStatus("ok", "Completed. Your stitched video is downloading now.");
-        downloadBlob(blob, "stitched.mp4");
-
-        // Cleanup FS
-        try { ff.FS("unlink", "output.mp4"); } catch {}
-        try { ff.FS("unlink", "list.txt"); } catch {}
-        for (let n = 0; n < ordered.length; n++){
-          try { ff.FS("unlink", `input_${n+1}.mp4`); } catch {}
-        }
-            }catch(err){
-        console.error("Stitch error:", err);
-        setStatus("bad", "Stitch failed. Open DevTools Console to see the exact FFmpeg error.");
-      }finally{
-        stitchBtn.disabled = false;
-        // keep progress visible briefly if success; otherwise hide
-        setTimeout(() => { if (!stitchBtn.disabled) hideProgress(); }, 1400);
-      }
-    }
 
     stitchBtn.addEventListener("click", stitchNow);
 
@@ -1189,6 +1162,7 @@ const blob = new Blob([out.buffer], { type: "video/mp4" });
   </script>
 </body>
 </html>
+
 
 
 
