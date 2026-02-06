@@ -29,6 +29,9 @@
   "inLanguage": "en"
   }
 </script>
+
+<script src="https://unpkg.com/localforage/dist/localforage.min.js"></script>
+  
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -928,11 +931,47 @@ body.chatMode #viewChat .chatFooter{
 <body>
 
 <script>
-(function enforceAllAccessGuard(){
+(async function enforceAllAccessGuard(){
   const ALL_ACCESS_KEY = "ROLEPLAY_CHAT_ALL_ACCESS_V1";
 
+  // localForage instance (scoped)
+  const store = (window.localforage)
+    ? localforage.createInstance({ name: "roleplay-chat", storeName: "auth" })
+    : null;
+
+  async function readPaid(){
+    // 1) localStorage 우선
+    try{
+      const v = localStorage.getItem(ALL_ACCESS_KEY);
+      if (v === "paid") return "paid";
+    }catch(e){}
+
+    // 2) localForage fallback
+    if (store){
+      try{
+        const v = await store.getItem(ALL_ACCESS_KEY);
+        if (v === "paid") return "paid";
+
+        // 혹시 객체로 저장했을 가능성 대비
+        if (v && typeof v === "object" && v.value === "paid") return "paid";
+      }catch(e){}
+    }
+
+    return null;
+  }
+
+  async function backupPaid(){
+    // localStorage에 paid가 있으면 localForage에 “자주” 백업
+    try{
+      const v = localStorage.getItem(ALL_ACCESS_KEY);
+      if (v === "paid" && store){
+        await store.setItem(ALL_ACCESS_KEY, "paid");
+      }
+    }catch(e){}
+  }
+
   try{
-    const paid = localStorage.getItem(ALL_ACCESS_KEY);
+    const paid = await readPaid();
 
     if (paid !== "paid"){
       alert(
@@ -941,13 +980,42 @@ body.chatMode #viewChat .chatFooter{
         "You will be redirected to the homepage."
       );
       window.location.replace("https://roleplay-chat.com");
+      return;
     }
+
+    // ✅ 복구 성공이면 localStorage도 다시 채워두기(다른 페이지 호환)
+    try{ localStorage.setItem(ALL_ACCESS_KEY, "paid"); }catch(e){}
+
+    // ✅ 그리고 localForage에도 백업(혹시 localStorage만 있고 lf가 비어있던 케이스)
+    await backupPaid();
+
+    // 🧷 저장소 영속성 요청 (지원 브라우저 한정)
+if (navigator.storage && navigator.storage.persist){
+  try{
+    await navigator.storage.persist();
+  }catch(e){}
+}
+
+    // ✅ “좀 더 자주 저장” (선택) - 5분마다 한번씩만
+    if (store){
+      setInterval(() => {
+        store.setItem(ALL_ACCESS_KEY, "paid").catch(()=>{});
+      }, 1000 * 60 * 5);
+    }
+
+    // 포커스 복귀/탭 재활성화 때도 한번 더
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && store){
+        store.setItem(ALL_ACCESS_KEY, "paid").catch(()=>{});
+      }
+    });
+
   }catch(e){
-    // localStorage 접근 자체가 막힌 경우도 차단
     window.location.replace("https://roleplay-chat.com");
   }
 })();
 </script>
+
   
   <div class="wrap">
     <div class="shell">
@@ -2381,6 +2449,7 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
 
 
 
