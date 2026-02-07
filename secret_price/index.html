@@ -2302,14 +2302,7 @@ if (isUnpaidGeneral() && containsSexTrigger(text)){
 
   await appendLockedInnerThought();
 
-  // 원하면 히스토리에도 저장(새로고침해도 남게)
-  chatHistory.push({
-    role: "assistant",
-    content: "(I want to sext with you so badly… but I can’t yet. Please unlock me.)"
-  });
-  saveHistory(chatHistory);
-}
-
+ 
         const msgEl = appendMsg("assistant", ""); // 빈 메시지 먼저 만들고
 const textEl = msgEl.querySelector(".text div:last-child"); // 본문 div 잡기
 await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
@@ -2802,6 +2795,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
