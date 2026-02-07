@@ -2062,15 +2062,7 @@ if (isUnpaidGeneral() && containsSexTrigger(text)){
 
   await appendLockedInnerThought();
 
-  // 원하면 히스토리에도 저장(새로고침해도 남게)
-  chatHistory.push({
-    role: "assistant",
-    content: "(I want to sext with you so badly… but I can’t yet. Please unlock me.)"
-  });
-  saveHistory(chatHistory);
-}
-
-        
+          
       }catch(e){
         appendMsg("assistant", `Error: ${String(e.message || e)}`);
       }finally{
@@ -2478,6 +2470,7 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
 
 
 
