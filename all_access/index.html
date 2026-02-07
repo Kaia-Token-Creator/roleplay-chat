@@ -2060,7 +2060,7 @@ if (isUnpaidGeneral() && containsSexTrigger(text)){
   // 살짝 텀 주면 “다음 말풍선” 느낌이 더 강해짐 (원하면 0으로)
   await new Promise(r => setTimeout(r, 250));
 
-  await appendLockedInnerThought();
+  await appendLockedInnerThought();}
 
           
       }catch(e){
@@ -2470,6 +2470,7 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
 
 
 
