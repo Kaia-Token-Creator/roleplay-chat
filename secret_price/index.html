@@ -2271,52 +2271,43 @@ who.innerHTML = (role === "assistant")
     }
 
     async function handleSend(){
-      const text = chatInput.value.trim();
-      if (!text) return;
+  const text = chatInput.value.trim();
+  if (!text) return;
 
-      chatInput.value = "";
-      appendMsg("user", text);
-      chatHistory.push({ role: "user", content: text });
-saveHistory(chatHistory);
+  chatInput.value = "";
+  appendMsg("user", text);
+  chatHistory.push({ role: "user", content: text });
+  saveHistory(chatHistory);
 
-      try{
-        sendBtn.disabled = true;
-        chatInput.disabled = true;
+  try{
+    sendBtn.disabled = true;
+    chatInput.disabled = true;
 
-        const reply = await sendToChatApi(text);
+    const reply = await sendToChatApi(text);
 
-        const msgEl = appendMsg("assistant", ""); // 빈 메시지 먼저 만들고
-const textEl = msgEl.querySelector(".text div:last-child"); // 본문 div 잡기
-await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
-chatHistory.push({ role: "assistant", content: reply });
-saveHistory(chatHistory);
-이 뒤에
+    // ✅ 서버 응답(캐릭터 답변) 타자기 출력
+    const msgEl = appendMsg("assistant", "");
+    const textEl = msgEl.querySelector(".text div:last-child");
+    await typeWriter(textEl, reply, 18);
 
+    chatHistory.push({ role: "assistant", content: reply });
+    saveHistory(chatHistory);
 
-
-// ✅ 결제 안 된 상태에서만 + 사용자가 sex 트리거 단어를 쓴 경우
-// ✅ 서버 응답(타자기) 완전히 끝난 "다음" 말풍선으로 속마음 출력
-if (isUnpaidGeneral() && containsSexTrigger(text)){
-  // 살짝 텀 주면 “다음 말풍선” 느낌이 더 강해짐 (원하면 0으로)
-  await new Promise(r => setTimeout(r, 250));
-
-  await appendLockedInnerThought();}
-
- 
-        const msgEl = appendMsg("assistant", ""); // 빈 메시지 먼저 만들고
-const textEl = msgEl.querySelector(".text div:last-child"); // 본문 div 잡기
-await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
-chatHistory.push({ role: "assistant", content: reply });
-saveHistory(chatHistory);
-        
-      }catch(e){
-        appendMsg("assistant", `Error: ${String(e.message || e)}`);
-      }finally{
-        sendBtn.disabled = false;
-        chatInput.disabled = false;
-        chatInput.focus();
-      }
+    // ✅ 결제 안 된 general + sex 트리거 단어 쓴 경우: "다음 말풍선" 속마음 출력
+    if (isUnpaidGeneral() && containsSexTrigger(text)){
+      await new Promise(r => setTimeout(r, 250));
+      await appendLockedInnerThought();
     }
+
+  }catch(e){
+    appendMsg("assistant", `Error: ${String(e.message || e)}`);
+  }finally{
+    sendBtn.disabled = false;
+    chatInput.disabled = false;
+    chatInput.focus();
+  }
+}
+
 
     sendBtn.addEventListener("click", handleSend);
     chatInput.addEventListener("keydown", (e) => {
@@ -2795,6 +2786,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
