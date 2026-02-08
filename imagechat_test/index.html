@@ -624,16 +624,37 @@ const LS_BACKUP_KEY = LS_BACKUP_PREFIX + TAB_ID;
 })();
 
 async function readBackupAny(){
-  const lf = await lfGet(LS_BACKUP_KEY);
-  if (lf && typeof lf === "object") return lf;
+  let lf = null, ls = null;
 
+  // 1) LF 읽기
+  try{
+    lf = await lfGet(LS_BACKUP_KEY);
+    if (lf && typeof lf === "object" && Object.keys(lf).length === 0) lf = null; // ✅ 빈 객체면 무시
+  }catch(e){ lf = null; }
+
+  // 2) LS 읽기
   try{
     const raw = localStorage.getItem(LS_BACKUP_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){
-    return null;
-  }
+    ls = raw ? JSON.parse(raw) : null;
+  }catch(e){ ls = null; }
+
+  // 3) 둘 다 없으면 null
+  if (!lf && !ls) return null;
+  if (lf && !ls) return lf;
+  if (!lf && ls) return ls;
+
+  // 4) 둘 다 있으면 updatedAt 큰 쪽(최신) 선택
+  const lfAt = Number(lf.updatedAt || 0);
+  const lsAt = Number(ls.updatedAt || 0);
+  const best = (lsAt >= lfAt) ? ls : lf;
+
+  // 5) ✅ best를 LF/LS에 동기화(선택이지만 강추)
+  try{ await lfSet(LS_BACKUP_KEY, best); }catch(e){}
+  try{ localStorage.setItem(LS_BACKUP_KEY, JSON.stringify(best)); }catch(e){}
+
+  return best;
 }
+
 
 async function writeBackupAny(patch){
   const cur = (await readBackupAny()) || {};
@@ -1557,6 +1578,7 @@ async function ensurePayPalUnlimitedButtons(){
 
 </body>
 </html>
+
 
 
 
