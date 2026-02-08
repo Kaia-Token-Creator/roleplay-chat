@@ -701,7 +701,11 @@ if (titleEl){
 const imgResetBtn = document.getElementById("imgResetBtn");
 if (imgResetBtn){
   imgResetBtn.addEventListener("click", () => {
-    window.open("/?new=1", "_blank");
+    const a = document.createElement("a");
+    a.href = "/";
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.click();
   });
 }
 
@@ -1333,6 +1337,7 @@ async function ensurePayPalUnlimitedButtons(){
 
 </body>
 </html>
+
 
 
 
