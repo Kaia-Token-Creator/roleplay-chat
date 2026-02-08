@@ -661,6 +661,16 @@
   
   </style>
 
+<script>
+(async () => {
+  if (!navigator.storage || !navigator.storage.persist) return;
+  try {
+    const already = await navigator.storage.persisted();
+    if (!already) await navigator.storage.persist();
+  } catch (e) {}
+})();
+</script>  
+
  
 </head>
 
@@ -2282,6 +2292,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
