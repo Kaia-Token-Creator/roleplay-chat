@@ -939,6 +939,17 @@ body.chatMode #viewChat .chatFooter{
 
     
   </style>
+
+ <script>
+(async () => {
+  if (!navigator.storage || !navigator.storage.persist) return;
+  try {
+    const already = await navigator.storage.persisted();
+    if (!already) await navigator.storage.persist();
+  } catch (e) {}
+})();
+</script>
+  
 </head>
 
 <body>
@@ -2794,6 +2805,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
