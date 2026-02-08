@@ -550,6 +550,16 @@ padding: 5px 8px;
 </div>
 
 <script>
+
+(async () => {
+  if (!navigator.storage || !navigator.storage.persist) return;
+  try {
+    const already = await navigator.storage.persisted();
+    if (!already) await navigator.storage.persist(); // "가능하면 지우지 말아줘" 요청
+    // console.log("persisted:", await navigator.storage.persisted());
+  } catch (e) {}
+})();
+  
 /* =========================
    Load character from main
    ========================= */
@@ -1337,6 +1347,7 @@ async function ensurePayPalUnlimitedButtons(){
 
 </body>
 </html>
+
 
 
 
