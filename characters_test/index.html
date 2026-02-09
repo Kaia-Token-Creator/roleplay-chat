@@ -1147,8 +1147,13 @@ if (infoBtn && infoMenu){
       const img = document.createElement("img");
       img.className = "charImg";
       img.alt = char.name;
-      img.loading = "lazy";
-      img.decoding = "async";
+      // Samsung Internet lazy-load bug fix
+const isSamsung = /SamsungBrowser/i.test(navigator.userAgent);
+if (!isSamsung) {
+  img.loading = "lazy";
+  img.decoding = "async";
+}
+
       img.src = `https://roleplay-chat.com/characters/pic/${char.id}.jpg`;
 
       media.appendChild(img);
@@ -1449,4 +1454,5 @@ if (infoBtn && infoMenu){
   </script>
 </body>
 </html>
+
 
