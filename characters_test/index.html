@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+  <meta name='impact-site-verification' value='f343b3c2-5405-4f62-a4ed-b9d389be3089'>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
+     crossorigin="anonymous"></script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4VRNKXVX3J"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-4VRNKXVX3J');
+  </script>
+
+  <meta name="yandex-verification" content="139f2b0989f2c7f0" />
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Recommended Characters | roleplay-chat.com</title>
+  <meta name="description" content="Browse recommended characters. Filter, search, and jump straight into roleplay chat." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Fonts (same as main) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- ✅ PayPal SDK (same as main) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AW41UQ3EzJV10FZHqYPy8yqdlDbklB4VjuT6hzu7DVoS-G9cJgKx9nHfxCRZpVSgs1dczhkPj4oM0VXv&currency=USD&intent=capture"></script>
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.75);
+      --muted2:rgba(255,255,255,.55);
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.09);
+      --border:rgba(255,255,255,.14);
+      --focus:rgba(255,255,255,.25);
+      --danger:#ff4d4d;
+      --ok:#52ff9a;
+      --shadow: 0 14px 36px rgba(0,0,0,.55);
+
+      --radius: 16px;
+      --radius2: 22px;
+
+      --chatColor: #ffd95c;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; }
+
+    body{
+      margin:0;
+      background: radial-gradient(900px 600px at 10% 0%, rgba(255,255,255,.06), transparent 55%),
+                  radial-gradient(900px 600px at 90% 10%, rgba(255,255,255,.05), transparent 60%),
+                  var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+    }
+
+    a{ color:inherit; }
+
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding: 18px 14px 26px;
+    }
+    .shell{
+      width: min(860px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 4px 6px 0;
+      gap: 12px;
+    }
+
+    .logo{
+      text-decoration: none;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: clamp(16px, 3.6vw, 24px);
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      user-select:none;
+    }
+    .logoRole{ color:#ffcc00; }
+    .logoDot{
+      color: rgba(255,255,255,.95);
+      font-size: 0.5em;
+      vertical-align: baseline;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .cardHead h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.2px;
+    }
+    .cardBody{
+      padding: 12px 12px 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    /* ===== Fixed Search Zone ===== */
+    .fixedZone{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(0,0,0,.78);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 14px 36px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .fixedInner{
+      padding: 12px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    .btn{
+      width: 100%;
+      padding: 14px 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      background: rgba(255,255,255,.10);
+      color: var(--fg);
+      font-weight: 800;
+      cursor:pointer;
+      transition:.15s ease;
+      font-size: 15px;
+      letter-spacing:.2px;
+    }
+    .btn:hover{ background: rgba(255,255,255,.14); transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px); }
+
+    .btnPrimary{
+      background: #e0b400;
+      border: 1px solid #c9a200;
+      color: #000;
+      font-weight: 900;
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.45);
+      color: var(--fg);
+      outline: none;
+      transition: .15s ease;
+      font-size: 14px;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(255,255,255,.30);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.08);
+    }
+
+    .filterRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .pill{
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.35);
+      border-radius: 999px;
+      padding: 10px 12px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      user-select:none;
+      transition:.15s ease;
+      font-size: 13px;
+      color: rgba(255,255,255,.92);
+    }
+    .pill:hover{ background: rgba(255,255,255,.06); }
+    .pill input{ width:auto; margin:0; }
+
+    /* ===== Cards ===== */
+    .list{
+      display:grid;
+      gap: 14px;
+    }
+
+    .charImg{
+      width:100%;
+      height: 260px;
+      border-radius: 18px;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+    }
+
+    .field{
+      font-size: 13px;
+      color: rgba(255,255,255,.88);
+    }
+    .field b{
+      color: #ffcc00;
+      font-weight: 900;
+    }
+
+    .tinyLabel{
+      font-size: 12px;
+      color: rgba(255,255,255,.75);
+      font-weight: 700;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 720px){
+      .grid2{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .colors{
+      display:grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .swatch{
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      transition:.15s ease;
+    }
+    .swatch:hover{ transform: translateY(-1px); }
+    .swatch[aria-selected="true"]{
+      outline: 3px solid rgba(255,255,255,.18);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+    }
+    .swatch .check{
+      position:absolute;
+      inset:auto 8px 8px auto;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.14);
+      display:none;
+    }
+    .swatch[aria-selected="true"] .check{ display:block; }
+
+    .pillGroup{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .pillGroup .pill small{
+      color:#fff;
+      font-weight: 800;
+      opacity:.9;
+    }
+    .pillTag{
+      margin-left: 6px;
+      font-size: 10px;
+      font-weight: 900;
+      color: #000;
+      background: #ff3b3b;
+      padding: 2px 6px;
+      border-radius: 999px;
+    }
+    .pill.recommend{
+      box-shadow:none;
+      background: rgba(0,0,0,.35);
+    }
+
+    .chatBtn{
+      width:100%;
+      padding: 14px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 204, 0, .65) !important;
+      outline: 2px solid rgba(255, 204, 0, .18);
+      outline-offset: 2px;
+      background: #ff4fd8;
+      color:#000;
+      font-weight: 900;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+    .chatBtn:hover{ transform: translateY(-1px); background:#ff6fe1; }
+    .chatBtn:active{ transform: translateY(0px); background:#ff2fce; }
+
+    /* ===== Paywall modal (same as original) ===== */
+    .modalOverlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px 14px;
+      z-index: 9999;
+    }
+    .modalOverlay.active{ display:flex; }
+    .modal{
+      width: min(520px, 100%);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(10,10,10,.92);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modalHeader{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .modalHeader h3{
+      margin:0;
+      font-size: 15px;
+      letter-spacing:.2px;
+    }
+    .xBtn{
+      border:none;
+      background: rgba(255,255,255,.08);
+      color: var(--fg);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .modalBody{ padding: 14px 16px 16px; }
+    .warn{
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    .error{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--danger);
+      display:none;
+    }
+    .ok{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--ok);
+      display:none;
+    }
+    .highlightCTA{ color: #e0b400; font-weight: 800; }
+  </style>
+
+  <script>
+  (async () => {
+    if (!navigator.storage || !navigator.storage.persist) return;
+    try {
+      const already = await navigator.storage.persisted();
+      if (!already) await navigator.storage.persist();
+    } catch (e) {}
+  })();
+  </script>
+
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="shell">
+
+      <!-- ✅ HEADER (must be identical style/feel; functional share/info isn't needed here; still same visual header shell) -->
+      <header>
+        <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer" class="logo">
+          <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+        </a>
+      </header>
+
+      <!-- ✅ FIXED SEARCH ZONE -->
+      <section class="fixedZone">
+        <div class="fixedInner">
+          <button class="btn btnPrimary" id="goCreateBtn" type="button">
+            Create your own character
+          </button>
+
+          <input id="searchInput" type="text" placeholder="Search characters by name, MBTI, appearance, scenario, etc..." />
+
+          <div class="filterRow" role="radiogroup" aria-label="Gender filter">
+            <label class="pill"><input type="radio" name="genderFilter" value="all" checked> All</label>
+            <label class="pill"><input type="radio" name="genderFilter" value="Man"> Man</label>
+            <label class="pill"><input type="radio" name="genderFilter" value="Woman"> Woman</label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ✅ LIST -->
+      <section class="list" id="list"></section>
+
+    </div>
+  </div>
+
+  <!-- Paywall Modal (same as original) -->
+  <div id="payModal" class="modalOverlay" role="dialog" aria-modal="true" aria-label="+18 Uncensored payment">
+    <div class="modal">
+      <div class="modalHeader">
+        <h3 id="payTitle">Unlock +18 Uncensored ($2)</h3>
+        <button class="xBtn" id="closePay" type="button">Close</button>
+      </div>
+      <div class="modalBody">
+        <p class="warn">
+          - <span class="highlightCTA">Unlock <b id="payCharName">your character</b></span> and unleash yourself.<br>
+          - <span class="highlightCTA">Fully uncensored</span> experience.<br>
+          - <span class="highlightCTA">Longer replies. Richer memory.</span><br>
+          - <span class="highlightCTA">More detail. More tension.</span><br>
+          - Secure one-time payment.<br>
+          - Unlimited access as long as this tab stays open.<br>
+          - No-login. Private and anonymous.<br>
+          - Payment = Auto age verification.<br>
+          - Shows as 'Playing game' on payment statement.<br>
+          - <span class="highlightCTA">Start now. Instant access.</span>
+        </p>
+
+        <div id="paypalButtons"></div>
+
+        <div class="ok" id="payOk">Payment successful. Entering chat…</div>
+        <div class="error" id="payErr">Payment failed or cancelled. Please try again.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Chat Paywall Modal (same as original) -->
+  <div id="imgPayModal" class="modalOverlay" role="dialog" aria-modal="true" aria-label="Image chat payment">
+    <div class="modal">
+      <div class="modalHeader">
+        <h3 id="imgPayTitle">Ucensored Image Chat 24hrs ($6.9)</h3>
+        <button class="xBtn" id="closeImgPay" type="button">Close</button>
+      </div>
+      <div class="modalBody">
+        <p class="warn" id="imgPayDesc">
+          - <span class="highlightCTA">Let your character come alive.</span><br>
+          - <span class="highlightCTA">Enter a New world.</span><br>
+          - <span class="highlightCTA">Real-time Image generating chat.</span><br>
+          - <span class="highlightCTA">Available for 24hrs.</span> (Time limit)<br>
+          - <span class="highlightCTA">Unlimited image generation during chat</span><br>
+          - <span class="highlightCTA">Fully uncensored</span><br>
+          - Unlimited access as long as this tab stays open.<br>
+          - Image Gen matching the roleplay context.<br>
+          - Longer replies. Richer memory.<br>
+          - More detail. More tension.<br>
+          - Secure one-time payment.<br>
+          - No-login. Private and anonymous.<br>
+          - Payment = Auto age verification.<br>
+          - Shows as 'Playing game' on payment statement.<br>
+          - <span class="highlightCTA">Start now. Instant access.</span>
+        </p>
+
+        <div id="imgPaypalButtons"></div>
+
+        <div class="ok" id="imgPayOk">Payment successful. Entering image chat…</div>
+        <div class="error" id="imgPayErr">Payment failed or cancelled. Please try again.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Chat Unlimited Paywall Modal (same as original) -->
+  <div id="imgUnlimitedPayModal" class="modalOverlay" role="dialog" aria-modal="true" aria-label="Image chat unlimited payment">
+    <div class="modal">
+      <div class="modalHeader">
+        <h3 id="imgUnlimitedPayTitle">Uncensored Image Chat Unlimited ($25)</h3>
+        <button class="xBtn" id="closeImgUnlimitedPay" type="button">Close</button>
+      </div>
+      <div class="modalBody">
+        <p class="warn" id="imgUnlimitedPayDesc">
+          - <b style="color:#ff3b3b;">🎁 Secret Gift Included</b><br>
+          - <span class="highlightCTA">Unlimited image chat</span> (no time limit)<br>
+          - <span class="highlightCTA">Real-time Image generating chat.</span><br>
+          - <span class="highlightCTA">Available for lifetime</span><br>
+          - <span class="highlightCTA">Unlimited image generation during chat</span><br>
+          - <span class="highlightCTA">Available for video generation (extra fee for video)</span><br>
+          - <span class="highlightCTA">Stitch the downloaded video a single long video.</span><br>
+          - <span class="highlightCTA">Yeah, exactly that..</span><br>
+          - <span class="highlightCTA">Fully uncensored</span><br>
+          - Unlimited access as long as this tab stays open.<br>
+          - Image Gen matching the roleplay context.<br>
+          - Longer replies. Richer memory.<br>
+          - More detail. More tension.<br>
+          - Secure one-time payment.<br>
+          - No-login. Private and anonymous.<br>
+          - Payment = Auto age verification.<br>
+          - Shows as 'Playing game' on payment statement.<br>
+          - <span class="highlightCTA">Start now. Instant access.</span>
+        </p>
+
+        <div id="imgUnlimitedPaypalButtons"></div>
+
+        <div class="ok" id="imgUnlimitedPayOk">Payment successful. Entering unlimited image chat…</div>
+        <div class="error" id="imgUnlimitedPayErr">Payment failed or cancelled. Please try again.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Helpers
+    const $ = (q) => document.querySelector(q);
+    const $$ = (q) => Array.from(document.querySelectorAll(q));
+
+    // ===== Keys (same as original) =====
+    const STORAGE_KEY = "roleplay-chat_session_v1";
+    const PENDING_KEY = "roleplay-chat_pending_session_v1";
+    const PAYMENT_KEY = "roleplay-chat_paid_v1";
+    const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
+    const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
+
+    // ===== Fixed: create button =====
+    $("#goCreateBtn").addEventListener("click", () => {
+      window.open("https://roleplay-chat.com", "_blank", "noopener,noreferrer");
+    });
+
+    // ===== Character sample data =====
+    // NOTE: You asked for most fields "fixed" except nickname/language/fontcolor selectable.
+    const LANG_OPTIONS = [
+      "English","Spanish","Chinese","French","Portuguese","German","Japanese","Italian","Dutch","Russian","Arabic","Swedish","Norwegian","Danish"
+    ];
+
+    const colorOptions = [
+      { name: "White", value: "#ffffff" },
+      { name: "Sky Blue", value: "#5cc8ff" },
+      { name: "Mint", value: "#5cffc4" },
+      { name: "Lime", value: "#b8ff5c" },
+      { name: "Yellow", value: "#ffd95c" },
+      { name: "Orange", value: "#ff9f5c" },
+      { name: "Pink", value: "#ff7ac8" },
+      { name: "Violet", value: "#b68cff" },
+    ];
+
+    const CHARACTERS = [
+      {
+        id: "0001",
+        name: "Luna Vale",
+        age: 24,
+        gender: "Woman",
+        language: "English",
+        height: { unit:"cm", cm:168, ft:null, in:null },
+        weight: { unit:"kg", value:54 },
+        mbti: "INFJ",
+        appearance:
+`A striking, cinematic presence: long silver hair that catches light like moonlit water, porcelain-pale skin with a subtle glow, violet eyes that linger a second too long. Slim, elegant build, quiet posture, and a black silk dress with faint shimmer; a tiny star-shaped birthmark sits near her collarbone. She smells faintly like cold rain and vanilla.`,
+        personality:
+`Speaks in soft, slow sentences with intentional pauses… as if choosing which truths to reveal. Emotionally perceptive and slightly obsessive about micro-reactions—your tone, your timing, what you don’t say. Calm on the surface, but intensely focused underneath. Uses gentle phrasing while steering situations with quiet control. Rarely laughs; instead she exhales—amused, intimate, unsettling.`,
+        scenario:
+`It’s past midnight in a modern office. The building is empty, the city humming outside the tall windows. Only one desk lamp is on, casting a warm circle of light. Luna insists it’s “easier to focus when the world is quiet,” and pulls a chair close—too close—inviting you to sit and “review things together.”`
+      },
+      {
+        id: "0002",
+        name: "Marcus Hale",
+        age: 31,
+        gender: "Man",
+        language: "English",
+        height: { unit:"cm", cm:185, ft:null, in:null },
+        weight: { unit:"kg", value:82 },
+        mbti: "INTJ",
+        appearance:
+`Tall, athletic frame; short dark hair kept neat, sharp jawline, deep grey eyes that feel like a measured assessment. A faint scar cuts through one eyebrow. He wears a crisp white shirt with sleeves rolled to the forearms, dark slacks, and a watch that looks too expensive for “casual.” His presence is disciplined, clean, and intimidatingly calm.`,
+        personality:
+`Controlled and deliberate—he doesn’t waste words. Speaks in clipped clarity when testing boundaries, longer sentences when he’s in control. Watches quietly, remembers details with unsettling accuracy. Dominant but composed; he doesn’t raise his voice—he lowers it. Tends to pause mid-message as if deciding how far to go… then continues anyway.`,
+        scenario:
+`A private after-hours gym session in a glass-walled high-rise. Lights dim, machines idle, and the city glows below. Marcus offered to “fix your form” and guided you through every movement slowly, hands hovering just close enough to feel dangerous. Now he locks the door (with a casual click) and says the next set needs “full attention.”`
+      }
+    ];
+
+    // ===== Paywall modal refs (same as original) =====
+    const payModal = $("#payModal");
+    const closePay = $("#closePay");
+    const payOk = $("#payOk");
+    const payErr = $("#payErr");
+
+    const imgPayModal = $("#imgPayModal");
+    const closeImgPay = $("#closeImgPay");
+    const imgPayOk = $("#imgPayOk");
+    const imgPayErr = $("#imgPayErr");
+
+    const imgUnlimitedPayModal = $("#imgUnlimitedPayModal");
+    const closeImgUnlimitedPay = $("#closeImgUnlimitedPay");
+    const imgUnlimitedPayOk = $("#imgUnlimitedPayOk");
+    const imgUnlimitedPayErr = $("#imgUnlimitedPayErr");
+
+    // ===== Pending/session helpers (same behavior) =====
+    function saveSession(data){ sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+    function savePending(session){ sessionStorage.setItem(PENDING_KEY, JSON.stringify(session)); }
+    function clearPending(){ sessionStorage.removeItem(PENDING_KEY); }
+
+    // ===== Modal open/close (same as original) =====
+    function openPayModal(){
+      payErr.style.display = "none";
+      payOk.style.display = "none";
+      payModal.classList.add("active");
+    }
+    function closePayModal(){
+      payModal.classList.remove("active");
+      clearPending();
+    }
+    closePay.addEventListener("click", closePayModal);
+    payModal.addEventListener("click", (e) => { if (e.target === payModal) closePayModal(); });
+
+    function openImgPayModal(){
+      if (imgPayErr) imgPayErr.style.display = "none";
+      if (imgPayOk) imgPayOk.style.display = "none";
+      if (imgPayModal) imgPayModal.classList.add("active");
+    }
+    function closeImgPayModalFn(){
+      if (imgPayModal) imgPayModal.classList.remove("active");
+      clearPending();
+    }
+    closeImgPay.addEventListener("click", closeImgPayModalFn);
+    imgPayModal.addEventListener("click", (e) => { if (e.target === imgPayModal) closeImgPayModalFn(); });
+
+    function openImgUnlimitedPayModal(){
+      if (imgUnlimitedPayErr) imgUnlimitedPayErr.style.display = "none";
+      if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "none";
+      if (imgUnlimitedPayModal) imgUnlimitedPayModal.classList.add("active");
+    }
+    function closeImgUnlimitedPayModalFn(){
+      if (imgUnlimitedPayModal) imgUnlimitedPayModal.classList.remove("active");
+      clearPending();
+    }
+    closeImgUnlimitedPay.addEventListener("click", closeImgUnlimitedPayModalFn);
+    imgUnlimitedPayModal.addEventListener("click", (e) => { if (e.target === imgUnlimitedPayModal) closeImgUnlimitedPayModalFn(); });
+
+    // ===== PayPal buttons (same as original) =====
+    function mountPayPalButtons(onSuccess, priceUsd = "2.00", description = "Playing game"){
+      const container = $("#paypalButtons");
+      container.innerHTML = "";
+      if (!window.paypal){
+        payErr.textContent = "PayPal SDK failed to load. Please refresh and try again.";
+        payErr.style.display = "block";
+        return;
+      }
+
+      window.paypal.Buttons({
+        style: { layout: "vertical", shape: "pill" },
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              description,
+              amount: { value: String(priceUsd), currency_code: "USD" }
+            }]
+          });
+        },
+        onApprove: async (data, actions) => {
+          try{
+            await actions.order.capture();
+            payOk.style.display = "block";
+            payErr.style.display = "none";
+            setTimeout(() => {
+              closePayModal();
+              onSuccess();
+            }, 600);
+          }catch(err){
+            payErr.textContent = "Payment capture failed. Please try again.";
+            payErr.style.display = "block";
+            payOk.style.display = "none";
+          }
+        },
+        onCancel: () => {
+          payErr.textContent = "Payment cancelled.";
+          payErr.style.display = "block";
+          payOk.style.display = "none";
+        },
+        onError: () => {
+          payErr.textContent = "Payment error. Please try again.";
+          payErr.style.display = "block";
+          payOk.style.display = "none";
+        }
+      }).render("#paypalButtons");
+    }
+
+    function mountPayPalButtonsImageChat(onSuccess, priceUsd = "6.90", description = "Playing image game"){
+      const container = document.querySelector("#imgPaypalButtons");
+      container.innerHTML = "";
+
+      if (!window.paypal){
+        if (imgPayErr){
+          imgPayErr.textContent = "PayPal SDK failed to load. Please refresh and try again.";
+          imgPayErr.style.display = "block";
+        }
+        return;
+      }
+
+      window.paypal.Buttons({
+        style: { layout: "vertical", shape: "pill" },
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              description,
+              amount: { value: String(priceUsd), currency_code: "USD" }
+            }]
+          });
+        },
+        onApprove: async (data, actions) => {
+          try{
+            await actions.order.capture();
+            if (imgPayOk){ imgPayOk.style.display = "block"; }
+            if (imgPayErr) imgPayErr.style.display = "none";
+
+            setTimeout(() => {
+              closeImgPayModalFn();
+              onSuccess();
+            }, 600);
+          }catch(err){
+            if (imgPayErr){
+              imgPayErr.textContent = "Payment capture failed. Please try again.";
+              imgPayErr.style.display = "block";
+            }
+            if (imgPayOk) imgPayOk.style.display = "none";
+          }
+        },
+        onCancel: () => {
+          if (imgPayErr){
+            imgPayErr.textContent = "Payment cancelled.";
+            imgPayErr.style.display = "block";
+          }
+          if (imgPayOk) imgPayOk.style.display = "none";
+        },
+        onError: () => {
+          if (imgPayErr){
+            imgPayErr.textContent = "Payment error. Please try again.";
+            imgPayErr.style.display = "block";
+          }
+          if (imgPayOk) imgPayOk.style.display = "none";
+        }
+      }).render("#imgPaypalButtons");
+    }
+
+    function mountPayPalButtonsImageChatUnlimited(onSuccess, priceUsd = "25.00", description = "Upgrade game"){
+      const container = document.querySelector("#imgUnlimitedPaypalButtons");
+      container.innerHTML = "";
+
+      if (!window.paypal){
+        if (imgUnlimitedPayErr){
+          imgUnlimitedPayErr.textContent = "PayPal SDK failed to load. Please refresh and try again.";
+          imgUnlimitedPayErr.style.display = "block";
+        }
+        return;
+      }
+
+      window.paypal.Buttons({
+        style: { layout: "vertical", shape: "pill" },
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              description,
+              amount: { value: String(priceUsd), currency_code: "USD" }
+            }]
+          });
+        },
+        onApprove: async (data, actions) => {
+          try{
+            await actions.order.capture();
+            if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "block";
+            if (imgUnlimitedPayErr) imgUnlimitedPayErr.style.display = "none";
+
+            setTimeout(() => {
+              closeImgUnlimitedPayModalFn();
+              onSuccess();
+            }, 600);
+          }catch(err){
+            if (imgUnlimitedPayErr){
+              imgUnlimitedPayErr.textContent = "Payment capture failed. Please try again.";
+              imgUnlimitedPayErr.style.display = "block";
+            }
+            if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "none";
+          }
+        },
+        onCancel: () => {
+          if (imgUnlimitedPayErr){
+            imgUnlimitedPayErr.textContent = "Payment cancelled.";
+            imgUnlimitedPayErr.style.display = "block";
+          }
+          if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "none";
+        },
+        onError: () => {
+          if (imgUnlimitedPayErr){
+            imgUnlimitedPayErr.textContent = "Payment error. Please try again.";
+            imgUnlimitedPayErr.style.display = "block";
+          }
+          if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "none";
+        }
+      }).render("#imgUnlimitedPaypalButtons");
+    }
+
+    // ===== UI: build character card =====
+    function esc(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    function renderColorGrid(container, initialValue){
+      let selectedColor = initialValue || colorOptions[4].value;
+      let selectedColorName = (colorOptions.find(c=>c.value===selectedColor)?.name) || "Yellow";
+
+      container.innerHTML = "";
+      colorOptions.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "swatch";
+        div.style.background = c.value;
+        div.setAttribute("role","option");
+        div.setAttribute("tabindex","0");
+        div.setAttribute("aria-label", c.name);
+        div.setAttribute("aria-selected", String(c.value===selectedColor));
+        div.dataset.value = c.value;
+        div.dataset.name = c.name;
+        div.innerHTML = `<div class="check">✓</div>`;
+        div.addEventListener("click", () => {
+          selectedColor = c.value;
+          selectedColorName = c.name;
+          Array.from(container.querySelectorAll(".swatch")).forEach(el=>{
+            el.setAttribute("aria-selected", String(el.dataset.value===selectedColor));
+          });
+        });
+        div.addEventListener("keydown", (e) => {
+          if (e.key==="Enter" || e.key===" "){
+            e.preventDefault();
+            div.click();
+          }
+        });
+        container.appendChild(div);
+      });
+
+      return () => ({ selectedColor, selectedColorName });
+    }
+
+    function buildLanguageSelect(selected){
+      const sel = document.createElement("select");
+      LANG_OPTIONS.forEach(l=>{
+        const o = document.createElement("option");
+        o.value = l;
+        o.textContent = l;
+        sel.appendChild(o);
+      });
+      sel.value = selected || "English";
+      return sel;
+    }
+
+    function buildCard(char){
+      const card = document.createElement("section");
+      card.className = "card";
+
+      const head = document.createElement("div");
+      head.className = "cardHead";
+      head.innerHTML = `<h2>Recommended Character</h2>`;
+      card.appendChild(head);
+
+      const body = document.createElement("div");
+      body.className = "cardBody";
+
+      const img = document.createElement("img");
+      img.className = "charImg";
+      img.alt = char.name;
+      img.src = `/character/${char.id}.jpg`;
+      body.appendChild(img);
+
+      // fields
+      const fields = document.createElement("div");
+      fields.style.display = "flex";
+      fields.style.flexDirection = "column";
+      fields.style.gap = "8px";
+
+      fields.innerHTML = `
+        <div class="field"><b>Character Name</b>: ${esc(char.name)}</div>
+
+        <div class="tinyLabel">What should the character call you?</div>
+      `;
+      const nick = document.createElement("input");
+      nick.type = "text";
+      nick.placeholder = "e.g., babe, buddy, captain, darling";
+      nick.value = "you";
+      fields.appendChild(nick);
+
+      fields.insertAdjacentHTML("beforeend", `
+        <div class="grid2">
+          <div class="field"><b>Age</b>: ${esc(char.age)}</div>
+          <div class="field"><b>Gender</b>: ${esc(char.gender)}</div>
+          <div class="field"><b>Height</b>: ${esc(char.height?.cm)} cm</div>
+          <div class="field"><b>Weight</b>: ${esc(char.weight?.value)} ${esc(char.weight?.unit)}</div>
+          <div class="field"><b>MBTI</b>: ${esc(char.mbti)}</div>
+        </div>
+      `);
+
+      // language selectable
+      const langWrap = document.createElement("div");
+      langWrap.innerHTML = `<div class="tinyLabel">Language</div>`;
+      const langSelect = buildLanguageSelect(char.language);
+      langWrap.appendChild(langSelect);
+      fields.appendChild(langWrap);
+
+      fields.insertAdjacentHTML("beforeend", `
+        <div class="field"><b>Appearance</b>: ${esc(char.appearance)}</div>
+        <div class="field"><b>Personality</b>: ${esc(char.personality)}</div>
+        <div class="field"><b>Place & Situation</b>: ${esc(char.scenario)}</div>
+      `);
+
+      // font color selectable
+      const colorWrap = document.createElement("div");
+      colorWrap.innerHTML = `<div class="tinyLabel">Font color</div>`;
+      const grid = document.createElement("div");
+      grid.className = "colors";
+      colorWrap.appendChild(grid);
+      fields.appendChild(colorWrap);
+
+      const getColorState = renderColorGrid(grid, colorOptions[4].value);
+
+      // tier radio (same as original)
+      const tierWrap = document.createElement("div");
+      tierWrap.innerHTML = `
+        <div class="tinyLabel">Chat Option</div>
+        <div class="pillGroup" role="radiogroup" aria-label="Chat option">
+          <label class="pill">
+            <input type="radio" name="tier_${esc(char.id)}" value="general" checked/>
+            <div><b>General text chat</b> <small>(free)</small></div>
+          </label>
+
+          <label class="pill">
+            <input type="radio" name="tier_${esc(char.id)}" value="uncensored" />
+            <div>
+              <b>+18 Uncensored text chat</b> <small>($2)</small><br>
+              <small style="opacity:.65; font-size:10px; margin:0 4px;"> Lifetime + unlimited + high performance</small>
+            </div>
+          </label>
+
+          <label class="pill recommend">
+            <input type="radio" name="tier_${esc(char.id)}" value="imagechat" />
+            <div>
+              <b>🔥 +18 Uncensored <span style="color:#ff3b3b;">Image</span> Chat (24hrs limit)</b>
+              <small class="pillTag">Most Popular</small>
+              <small>($6.9)</small>
+            </div>
+          </label>
+
+          <label class="pill">
+            <input type="radio" name="tier_${esc(char.id)}" value="imagechat_unlimited" />
+            <div>
+              <b>🔥 +18 Uncensored <span style="color:#ff3b3b;">Image</span><span style="color:#FFFFFF;"> & Video</span> Chat (Unlimited)</b>
+              <small>($25)</small>
+              <small style="opacity:.65; font-size:10px; margin:0 4px;">Lifetime</small><br>
+              <span style="margin-left:6px; font-size:10px; font-weight:800; color:#ff3b3b;">🎁 Secret Gift Included</span>
+            </div>
+          </label>
+        </div>
+      `;
+      fields.appendChild(tierWrap);
+
+      const chatBtn = document.createElement("button");
+      chatBtn.className = "chatBtn";
+      chatBtn.type = "button";
+      chatBtn.textContent = `Chat with ${char.name}`;
+      fields.appendChild(chatBtn);
+
+      body.appendChild(fields);
+      card.appendChild(body);
+
+      // click handler: use the SAME key schema as original
+      chatBtn.addEventListener("click", () => {
+        const tier = (card.querySelector(`input[name="tier_${char.id}"]:checked`) || {}).value || "general";
+        const { selectedColor, selectedColorName } = getColorState();
+
+        const session = {
+          name: char.name,
+          nickname: (nick.value || "you").trim() || "you",
+          age: String(char.age),
+          gender: char.gender,
+          language: langSelect.value,
+
+          height: char.height,
+          weight: char.weight,
+
+          mbti: char.mbti,
+          appearance: char.appearance,
+          personality: char.personality,
+          scenario: char.scenario,
+
+          fontColor: selectedColor,
+          fontColorName: selectedColorName,
+          avatarDataUrl: "",
+
+          tier,
+          createdAt: Date.now()
+        };
+
+        // General: no pay
+        if (tier === "general"){
+          try{ saveSession(session); }catch(e){ console.error(e); }
+          window.location.href = "https://roleplay-chat.com/";
+          return;
+        }
+
+        // Uncensored: $2 modal (same)
+        if (tier === "uncensored"){
+          savePending(session);
+
+          const payTitle = document.getElementById("payTitle");
+          const payCharName = document.getElementById("payCharName");
+          if (payTitle) payTitle.textContent = `Unlock +18 Uncensored ($2)`;
+          if (payCharName) payCharName.textContent = session.name;
+
+          openPayModal();
+          mountPayPalButtons(() => {
+            sessionStorage.setItem(PAYMENT_KEY, "paid");
+            session.tier = "uncensored";
+
+            try{ saveSession(session); }catch(e){ console.error(e); }
+
+            clearPending();
+            window.location.href = "https://roleplay-chat.com/";
+          }, "2.00", "Playing game");
+
+          return;
+        }
+
+        // Imagechat: $6.9 modal (same)
+        if (tier === "imagechat"){
+          savePending(session);
+
+          openImgPayModal();
+          mountPayPalButtonsImageChat(() => {
+            sessionStorage.setItem(IMAGECHAT_PAID_KEY, "paid");
+            session.tier = "imagechat";
+
+            try{ saveSession(session); }catch(e){ console.error(e); }
+
+            clearPending();
+            // original flow: go to /imagechat/
+            window.location.href = "https://roleplay-chat.com/imagechat/";
+          }, "6.90", "playing image game");
+
+          return;
+        }
+
+        // Unlimited: $25 modal (same)
+        if (tier === "imagechat_unlimited"){
+          savePending(session);
+
+          openImgUnlimitedPayModal();
+          mountPayPalButtonsImageChatUnlimited(() => {
+            sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
+            session.tier = "imagechat_unlimited";
+
+            try{ saveSession(session); }catch(e){ console.error(e); }
+
+            clearPending();
+            window.location.href = "https://roleplay-chat.com/imagechat_unlimited";
+          }, "25.00", "Upgrade game");
+
+          return;
+        }
+      });
+
+      return card;
+    }
+
+    // ===== Infinite load: shuffle + loop forever =====
+    function shuffle(arr){
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    let base = shuffle(CHARACTERS);
+    let cursor = 0;
+
+    function nextChar(){
+      if (base.length === 0) base = shuffle(CHARACTERS);
+      if (cursor >= base.length){
+        base = shuffle(CHARACTERS);
+        cursor = 0;
+      }
+      return base[cursor++];
+    }
+
+    const list = $("#list");
+
+    function appendBatch(n=2){
+      for (let i=0;i<n;i++){
+        const c = nextChar();
+        list.appendChild(buildCard(c));
+      }
+    }
+
+    // ===== Search + Filter =====
+    const searchInput = $("#searchInput");
+    let genderFilter = "all";
+
+    function getCardText(card){
+      return card.innerText.toLowerCase();
+    }
+
+    function applySearchFilter(){
+      const q = (searchInput.value || "").trim().toLowerCase();
+
+      $$("#list > section.card").forEach(card=>{
+        const g = (card.querySelector(".field b") && card.innerText.includes("Gender")) ? card.innerText : card.innerText;
+        const txt = getCardText(card);
+
+        // gender match: by checking fixed value in card text (simple + robust)
+        const isMan = txt.includes("gender: man");
+        const isWoman = txt.includes("gender: woman");
+
+        let passGender = true;
+        if (genderFilter === "Man") passGender = isMan;
+        if (genderFilter === "Woman") passGender = isWoman;
+
+        const passQuery = !q || txt.includes(q);
+
+        card.style.display = (passGender && passQuery) ? "" : "none";
+      });
+    }
+
+    searchInput.addEventListener("input", applySearchFilter);
+    $$('input[name="genderFilter"]').forEach(r=>{
+      r.addEventListener("change", ()=>{
+        genderFilter = r.value;
+        applySearchFilter();
+      });
+    });
+
+    // ===== Initial render =====
+    appendBatch(3);
+
+    // infinite scroll
+    window.addEventListener("scroll", ()=>{
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 800){
+        appendBatch(2);
+        applySearchFilter();
+      }
+    });
+  </script>
+</body>
+</html>
