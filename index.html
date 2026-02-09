@@ -22,23 +22,13 @@
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Roleplay-chat",
+  "@type": "WebSite",
+  "name": "Roleplay-chat.com",
   "url": "https://roleplay-chat.com/",
-  "applicationCategory": "ChatApplication",
-  "applicationSubCategory": "AI Chatbot",
-  "featureList": "No login, Private chat, Uncensored roleplay, AI character creation",  
-  "operatingSystem": "Web",
-  "description": "Uncensored AI roleplay chat with no login. Private and anonymous character AI experience.",
-  "inLanguage": "en",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
+  "description": "Create a character and start an anonymous no-login AI roleplay chat instantly.",
+  "inLanguage": "en"
   }
-}
 </script>
-
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -48,7 +38,7 @@
   <meta name="theme-color" content="#000000" />
 
  <!-- Open Graph -->
-<meta property="og:title" content="Uncensored AI Roleplay Chat – No Login, Private & Anonymous" />
+<meta property="og:title" content="roleplay-chat.com | No-login AI Roleplay" />
 <meta property="og:description" content="Create a character and start a no-login AI roleplay chat instantly." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://roleplay-chat.com/" />
@@ -887,7 +877,7 @@ body.chatMode #viewChat .chatFooter{
   border-radius: 999px;
   font-weight: 900;
   font-size: 12px;
-  text-align: right; 
+  text-align: right;
   letter-spacing: .3px;
   text-decoration: none;
   color: #000;
@@ -945,21 +935,54 @@ body.chatMode #viewChat .chatFooter{
       0 0 30px rgba(255,204,0,.18),
       0 10px 30px rgba(0,0,0,.55);
   }
-}    
-
-
-.seoH1{
-  position:absolute;
-  width:1px;
-  height:1px;
-  overflow:hidden;
-  clip:rect(0,0,0,0);
-  white-space:nowrap;
 }
+
+.marquee{
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.28);
+}
+
+.marqueeTrack{
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  width: max-content;
+  animation: marqueeMove 42s linear infinite;
+  transform: translateZ(0);
+}
+
+@keyframes marqueeMove{
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.marqueeItem{
+  width: 70px;
+  height: 95px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.marqueeItem img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 채팅 화면에서는 캐릭터 마키 숨김 */
+body.chatMode .marqueeCard,
+body.chatMode .marqueeInline{
+  display: none !important;
+}
+   
     
   </style>
 
-<script>
+ <script>
 (async () => {
   if (!navigator.storage || !navigator.storage.persist) return;
   try {
@@ -1042,12 +1065,20 @@ body.chatMode #viewChat .chatFooter{
   </div>
 </header>
 
-      <h1 class="seoH1">
-Uncensored AI Roleplay Chat – Private No Login Character AI Alternative. C.ai Alternative. Chai Alternative. Create your AI girlfriend and boyfriend. Gay Lesbian roleplay.
-</h1>
+      <div class="sub">Create the most human-like character, Enjoy roleplay.<br>no-login. Private & Safe.</div>
 
+      <!-- Characters moving strip (top) -->
+<section class="card marqueeCard" aria-label="Characters">
+  <div class="cardHead">
+    <h2 class="highlightCTA" style="font-size:10px;">Meet the recommended characters</h2>
+  </div>
+  <div class="cardBody">
+    <div class="marquee" id="marqueeTop">
+      <div class="marqueeTrack"></div>
+    </div>
+  </div>
+</section>
 
-      <div class="sub">AI roleplay chat with uncensored image & video gen.<br>No login. Private & anonymous character AI experience.</div>
 
       <!-- VIEW 1: Character setup -->
       <section id="viewSetup" class="card view active" aria-label="Character creation">
@@ -1282,15 +1313,14 @@ Uncensored AI Roleplay Chat – Private No Login Character AI Alternative. C.ai 
   No login. Your character is kept per browser tab.<br />
   <span style="opacity:.8;">
     The conversation will remain available for the lifetime of this browser tab (except for image chat for 24hrs option) as long as it stays open. This is an anonymous chat and is not stored on the server.
-    <br>⚠️ Important Notice<br>
+<br>⚠️ Important Notice<br>
 Do not use Incognito or Private Browsing mode.
 Do NOT clear browser cache, cookies, or site data.
-Deleting browser data will erase your character, chat history, and access permissions.
+Deleting browser data will erase your character, chat history, and access permissions.    
   </span>
   <br><span style="color:#fff;">Add more detail to the scenario.</span><br><span style="color:#ffcc00;">The more NSFW the prompt, the more NSFW the output.</span>
 </div>
-
-<!-- ✅ All Access Pass CTA -->
+            <!-- ✅ All Access Pass CTA -->
 <div class="span2" style="display:flex; justify-content:flex-end; margin-top:2px;">
   <a href="https://roleplay-chat.com/all_access_purchase"
      target="_blank"
@@ -1299,6 +1329,8 @@ Deleting browser data will erase your character, chat history, and access permis
     ✨ All Access Pass<br> $99 Lifetime
   </a>
 </div>
+
+
               <div class="actions">
                 <button id="createBtn" class="btn btnPrimary" type="submit">Create</button>
               </div>
@@ -1418,7 +1450,7 @@ Deleting browser data will erase your character, chat history, and access permis
           - <span class="highlightCTA">Real-time Image generating chat.</span><br>
           - <span class="highlightCTA">Available for lifetime</span><br>
           - <span class="highlightCTA">Unlimited image generation during chat</span><br>
-          - <span class="highlightCTA">Available for video generation (extra fee for video)</span><br>
+          - <span class="highlightCTA">Available for video generation (extra fee)</span><br>
           - <span class="highlightCTA">Stitch the downloaded video a single long video.</span><br>
           - <span class="highlightCTA">Yeah, exactly that..</span><br>
           - <span class="highlightCTA">Fully uncensored</span><br>
@@ -1502,8 +1534,6 @@ const chatAvatar = $("#chatAvatar");
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
     const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
 
-
- 
     // Share button
 const shareBtn = document.querySelector("#shareBtn");
 if (shareBtn){
@@ -1524,6 +1554,7 @@ if (shareBtn){
   });
 }
 
+    
     // Info button dropdown ✅ (여기!)
 const infoBtn = document.querySelector("#infoBtn");
 const infoMenu = document.querySelector("#infoMenu");
@@ -2162,7 +2193,6 @@ const SEX_TRIGGER_RE = new RegExp(
   "i"
 );
 
-
 // 🔒 Locked responses (randomized)
 const LOCKED_MESSAGES = [
   "I want to take this further… but I can’t right now. Can you unlock me?",
@@ -2194,6 +2224,7 @@ function getRandomLockedMessage(){
   ];
 }
     
+
 function containsSexTrigger(text){
   if (!text) return false;
   return SEX_TRIGGER_RE.test(text);
@@ -2219,8 +2250,7 @@ function appendLockedInnerThought(){
   return typeWriter(textEl, inner, 14);
 }
 
-
-
+    
     function appendMsg(role, content){
       const currentSession = loadSession();
 const assistantName = (currentSession && currentSession.name) || "Character";
@@ -2307,6 +2337,7 @@ who.innerHTML = (role === "assistant")
       return data.reply;
     }
 
+    
     async function handleSend(){
       const text = chatInput.value.trim();
       if (!text) return;
@@ -2328,14 +2359,13 @@ await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
 chatHistory.push({ role: "assistant", content: reply });
 saveHistory(chatHistory);
 
-// ✅ 결제 안 된 상태에서만 + 사용자가 sex 트리거 단어를 쓴 경우
+        // ✅ 결제 안 된 상태에서만 + 사용자가 sex 트리거 단어를 쓴 경우
 // ✅ 서버 응답(타자기) 완전히 끝난 "다음" 말풍선으로 속마음 출력
 if (isUnpaidGeneral() && containsSexTrigger(text)){
   // 살짝 텀 주면 “다음 말풍선” 느낌이 더 강해짐 (원하면 0으로)
   await new Promise(r => setTimeout(r, 250));
 
-  await appendLockedInnerThought();
-}
+  await appendLockedInnerThought();}
 
         
       }catch(e){
@@ -2684,7 +2714,7 @@ const SCENARIO_DEFAULTS = [
   "A private apology meeting; forgiveness isn’t immediate.",
   "A simple question asked too close; the answer suddenly matters a lot."
 ];
-    
+
 function pick(arr){
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -2703,6 +2733,47 @@ function pick(arr){
   if (typeof updateCounts === "function") updateCounts();
 })();
 
+const CHARACTER_PICS = [
+  "0001.jpg","0002.jpg","0003.jpg","0004.jpg","0005.jpg","0006.jpg"
+];
+
+function buildMarquee(marqueeEl){
+  if (!marqueeEl) return;
+  const track = marqueeEl.querySelector(".marqueeTrack");
+  if (!track) return;
+
+  function make(){
+    const frag = document.createDocumentFragment();
+    CHARACTER_PICS.forEach(fn=>{
+      const a = document.createElement("a");
+      a.href="/characters";
+      a.className="marqueeItem";
+
+      const img=document.createElement("img");
+img.src="/characters/pic/"+fn;
+
+/* 삼성브라우저 이미지 안뜨는 버그 방지 */
+img.loading = "eager";
+img.decoding = "async";
+
+/* 로딩 실패하면 그냥 숨김 */
+img.onerror = () => {
+  a.style.display = "none";
+};
+
+
+      a.appendChild(img);
+      frag.appendChild(a);
+    });
+    return frag;
+  }
+
+  track.appendChild(make());
+  track.appendChild(make());
+}
+
+buildMarquee(document.getElementById("marqueeTop"));
+buildMarquee(document.getElementById("marqueeSetup"));
 
     // --------- Restore session if exists
 const existing = loadSession();
@@ -2830,39 +2901,4 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
