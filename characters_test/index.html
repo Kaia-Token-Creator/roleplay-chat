@@ -408,20 +408,24 @@ padding: 5px 8px;
     }
 
     .chatBtn{
-      width:100%;
-      padding: 14px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 204, 0, .65) !important;
-      outline: 2px solid rgba(255, 204, 0, .18);
-      outline-offset: 2px;
-      background: #ff4fd8;
-      color:#000;
-      font-weight: 900;
-      cursor:pointer;
-      transition:.15s ease;
-    }
-    .chatBtn:hover{ transform: translateY(-1px); background:#ff6fe1; }
-    .chatBtn:active{ transform: translateY(0px); background:#ff2fce; }
+  margin-top:10px;
+  padding:14px;
+  border-radius:14px;
+  background:#e0b400;
+  border:1px solid #c9a200;
+  color:#000;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.chatBtn:hover{
+  background:#f0c800;
+}
+
+.chatBtn:active{
+  background:#cfa600;
+}
+
 
     /* ===== Paywall modal (same as original) ===== */
     .modalOverlay{
@@ -777,8 +781,8 @@ if (infoBtn && infoMenu){
         age: 24,
         gender: "Woman",
         language: "English",
-        height: { unit:"cm", cm:168, ft:null, in:null },
-        weight: { unit:"kg", value:54 },
+        height: { unit:"ft", cm:null, ft:5, in:6 },
+        weight: { unit:"lb", value:119 },
         mbti: "INFJ",
         appearance:
 `A striking, cinematic presence: long silver hair that catches light like moonlit water, porcelain-pale skin with a subtle glow, violet eyes that linger a second too long. Slim, elegant build, quiet posture, and a black silk dress with faint shimmer; a tiny star-shaped birthmark sits near her collarbone. She smells faintly like cold rain and vanilla.`,
@@ -793,8 +797,8 @@ if (infoBtn && infoMenu){
         age: 31,
         gender: "Man",
         language: "English",
-        height: { unit:"cm", cm:185, ft:null, in:null },
-        weight: { unit:"kg", value:82 },
+        height: { unit:"ft", cm:null, ft:6, in:1 },
+        weight: { unit:"lb", value:181 },
         mbti: "INTJ",
         appearance:
 `Tall, athletic frame; short dark hair kept neat, sharp jawline, deep grey eyes that feel like a measured assessment. A faint scar cuts through one eyebrow. He wears a crisp white shirt with sleeves rolled to the forearms, dark slacks, and a watch that looks too expensive for “casual.” His presence is disciplined, clean, and intimidatingly calm.`,
@@ -1372,5 +1376,6 @@ if (infoBtn && infoMenu){
   </script>
 </body>
 </html>
+
 
 
