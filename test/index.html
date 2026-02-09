@@ -971,7 +971,13 @@ body.chatMode #viewChat .chatFooter{
   height: 100%;
   object-fit: cover;
 }
-    
+
+/* 채팅 화면에서는 캐릭터 마키 숨김 */
+body.chatMode .marqueeCard,
+body.chatMode .marqueeInline{
+  display: none !important;
+}
+   
     
   </style>
 
@@ -2890,6 +2896,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
