@@ -952,6 +952,7 @@ body.chatMode #viewChat .chatFooter{
   padding: 10px;
   width: max-content;
   animation: marqueeMove 42s linear infinite;
+  transform: translateZ(0);
 }
 
 @keyframes marqueeMove{
@@ -1084,12 +1085,6 @@ body.chatMode .marqueeInline{
         <div class="cardHead">
           <h2>Character Setup</h2>
           </div>
-
-        <div class="marqueeInline">
-  <div class="marquee" id="marqueeSetup">
-    <div class="marqueeTrack"></div>
-  </div>
-</div>
 
         <div class="cardBody">
           <form id="characterForm" class="grid" autocomplete="off">
@@ -2755,7 +2750,17 @@ function buildMarquee(marqueeEl){
       a.className="marqueeItem";
 
       const img=document.createElement("img");
-      img.src="/characters/pic/"+fn;
+img.src="/characters/pic/"+fn;
+
+/* 삼성브라우저 이미지 안뜨는 버그 방지 */
+img.loading = "eager";
+img.decoding = "async";
+
+/* 로딩 실패하면 그냥 숨김 */
+img.onerror = () => {
+  a.style.display = "none";
+};
+
 
       a.appendChild(img);
       frag.appendChild(a);
@@ -2896,6 +2901,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
