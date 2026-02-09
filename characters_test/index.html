@@ -1118,7 +1118,12 @@ if (infoBtn && infoMenu){
         <div class="grid2">
           <div class="field"><b>Age</b>: ${esc(char.age)}</div>
           <div class="field"><b>Gender</b>: ${esc(char.gender)}</div>
-          <div class="field"><b>Height</b>: ${esc(char.height?.cm)} cm</div>
+          <div class="field"><b>Height</b>: ${
+  char.height?.unit === "ft"
+    ? `${esc(char.height?.ft)} ft ${esc(char.height?.in)} in`
+    : `${esc(char.height?.cm)} cm`
+}</div>
+
           <div class="field"><b>Weight</b>: ${esc(char.weight?.value)} ${esc(char.weight?.unit)}</div>
           <div class="field"><b>MBTI</b>: ${esc(char.mbti)}</div>
         </div>
