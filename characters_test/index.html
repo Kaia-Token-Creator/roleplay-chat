@@ -88,6 +88,11 @@
   justify-content:space-between;
   padding: 4px 6px 0;
   gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(0,0,0,.78);
+  backdrop-filter: blur(10px);    
 }
 
     .logo{
@@ -235,7 +240,7 @@ padding: 5px 8px;
     /* ===== Fixed Search Zone ===== */
     .fixedZone{
       position: sticky;
-      top: 0;
+      top: 70;
       z-index: 50;
       background: rgba(0,0,0,.78);
       backdrop-filter: blur(10px);
@@ -2173,6 +2178,7 @@ applySearchFilter();
   </script>
 </body>
 </html>
+
 
 
 
