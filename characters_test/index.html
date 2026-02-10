@@ -533,6 +533,90 @@ padding: 5px 8px;
       display:none;
     }
     .highlightCTA{ color: #e0b400; font-weight: 800; }
+
+  /* ===== Collapsible card ===== */
+.cardSummary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+
+.cardTitleWrap{
+  display:flex;
+  flex-direction:column;
+  gap: 2px;
+  min-width: 0;
+}
+.cardTitle{
+  font-weight: 900;
+  font-size: 14px;
+  color: rgba(255,255,255,.94);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cardSub{
+  font-size: 11px;
+  color: rgba(255,255,255,.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toggleBtn{
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.92);
+  padding: 9px 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: .15s ease;
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.toggleBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+.toggleBtn:active{ transform: translateY(0px); }
+
+.chev{
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid rgba(255,255,255,.75);
+  border-bottom: 2px solid rgba(255,255,255,.75);
+  transform: rotate(45deg);
+  transition: .15s ease;
+  margin-top:-2px;
+}
+.card.isOpen .chev{
+  transform: rotate(-135deg);
+  margin-top:2px;
+}
+
+/* 접힘/펼침 패널 */
+.collapse{
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height .25s ease, opacity .2s ease;
+}
+.card.isOpen .collapse{
+  max-height: 2400px; /* 충분히 크게 */
+  opacity: 1;
+}
+
+/* 접힌 상태에서 카드 높이 깔끔 */
+.charTop.compact{
+  gap: 10px;
+}
+@media (min-width: 900px){
+  .charTop.compact .charMedia{ width: 180px; flex: 0 0 180px; }
+}
+  
   </style>
 
   <script>
@@ -1689,271 +1773,295 @@ if (infoBtn && infoMenu){
 
     function buildCard(char){
 
-      function imgToDataURL(url){
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = image.naturalWidth;
-      canvas.height = image.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(image, 0, 0);
-      resolve(canvas.toDataURL("image/jpeg", 0.9));
-    };
-    image.onerror = reject;
-    image.src = url;
+  function imgToDataURL(url){
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.crossOrigin = "anonymous";
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(image, 0, 0);
+        resolve(canvas.toDataURL("image/jpeg", 0.9));
+      };
+      image.onerror = reject;
+      image.src = url;
+    });
+  }
+
+  const card = document.createElement("section");
+  card.className = "card";
+
+  // Head (기존 문구 유지)
+  const head = document.createElement("div");
+  head.className = "cardHead";
+  head.innerHTML = `<h2>Recommended Character</h2>`;
+  card.appendChild(head);
+
+  const body = document.createElement("div");
+  body.className = "cardBody";
+
+  // ✅ top wrapper (이미지는 항상 보임)
+  const top = document.createElement("div");
+  top.className = "charTop compact";
+
+  const media = document.createElement("div");
+  media.className = "charMedia";
+
+  const img = document.createElement("img");
+  img.className = "charImg";
+  img.alt = char.name;
+
+  const isSamsung = /SamsungBrowser/i.test(navigator.userAgent);
+  if (!isSamsung) {
+    img.loading = "lazy";
+    img.decoding = "async";
+  }
+  img.src = `https://roleplay-chat.com/characters/pic/${char.id}.jpg?v=1`;
+
+  media.appendChild(img);
+  top.appendChild(media);
+
+  // ✅ 오른쪽(또는 아래) 요약 + 토글 버튼
+  const summary = document.createElement("div");
+  summary.style.flex = "1 1 auto";
+  summary.style.minWidth = "0";
+
+  const summaryBar = document.createElement("div");
+  summaryBar.className = "cardSummary";
+
+  summaryBar.innerHTML = `
+    <div class="cardTitleWrap">
+      <div class="cardTitle">${esc(char.name)}</div>
+      <div class="cardSub">${esc(char.gender)} · ${esc(char.mbti)} · ${esc(char.age)}y</div>
+    </div>
+    <button class="toggleBtn" type="button" aria-expanded="false">
+      <span class="toggleTxt">Expand</span>
+      <span class="chev" aria-hidden="true"></span>
+    </button>
+  `;
+
+  summary.appendChild(summaryBar);
+  top.appendChild(summary);
+
+  body.appendChild(top);
+
+  // ✅ 접힘 패널 (여기에 기존 fields 전부 넣기)
+  const collapse = document.createElement("div");
+  collapse.className = "collapse";
+
+  const collapseInner = document.createElement("div");
+  collapseInner.style.display = "flex";
+  collapseInner.style.flexDirection = "column";
+  collapseInner.style.gap = "8px";
+  collapseInner.style.paddingTop = "10px";
+
+  collapse.appendChild(collapseInner);
+  body.appendChild(collapse);
+
+  // ✅ 기존 fields = collapseInner 로 치환
+  const fields = collapseInner;
+
+  // ---- 여기부터는 너가 원래 만들던 fields 내용 그대로 ----
+  fields.innerHTML = `
+    <div class="field"><b>Character Name</b>: ${esc(char.name)}</div>
+    <div class="tinyLabel">What should the character call you?</div>
+  `;
+
+  const nick = document.createElement("input");
+  nick.type = "text";
+  nick.placeholder = "e.g., babe, buddy, captain, darling";
+  nick.value = "you";
+  fields.appendChild(nick);
+
+  fields.insertAdjacentHTML("beforeend", `
+    <div class="grid2">
+      <div class="field"><b>Age</b>: ${esc(char.age)}</div>
+      <div class="field"><b>Gender</b>: ${esc(char.gender)}</div>
+      <div class="field"><b>Height</b>: ${
+        char.height?.unit === "ft"
+          ? `${esc(char.height?.ft)} ft ${esc(char.height?.in)} in`
+          : `${esc(char.height?.cm)} cm`
+      }</div>
+      <div class="field"><b>Weight</b>: ${esc(char.weight?.value)} ${esc(char.weight?.unit)}</div>
+      <div class="field"><b>MBTI</b>: ${esc(char.mbti)}</div>
+    </div>
+  `);
+
+  const langWrap = document.createElement("div");
+  langWrap.innerHTML = `<div class="tinyLabel">Language</div>`;
+  const langSelect = buildLanguageSelect(char.language);
+  langWrap.appendChild(langSelect);
+  fields.appendChild(langWrap);
+
+  fields.insertAdjacentHTML("beforeend", `
+    <div class="field"><b>Appearance</b>: ${esc(char.appearance)}</div>
+    <div class="field"><b>Personality</b>: ${esc(char.personality)}</div>
+    <div class="field"><b>Place & Situation</b>: ${esc(char.scenario)}</div>
+  `);
+
+  const colorWrap = document.createElement("div");
+  colorWrap.innerHTML = `<div class="tinyLabel">Font color</div>`;
+  const grid = document.createElement("div");
+  grid.className = "colors";
+  colorWrap.appendChild(grid);
+  fields.appendChild(colorWrap);
+
+  const getColorState = renderColorGrid(grid, colorOptions[4].value);
+
+  const tierWrap = document.createElement("div");
+  tierWrap.innerHTML = `
+    <div class="tinyLabel">Chat Option</div>
+    <div class="pillGroup" role="radiogroup" aria-label="Chat option">
+      <label class="pill">
+        <input type="radio" name="tier_${esc(char.id)}" value="general" checked/>
+        <div><b>General text chat</b> <small>(free)</small></div>
+      </label>
+
+      <label class="pill">
+        <input type="radio" name="tier_${esc(char.id)}" value="uncensored" />
+        <div>
+          <b>+18 Uncensored text chat</b> <small>($2)</small><br>
+          <small style="opacity:.65; font-size:10px; margin:0 4px;"> Lifetime + unlimited + high performance</small>
+        </div>
+      </label>
+
+      <label class="pill recommend">
+        <input type="radio" name="tier_${esc(char.id)}" value="imagechat" />
+        <div>
+          <b>🔥 +18 Uncensored <span style="color:#ff3b3b;">Image</span> Chat (24hrs limit)</b>
+          <small class="pillTag">Most Popular</small>
+          <small>($6.9)</small>
+        </div>
+      </label>
+
+      <label class="pill">
+        <input type="radio" name="tier_${esc(char.id)}" value="imagechat_unlimited" />
+        <div>
+          <b>🔥 +18 Uncensored <span style="color:#ff3b3b;">Image</span><span style="color:#FFFFFF;"> & Video</span> Chat (Unlimited)</b>
+          <small>($25)</small>
+          <small style="opacity:.65; font-size:10px; margin:0 4px;">Lifetime</small><br>
+          <span style="margin-left:6px; font-size:10px; font-weight:800; color:#ff3b3b;">🎁 Secret Gift Included</span>
+        </div>
+      </label>
+    </div>
+  `;
+  fields.appendChild(tierWrap);
+
+  const chatBtn = document.createElement("button");
+  chatBtn.className = "chatBtn";
+  chatBtn.type = "button";
+  chatBtn.textContent = `Chat with ${char.name}`;
+  fields.appendChild(chatBtn);
+
+  card.appendChild(body);
+
+  // ✅ 토글 로직
+  const toggleBtn = summaryBar.querySelector(".toggleBtn");
+  const toggleTxt = summaryBar.querySelector(".toggleTxt");
+
+  function setOpen(open){
+    card.classList.toggle("isOpen", open);
+    toggleBtn.setAttribute("aria-expanded", String(open));
+    toggleTxt.textContent = open ? "Collapse" : "Expand";
+  }
+  setOpen(false);
+
+  toggleBtn.addEventListener("click", () => {
+    setOpen(!card.classList.contains("isOpen"));
   });
-}
 
-      const card = document.createElement("section");
-      card.className = "card";
+  // ✅ “Chat with ...” 누르면 자동으로 펼쳐서 옵션 보이게 할 수도 있음(원하면)
+  // summaryBar.addEventListener("click", (e) => { if(e.target.closest("button")) return; setOpen(true); });
 
-      const head = document.createElement("div");
-      head.className = "cardHead";
-      head.innerHTML = `<h2>Recommended Character</h2>`;
-      card.appendChild(head);
+  // ---- 기존 chatBtn click handler는 그대로 두되, fields/변수들이 살아있으니 정상 작동 ----
+  chatBtn.addEventListener("click", async () => {
+    const tier = (card.querySelector(`input[name="tier_${char.id}"]:checked`) || {}).value || "general";
+    const { selectedColor, selectedColorName } = getColorState();
 
-      const body = document.createElement("div");
-      body.className = "cardBody";
+    const avatarData = await imgToDataURL(img.src);
+    const session = {
+      name: char.name,
+      nickname: (nick.value || "you").trim() || "you",
+      age: String(char.age),
+      gender: char.gender,
+      language: langSelect.value,
+      height: char.height,
+      weight: char.weight,
+      mbti: char.mbti,
+      appearance: char.appearance,
+      personality: char.personality,
+      scenario: char.scenario,
+      fontColor: selectedColor,
+      fontColorName: selectedColorName,
+      avatarDataUrl: avatarData,
+      tier,
+      createdAt: Date.now()
+    };
 
-      // ✅ top wrapper (PC에서 이미지 왼쪽/정보 오른쪽)
-      const top = document.createElement("div");
-      top.className = "charTop";
-
-      // ✅ square media container
-      const media = document.createElement("div");
-      media.className = "charMedia";
-
-      const img = document.createElement("img");
-      img.className = "charImg";
-      img.alt = char.name;
-      // Samsung Internet lazy-load bug fix
-const isSamsung = /SamsungBrowser/i.test(navigator.userAgent);
-if (!isSamsung) {
-  img.loading = "lazy";
-  img.decoding = "async";
-}
-
-      img.src = `https://roleplay-chat.com/characters/pic/${char.id}.jpg?v=1`;
-
-      media.appendChild(img);
-      top.appendChild(media);
-
-      // ✅ info wrapper (기존 fields를 이 안에)
-      const info = document.createElement("div");
-      info.className = "charInfo";
-      top.appendChild(info);
-
-      // ✅ fields (딱 1번만!)
-      const fields = document.createElement("div");
-      fields.style.display = "flex";
-      fields.style.flexDirection = "column";
-      fields.style.gap = "8px";
-
-      // ✅ fields는 info에 붙임
-      info.appendChild(fields);
-
-      // ✅ top을 body에 붙임
-      body.appendChild(top);
-
-      fields.innerHTML = `
-        <div class="field"><b>Character Name</b>: ${esc(char.name)}</div>
-
-        <div class="tinyLabel">What should the character call you?</div>
-      `;
-      const nick = document.createElement("input");
-      nick.type = "text";
-      nick.placeholder = "e.g., babe, buddy, captain, darling";
-      nick.value = "you";
-      fields.appendChild(nick);
-
-      fields.insertAdjacentHTML("beforeend", `
-        <div class="grid2">
-          <div class="field"><b>Age</b>: ${esc(char.age)}</div>
-          <div class="field"><b>Gender</b>: ${esc(char.gender)}</div>
-          <div class="field"><b>Height</b>: ${
-  char.height?.unit === "ft"
-    ? `${esc(char.height?.ft)} ft ${esc(char.height?.in)} in`
-    : `${esc(char.height?.cm)} cm`
-}</div>
-
-          <div class="field"><b>Weight</b>: ${esc(char.weight?.value)} ${esc(char.weight?.unit)}</div>
-          <div class="field"><b>MBTI</b>: ${esc(char.mbti)}</div>
-        </div>
-      `);
-
-      // language selectable
-      const langWrap = document.createElement("div");
-      langWrap.innerHTML = `<div class="tinyLabel">Language</div>`;
-      const langSelect = buildLanguageSelect(char.language);
-      langWrap.appendChild(langSelect);
-      fields.appendChild(langWrap);
-
-      fields.insertAdjacentHTML("beforeend", `
-        <div class="field"><b>Appearance</b>: ${esc(char.appearance)}</div>
-        <div class="field"><b>Personality</b>: ${esc(char.personality)}</div>
-        <div class="field"><b>Place & Situation</b>: ${esc(char.scenario)}</div>
-      `);
-
-      // font color selectable
-      const colorWrap = document.createElement("div");
-      colorWrap.innerHTML = `<div class="tinyLabel">Font color</div>`;
-      const grid = document.createElement("div");
-      grid.className = "colors";
-      colorWrap.appendChild(grid);
-      fields.appendChild(colorWrap);
-
-      const getColorState = renderColorGrid(grid, colorOptions[4].value);
-
-      // tier radio (same as original)
-      const tierWrap = document.createElement("div");
-      tierWrap.innerHTML = `
-        <div class="tinyLabel">Chat Option</div>
-        <div class="pillGroup" role="radiogroup" aria-label="Chat option">
-          <label class="pill">
-            <input type="radio" name="tier_${esc(char.id)}" value="general" checked/>
-            <div><b>General text chat</b> <small>(free)</small></div>
-          </label>
-
-          <label class="pill">
-            <input type="radio" name="tier_${esc(char.id)}" value="uncensored" />
-            <div>
-              <b>+18 Uncensored text chat</b> <small>($2)</small><br>
-              <small style="opacity:.65; font-size:10px; margin:0 4px;"> Lifetime + unlimited + high performance</small>
-            </div>
-          </label>
-
-          <label class="pill recommend">
-            <input type="radio" name="tier_${esc(char.id)}" value="imagechat" />
-            <div>
-              <b>🔥 +18 Uncensored <span style="color:#ff3b3b;">Image</span> Chat (24hrs limit)</b>
-              <small class="pillTag">Most Popular</small>
-              <small>($6.9)</small>
-            </div>
-          </label>
-
-          <label class="pill">
-            <input type="radio" name="tier_${esc(char.id)}" value="imagechat_unlimited" />
-            <div>
-              <b>🔥 +18 Uncensored <span style="color:#ff3b3b;">Image</span><span style="color:#FFFFFF;"> & Video</span> Chat (Unlimited)</b>
-              <small>($25)</small>
-              <small style="opacity:.65; font-size:10px; margin:0 4px;">Lifetime</small><br>
-              <span style="margin-left:6px; font-size:10px; font-weight:800; color:#ff3b3b;">🎁 Secret Gift Included</span>
-            </div>
-          </label>
-        </div>
-      `;
-      fields.appendChild(tierWrap);
-
-      const chatBtn = document.createElement("button");
-      chatBtn.className = "chatBtn";
-      chatBtn.type = "button";
-      chatBtn.textContent = `Chat with ${char.name}`;
-      fields.appendChild(chatBtn);
-
-      // ✅ body를 card에 붙임 (원래 유지)
-      card.appendChild(body);
-
-      // click handler: use the SAME key schema as original
-      chatBtn.addEventListener("click", async () => {
-        const tier = (card.querySelector(`input[name="tier_${char.id}"]:checked`) || {}).value || "general";
-        const { selectedColor, selectedColorName } = getColorState();
-
-        const avatarData = await imgToDataURL(img.src);
-        const session = {
-          name: char.name,
-          nickname: (nick.value || "you").trim() || "you",
-          age: String(char.age),
-          gender: char.gender,
-          language: langSelect.value,
-
-          height: char.height,
-          weight: char.weight,
-
-          mbti: char.mbti,
-          appearance: char.appearance,
-          personality: char.personality,
-          scenario: char.scenario,
-
-          fontColor: selectedColor,
-          fontColorName: selectedColorName,
-          avatarDataUrl: avatarData,
-
-          tier,
-          createdAt: Date.now()
-        };
-
-        // General: no pay
-        if (tier === "general"){
-          try{ saveSession(session); }catch(e){ console.error(e); }
-          window.location.replace("https://roleplay-chat.com/");
-          return;
-        }
-
-        // Uncensored: $2 modal (same)
-        if (tier === "uncensored"){
-          savePending(session);
-
-          const payTitle = document.getElementById("payTitle");
-          const payCharName = document.getElementById("payCharName");
-          if (payTitle) payTitle.textContent = `Unlock +18 Uncensored ($2)`;
-          if (payCharName) payCharName.textContent = session.name;
-
-          openPayModal();
-          mountPayPalButtons(() => {
-            sessionStorage.setItem(PAYMENT_KEY, "paid");
-            session.tier = "uncensored";
-
-            try{ saveSession(session); }catch(e){ console.error(e); }
-
-            clearPending();
-            window.location.replace("https://roleplay-chat.com/");
-          }, "2.00", "Playing game");
-
-          return;
-        }
-
-        // Imagechat: $6.9 modal (same)
-        if (tier === "imagechat"){
-          savePending(session);
-
-          openImgPayModal();
-          mountPayPalButtonsImageChat(() => {
-            sessionStorage.setItem(IMAGECHAT_PAID_KEY, "paid");
-            session.tier = "imagechat";
-
-            try{ saveSession(session); }catch(e){ console.error(e); }
-
-            clearPending();
-            // original flow: go to /imagechat/
-            window.location.href = "https://roleplay-chat.com/imagechat/";
-          }, "6.90", "playing image game");
-
-          return;
-        }
-
-        // Unlimited: $25 modal (same)
-        if (tier === "imagechat_unlimited"){
-          savePending(session);
-
-          openImgUnlimitedPayModal();
-          mountPayPalButtonsImageChatUnlimited(() => {
-            sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
-            session.tier = "imagechat_unlimited";
-
-            try{ saveSession(session); }catch(e){ console.error(e); }
-
-            clearPending();
-            window.location.href = "https://roleplay-chat.com/imagechat_unlimited";
-          }, "25.00", "Upgrade game");
-
-          return;
-        }
-      });
-
-      return card;
+    if (tier === "general"){
+      try{ saveSession(session); }catch(e){ console.error(e); }
+      window.location.replace("https://roleplay-chat.com/");
+      return;
     }
+
+    if (tier === "uncensored"){
+      savePending(session);
+
+      const payTitle = document.getElementById("payTitle");
+      const payCharName = document.getElementById("payCharName");
+      if (payTitle) payTitle.textContent = `Unlock +18 Uncensored ($2)`;
+      if (payCharName) payCharName.textContent = session.name;
+
+      openPayModal();
+      mountPayPalButtons(() => {
+        sessionStorage.setItem(PAYMENT_KEY, "paid");
+        session.tier = "uncensored";
+
+        try{ saveSession(session); }catch(e){ console.error(e); }
+
+        clearPending();
+        window.location.replace("https://roleplay-chat.com/");
+      }, "2.00", "Playing game");
+      return;
+    }
+
+    if (tier === "imagechat"){
+      savePending(session);
+
+      openImgPayModal();
+      mountPayPalButtonsImageChat(() => {
+        sessionStorage.setItem(IMAGECHAT_PAID_KEY, "paid");
+        session.tier = "imagechat";
+
+        try{ saveSession(session); }catch(e){ console.error(e); }
+
+        clearPending();
+        window.location.href = "https://roleplay-chat.com/imagechat/";
+      }, "6.90", "playing image game");
+      return;
+    }
+
+    if (tier === "imagechat_unlimited"){
+      savePending(session);
+
+      openImgUnlimitedPayModal();
+      mountPayPalButtonsImageChatUnlimited(() => {
+        sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
+        session.tier = "imagechat_unlimited";
+
+        try{ saveSession(session); }catch(e){ console.error(e); }
+
+        clearPending();
+        window.location.href = "https://roleplay-chat.com/imagechat_unlimited";
+      }, "25.00", "Upgrade game");
+      return;
+    }
+  });
+
+  return card;
+}
 
    
     // ===== Search + Filter =====
@@ -2018,6 +2126,7 @@ applySearchFilter();
   </script>
 </body>
 </html>
+
 
 
 
