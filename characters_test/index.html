@@ -1965,7 +1965,7 @@ if (infoBtn && infoMenu){
   `);
 
   const colorWrap = document.createElement("div");
-  colorWrap.innerHTML = `<div class="tinyLabel">Font color</div>`;
+  colorWrap.innerHTML = `<div class="tinyLabel" style="color:#ffcc00;">Font color</div>`;
   const grid = document.createElement("div");
   grid.className = "colors";
   colorWrap.appendChild(grid);
@@ -1975,7 +1975,7 @@ if (infoBtn && infoMenu){
 
   const tierWrap = document.createElement("div");
   tierWrap.innerHTML = `
-    <div class="tinyLabel">Chat Option</div>
+    <div class="tinyLabel" style="color:#ffcc00;">Chat Option</div>
     <div class="pillGroup" role="radiogroup" aria-label="Chat option">
       <label class="pill">
         <input type="radio" name="tier_${esc(char.id)}" value="general" checked/>
@@ -2209,6 +2209,7 @@ applySearchFilter();
   </script>
 </body>
 </html>
+
 
 
 
