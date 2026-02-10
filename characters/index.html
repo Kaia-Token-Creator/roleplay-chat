@@ -1646,7 +1646,7 @@ if (!isSamsung) {
         // General: no pay
         if (tier === "general"){
           try{ saveSession(session); }catch(e){ console.error(e); }
-          window.location.href = "https://roleplay-chat.com/";
+          window.location.replace("https://roleplay-chat.com/");
           return;
         }
 
@@ -1667,7 +1667,7 @@ if (!isSamsung) {
             try{ saveSession(session); }catch(e){ console.error(e); }
 
             clearPending();
-            window.location.href = "https://roleplay-chat.com/";
+            window.location.replace("https://roleplay-chat.com/");
           }, "2.00", "Playing game");
 
           return;
@@ -1777,6 +1777,7 @@ applySearchFilter();
   </script>
 </body>
 </html>
+
 
 
 
