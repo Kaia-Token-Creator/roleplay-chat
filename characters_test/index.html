@@ -664,6 +664,17 @@ padding: 5px 8px;
   margin: 0;
 }
 
+.note{
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.14);
+  color: rgba(255,255,255,.85);
+}
+
+    
   </style>
 
   <script>
@@ -2000,6 +2011,26 @@ if (infoBtn && infoMenu){
     </div>
   `;
   fields.appendChild(tierWrap);
+  const note = document.createElement("div");
+note.className = "note";
+note.innerHTML = `
+  No login. Your character is kept per browser tab.<br />
+  <span style="opacity:.8;">
+    The conversation will remain available for the lifetime of this browser tab
+    (except for image chat for 24hrs option) as long as it stays open.
+    This is an anonymous chat and is not stored on the server.
+    <br><br>
+    ⚠️ <b>Important Notice</b><br>
+    Do not use Incognito or Private Browsing mode.<br>
+    Do NOT clear browser cache, cookies, or site data.<br>
+    Deleting browser data will erase your character, chat history, and access permissions.
+  </span>
+  <br><br>
+  <span style="color:#fff;">Add more detail to the scenario on your own character setup page.</span><br>
+  <span style="color:#ffcc00;">The more NSFW the prompt, the more NSFW the output.</span>
+`;
+fields.appendChild(note);
+    
 
   const chatBtn = document.createElement("button");
   chatBtn.className = "chatBtn";
@@ -2178,6 +2209,7 @@ applySearchFilter();
   </script>
 </body>
 </html>
+
 
 
 
