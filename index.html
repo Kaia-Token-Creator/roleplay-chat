@@ -991,6 +991,34 @@ body.chatMode .marqueeInline{
   display: none !important;
 }
    
+/* ✅ 모달 열리면 뒤 페이지 스크롤 잠금 */
+body.modalOpen{
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ✅ 모달 오버레이 자체가 스크롤을 먹게 (뒤로 스크롤 안 새게) */
+.modalOverlay{
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ✅ 모달 높이를 화면 안으로 제한 + 내부를 flex로 */
+.modal{
+  display: flex;
+  flex-direction: column;
+  max-height: 86dvh;   /* 필요하면 90dvh로 */
+}
+
+/* ✅ 핵심: 모달 바디가 스크롤 컨테이너가 되게 */
+.modalBody{
+  flex: 1 1 auto;
+  min-height: 0;       /* flex 스크롤 필수 */
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
     
   </style>
 
@@ -1956,10 +1984,14 @@ setUnlockUIVisibility();
       payErr.style.display = "none";
       payOk.style.display = "none";
       payModal.classList.add("active");
+
+      document.body.classList.add("modalOpen");   // ✅ 추가
     }
     function closePayModal(){
       payModal.classList.remove("active");
       clearPending();
+
+      document.body.classList.remove("modalOpen"); // ✅ 추가
     }
     closePay.addEventListener("click", closePayModal);
     payModal.addEventListener("click", (e) => {
@@ -1970,12 +2002,17 @@ function openImgPayModal(){
   if (imgPayErr) imgPayErr.style.display = "none";
   if (imgPayOk) imgPayOk.style.display = "none";
   if (imgPayModal) imgPayModal.classList.add("active");
+
+    document.body.classList.add("modalOpen");   // ✅ 추가
+
 }
 
 function closeImgPayModalFn(){
   if (imgPayModal) imgPayModal.classList.remove("active");
   // imagechat 결제는 pending을 유지해도 되지만, 닫으면 취소로 보고 지우는 게 깔끔
   clearPending();
+
+  document.body.classList.remove("modalOpen"); // ✅ 추가
 }
 
 if (closeImgPay){
@@ -1991,11 +2028,16 @@ function openImgUnlimitedPayModal(){
   if (imgUnlimitedPayErr) imgUnlimitedPayErr.style.display = "none";
   if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "none";
   if (imgUnlimitedPayModal) imgUnlimitedPayModal.classList.add("active");
+
+    document.body.classList.add("modalOpen");   // ✅ 추가
+
 }
 
 function closeImgUnlimitedPayModalFn(){
   if (imgUnlimitedPayModal) imgUnlimitedPayModal.classList.remove("active");
   clearPending();
+
+    document.body.classList.remove("modalOpen"); // ✅ 추가
 }
 
 if (closeImgUnlimitedPay){
@@ -2933,6 +2975,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
