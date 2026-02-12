@@ -310,6 +310,7 @@
   border:1px solid rgba(255,204,0,.45);
   box-shadow:var(--shadow);
   padding:22px;
+  position:relative;    
 
   max-height: calc(100dvh - 48px);   /* ✅ 화면보다 길어지면 */
   overflow:auto;                     /* ✅ 내부 스크롤 허용 */
@@ -635,6 +636,15 @@
       if(e.target === modal) modal.classList.remove("active");
     });
 
+    /* ✅ 여기다가 넣어 */
+const modalCloseBtn = document.getElementById("modalCloseBtn");
+
+if(modalCloseBtn){
+  modalCloseBtn.onclick = () => {
+    modal.classList.remove("active");
+  };
+}
+
     function generatePaidKey(){
       return "paid_" + crypto.randomUUID();
     }
@@ -662,5 +672,6 @@
   </script>
 </body>
 </html>
+
 
 
