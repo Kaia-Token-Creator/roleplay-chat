@@ -496,24 +496,35 @@ padding: 5px 8px;
 
     /* ===== Paywall modal (same as original) ===== */
     .modalOverlay{
-      position:fixed;
-      inset:0;
-      background: rgba(0,0,0,.72);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 18px 14px;
-      z-index: 9999;
-    }
-    .modalOverlay.active{ display:flex; }
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.72);
+  display:none;
+
+  /* ✅ center에서 위쪽 정렬로 */
+  align-items:flex-start;
+  justify-content:center;
+
+  /* ✅ 오버레이가 스크롤을 먹게 */
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+
+  padding: 18px 14px;
+  z-index: 9999;
+}
+.modalOverlay.active{ display:flex; }
+
     .modal{
-      width: min(520px, 100%);
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(10,10,10,.92);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
+  width: min(520px, 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(10,10,10,.92);
+  box-shadow: var(--shadow);
+
+  /* ✅ hidden 빼기 */
+  overflow: visible;
+}
+
     .modalHeader{
       padding: 14px 16px;
       border-bottom: 1px solid rgba(255,255,255,.10);
@@ -2219,6 +2230,7 @@ applySearchFilter();
   </script>
 </body>
 </html>
+
 
 
 
