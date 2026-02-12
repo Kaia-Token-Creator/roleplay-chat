@@ -12,7 +12,7 @@
   gtag('config', 'AW-17946940858');
 </script>
 
-   
+    
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>All-access Pass | roleplay-chat.com</title>
@@ -286,24 +286,35 @@
 
     /* Modal */
     .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.72);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-    }
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  display:none;
+
+  align-items:flex-start;        /* center → flex-start */
+  justify-content:center;
+
+  overflow-y:auto;               /* ✅ 모달이 스크롤을 먹게 */
+  -webkit-overflow-scrolling:touch;
+
+  padding: 24px 0;               /* 위아래 여백 */
+  z-index:9999;
+}
+
     .modal.active{display:flex}
 
     .modalBox{
-      width:min(420px,92%);
-      background:#050505;
-      border-radius:20px;
-      border:1px solid rgba(255,204,0,.45);
-      box-shadow:var(--shadow);
-      padding:22px;
-    }
+  width:min(420px,92%);
+  background:#050505;
+  border-radius:20px;
+  border:1px solid rgba(255,204,0,.45);
+  box-shadow:var(--shadow);
+  padding:22px;
+
+  max-height: calc(100dvh - 48px);   /* ✅ 화면보다 길어지면 */
+  overflow:auto;                     /* ✅ 내부 스크롤 허용 */
+}
+
 
     .modalTitle{
       font-family:"Baloo 2",sans-serif;
@@ -526,6 +537,22 @@
   <!-- PayPal Modal -->
 <div class="modal" id="payModal">
   <div class="modalBox">
+    <!-- ✅ 닫기 버튼 -->
+  <button id="modalCloseBtn" style="
+    position:absolute;
+    top:14px;
+    right:16px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+    width:32px;
+    height:32px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:700;
+  ">✕</button>
+    
     <div class="modalTitle">All-access Pass</div>
 
     <div class="modalPrice">$99 <small>one-time · lifetime on this browser</small></div>
@@ -635,26 +662,5 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
