@@ -522,6 +522,9 @@
       justify-content: center;
       z-index: 110000; /* secret modal보다 위 */
       backdrop-filter: blur(6px);
+      overflow: auto;                 /* overlay 자체도 스크롤 컨테이너 */
+  overscroll-behavior: contain;   /* 뒤 컨텐츠로 스크롤 튐 방지 */
+  -webkit-overflow-scrolling: touch;
     }
     .videoPayModal.active{ display:flex; }
 
@@ -532,6 +535,9 @@
       border-radius: 18px;
       box-shadow: var(--shadow);
       padding: 14px 14px 12px;
+      max-height: calc(100dvh - 28px); /* 화면 밖으로 안 나가게 */
+  overflow: auto;                  /* ✅ 핵심: 카드 내부 스크롤 */
+  -webkit-overflow-scrolling: touch;
     }
 
     .videoPayTop{
@@ -2293,6 +2299,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
