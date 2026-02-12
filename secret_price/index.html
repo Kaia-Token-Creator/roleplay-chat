@@ -528,10 +528,11 @@ padding: 5px 8px;
       border: 1px solid rgba(255,255,255,.16);
       background: rgba(10,10,10,.92);
       box-shadow: var(--shadow);
-      overflow:hidden;
       max-height: calc(100dvh - 36px);
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* 유지 */
+      
     }
     .modalHeader{
       padding: 14px 16px;
@@ -540,6 +541,7 @@ padding: 5px 8px;
       align-items:center;
       justify-content:space-between;
       gap: 12px;
+      flex: 0 0 auto;  /* 헤더 고정 */
     }
     .modalHeader h3{
       margin:0;
@@ -628,15 +630,18 @@ padding: 5px 8px;
   background: #cfa600;
 }
 
-    .modalBody{ padding: 14px 16px 16px; }
-    .warn{
-      font-size: 12px;
-      color: var(--muted);
-      margin: 0 0 10px;
+    .modalBody{
+      padding: 14px 16px 16px;
+      flex: 1 1 auto;          /* 남은 높이 먹고 */
       overflow: auto;
   -webkit-overflow-scrolling: touch;
   min-height: 0;
     }
+    .warn{
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 10px;
+          }
     .error{
       margin-top: 10px;
       font-size: 12px;
@@ -951,7 +956,9 @@ body.chatMode #viewChat .chatFooter{
 body.modalOpen{
   overflow: hidden;
   height: 100dvh;
-}    
+} 
+
+    
 
   </style>
 
@@ -2826,6 +2833,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
