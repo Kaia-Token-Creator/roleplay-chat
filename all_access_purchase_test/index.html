@@ -660,18 +660,32 @@ if(modalCloseBtn){
         });
       },
       onApprove: async (data, actions) => {
-        await actions.order.capture();
 
-        const paidKey = "paid";
-        localStorage.setItem(STORAGE_KEY, paidKey);
+  const details = await actions.order.capture(); // 결제 확정
 
-        const url = "https://roleplay-chat.com/all_access?key=" + encodeURIComponent(paidKey);
-        window.location.href = url;
-      }
+  // ⭐⭐⭐ 전환 코드 여기 ⭐⭐⭐
+  gtag('event', 'conversion', {
+    send_to: 'AW-17946940858/F-qqCILj2_cbELqr4u1C',
+    transaction_id: details.id || data.orderID
+  });
+
+  const paidKey = "paid";
+  localStorage.setItem(STORAGE_KEY, paidKey);
+
+  const url = "https://roleplay-chat.com/all_access?key=" + encodeURIComponent(paidKey);
+
+  // ⭐ 너무 빨리 이동하면 전환이 씹힐 수 있음
+  setTimeout(() => {
+    window.location.href = url;
+  }, 1000);
+
+}
+
     }).render("#paypal-button-container");
   </script>
 </body>
 </html>
+
 
 
 
