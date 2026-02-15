@@ -1518,6 +1518,11 @@ Deleting browser data will erase your character, chat history, and access permis
 
 
   <script>
+
+    function generateTabID(){
+  return "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
+}
+
     // --------- Helpers
     const $ = (q) => document.querySelector(q);
     const $$ = (q) => Array.from(document.querySelectorAll(q));
@@ -2540,17 +2545,19 @@ if (!nicknameVal){
 
 
   if (tier === "general"){
-    // ✅ 무료는 즉시 확정 저장
-    try{
-      saveSession(session);
-    }catch(e){
-      console.error(e);
-      session.avatarDataUrl = "";
-      try{ saveSession(session); }catch(_){}
-    }
-    enterChat(session);
-    return;
+  try{
+    saveSession(session);
+  }catch(e){
+    console.error(e);
+    session.avatarDataUrl = "";
+    try{ saveSession(session); }catch(_){}
   }
+
+  const tabID = generateTabID();
+  window.location.href = "/?tabID=" + tabID;
+  return;
+}
+
 
   if (tier === "uncensored"){
     // ✅ 유료(uncensored)는 결제 전까지 저장 금지 (pending)
@@ -2572,7 +2579,8 @@ if (!nicknameVal){
       }
 
       clearPending();
-      enterChat(session);
+      const tabID = generateTabID();
+window.location.href = "/?tabID=" + tabID;
     }, "2.00", "Playing game");
     return;
   }
@@ -2594,7 +2602,8 @@ if (!nicknameVal){
       }
 
       clearPending();
-      window.location.href = "/imagechat_test/";
+      const tabID = generateTabID();
+window.location.href = "/imagechat_test/?tabID=" + tabID;
     }, "6.90", "playing image game");
     return;
   }
@@ -2616,8 +2625,9 @@ if (!nicknameVal){
       }
 
       clearPending();
-window.location.href =
-  "/imagechat_unlimited_test";
+clearPending();
+const tabID = generateTabID();
+window.location.href = "/imagechat_unlimited_test/?tabID=" + tabID;
     }, "25.00", "Upgrade game");
     return;
   }
@@ -2978,6 +2988,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
