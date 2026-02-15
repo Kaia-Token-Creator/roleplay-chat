@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  
 
   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17946940858"></script>
@@ -11,8 +12,6 @@
 
   gtag('config', 'AW-17946940858');
 </script>
-
- 
 
   <meta name='impact-site-verification' value='f343b3c2-5405-4f62-a4ed-b9d389be3089'>
 
@@ -77,6 +76,8 @@
 
   <!-- PayPal SDK (for in-page popup/overlay checkout). Note: The "buttons" flow opens PayPal in an overlay/mini-window. -->
   <script src="https://www.paypal.com/sdk/js?client-id=AW41UQ3EzJV10FZHqYPy8yqdlDbklB4VjuT6hzu7DVoS-G9cJgKx9nHfxCRZpVSgs1dczhkPj4oM0VXv&currency=USD&intent=capture"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 
   <style>
     :root{
@@ -990,7 +991,8 @@ body.chatMode .marqueeCard,
 body.chatMode .marqueeInline{
   display: none !important;
 }
-   
+
+
 /* ✅ 모달 열리면 뒤 페이지 스크롤 잠금 */
 body.modalOpen{
   height: 100dvh;
@@ -1019,6 +1021,7 @@ body.modalOpen{
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+    
     
   </style>
 
@@ -1079,6 +1082,7 @@ body.modalOpen{
           <a href="https://roleplay-chat.com/human" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Chat with real human</a>
           <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer">Home</a>
           <a href="https://roleplay-chat.com/characters" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Featured Characters</a>
+          <a href="https://roleplay-chat.com/human" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Featured Characters</a>
           <a href="https://roleplay-chat.com/how" target="_blank" rel="noopener noreferrer">How to use</a>
           <a href="https://roleplay-chat.com/about" target="_blank" rel="noopener noreferrer">About</a>
           <a href="https://roleplay-chat.com/pricing" target="_blank" rel="noopener noreferrer">Pricing</a>
@@ -1517,6 +1521,11 @@ Deleting browser data will erase your character, chat history, and access permis
 
 
   <script>
+
+    function generateTabID(){
+  return "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
+}
+
     // --------- Helpers
     const $ = (q) => document.querySelector(q);
     const $$ = (q) => Array.from(document.querySelectorAll(q));
@@ -1575,6 +1584,64 @@ const chatAvatar = $("#chatAvatar");
     const MAX_HISTORY = 120;
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
     const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
+
+    // =========================
+// tabID + backup storage utils
+// =========================
+function generateTabID(){
+  return "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
+}
+
+// URL -> window.name -> 새 생성 순으로 tabID 확보
+function getTabID(){
+  const qs = new URLSearchParams(location.search);
+  let id = qs.get("tabID") || "";
+  if (!id && window.name && window.name.startsWith("tab_")) id = window.name;
+  if (!id){
+    id = generateTabID();
+    // URL에 tabID 강제 부여(탭 식별 안정화)
+    const u = new URL(location.href);
+    u.searchParams.set("tabID", id);
+    history.replaceState(null, "", u.toString());
+  }
+  // window.name에도 백업(탭 내 이동/리프레시 안정화)
+  try{ window.name = id; }catch(e){}
+  return id;
+}
+
+// tabID 전용 저장 키
+function k(type){
+  const tabID = getTabID();
+  return `rpc_${type}_${tabID}`;
+}
+
+// localStorage (작은 것) 저장/로드
+function lsSet(key, value){
+  try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+}
+function lsGet(key){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    return null;
+  }
+}
+function lsDel(key){
+  try{ localStorage.removeItem(key); }catch(e){}
+}
+
+// localForage (큰 것) 저장/로드
+async function lfSet(key, value){
+  try{ await localforage.setItem(key, value); }catch(e){}
+}
+async function lfGet(key){
+  try{ return await localforage.getItem(key); }catch(e){ return null; }
+}
+async function lfDel(key){
+  try{ await localforage.removeItem(key); }catch(e){}
+}
+
 
     // Share button
 const shareBtn = document.querySelector("#shareBtn");
@@ -1838,63 +1905,96 @@ function show(view){
   }
 }
 
-    // --------- Save & load (tab-scoped)
-    function saveSession(data){
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-    function loadSession(){
-      try{
-        const raw = sessionStorage.getItem(STORAGE_KEY);
-        if (!raw) return null;
-        return JSON.parse(raw);
-      }catch(e){
-        return null;
-      }
-    }
-    function clearSession(){
-      sessionStorage.removeItem(STORAGE_KEY);
-    }
+    // --------- Save & load (tab-scoped) + Backup by tabID
+function saveSession(data){
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data)); // 기존(빠른)
+  lsSet(k("session"), data);                                 // localStorage 백업
+}
 
-    function savePending(session){
+function loadSession(){
+  // 1) sessionStorage 우선
+  try{
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  }catch(e){}
+
+  // 2) localStorage 복원
+  const b = lsGet(k("session"));
+  if (b){
+    try{ sessionStorage.setItem(STORAGE_KEY, JSON.stringify(b)); }catch(e){}
+    return b;
+  }
+  return null;
+}
+
+function clearSession(){
+  sessionStorage.removeItem(STORAGE_KEY);
+  lsDel(k("session"));
+}
+
+
+function savePending(session){
   sessionStorage.setItem(PENDING_KEY, JSON.stringify(session));
+  lsSet(k("pending"), session);
 }
 function loadPending(){
   try{
     const raw = sessionStorage.getItem(PENDING_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){
-    return null;
+    if (raw) return JSON.parse(raw);
+  }catch(e){}
+  const b = lsGet(k("pending"));
+  if (b){
+    try{ sessionStorage.setItem(PENDING_KEY, JSON.stringify(b)); }catch(e){}
+    return b;
   }
+  return null;
 }
 function clearPending(){
   sessionStorage.removeItem(PENDING_KEY);
+  lsDel(k("pending"));
 }
 
 
-// --------- Save & load (chat history, tab-scoped)
-function saveHistory(history){
+// --------- Save & load (chat history, tab-scoped) + Backup by tabID
+async function saveHistory(history){
   if (Array.isArray(history) && history.length > MAX_HISTORY){
-    history = history.slice(-MAX_HISTORY); // ✅ 최근 120개만
+    history = history.slice(-MAX_HISTORY);
   }
+  // 빠른용 sessionStorage
   sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+
+  // 큰 데이터는 localForage 백업(탭별)
+  await lfSet(k("history"), history);
 }
 
-function loadHistory(){
+async function loadHistory(){
+  // 1) sessionStorage 우선
   try{
     const raw = sessionStorage.getItem(HISTORY_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed.slice(-MAX_HISTORY) : [];
-  }catch(e){
-    return [];
+    if (raw){
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed.slice(-MAX_HISTORY);
+    }
+  }catch(e){}
+
+  // 2) localForage 복원
+  const b = await lfGet(k("history"));
+  if (Array.isArray(b)){
+    const clipped = b.slice(-MAX_HISTORY);
+    try{ sessionStorage.setItem(HISTORY_KEY, JSON.stringify(clipped)); }catch(e){}
+    return clipped;
   }
+  return [];
 }
 
-function clearHistory(){
+async function clearHistory(){
   sessionStorage.removeItem(HISTORY_KEY);
+  await lfDel(k("history"));
 }
+
 
     // --------- Fill chat view (NULL-SAFE)
-function enterChat(session){
+async function enterChat(session){
   // ✅ 채팅 타이틀 변경
   const chatTitle = document.getElementById("chatTitle");
   if (chatTitle){
@@ -1929,7 +2029,7 @@ function enterChat(session){
 setUnlockUIVisibility();
 
   // ✅ history restore
-  chatHistory = loadHistory();
+  chatHistory = await loadHistory();
 
   // 채팅 UI 비우고 다시 그리기
   const box = document.getElementById("chatBox");
@@ -1985,13 +2085,15 @@ setUnlockUIVisibility();
       payOk.style.display = "none";
       payModal.classList.add("active");
 
-      document.body.classList.add("modalOpen");   // ✅ 추가
+      
+  document.body.classList.add("modalOpen");   // ✅ 추가
     }
     function closePayModal(){
       payModal.classList.remove("active");
       clearPending();
 
-      document.body.classList.remove("modalOpen"); // ✅ 추가
+    
+  document.body.classList.remove("modalOpen"); // ✅ 추가  
     }
     closePay.addEventListener("click", closePayModal);
     payModal.addEventListener("click", (e) => {
@@ -2003,8 +2105,7 @@ function openImgPayModal(){
   if (imgPayOk) imgPayOk.style.display = "none";
   if (imgPayModal) imgPayModal.classList.add("active");
 
-    document.body.classList.add("modalOpen");   // ✅ 추가
-
+  document.body.classList.add("modalOpen");   // ✅ 추가
 }
 
 function closeImgPayModalFn(){
@@ -2012,7 +2113,7 @@ function closeImgPayModalFn(){
   // imagechat 결제는 pending을 유지해도 되지만, 닫으면 취소로 보고 지우는 게 깔끔
   clearPending();
 
-  document.body.classList.remove("modalOpen"); // ✅ 추가
+  document.body.classList.add("modalOpen");   // ✅ 추가
 }
 
 if (closeImgPay){
@@ -2227,7 +2328,23 @@ function mountPayPalButtons(onSuccess, priceUsd = "2.00", description = "Playing
 
     let chatHistory = []; // {role:"user"|"assistant", content:string}
     const PAYMENT_KEY = "roleplay-chat_paid_v1";
-    let paymentStatus = sessionStorage.getItem(PAYMENT_KEY) || "unpaid"; // refresh-safe within this tab
+    function setPaid(keyName, value){
+  sessionStorage.setItem(keyName, value);
+  lsSet(k(keyName), value);
+}
+function getPaid(keyName){
+  const s = sessionStorage.getItem(keyName);
+  if (s) return s;
+  const b = lsGet(k(keyName));
+  if (b){
+    sessionStorage.setItem(keyName, b);
+    return b;
+  }
+  return null;
+}
+
+    let paymentStatus = (getPaid(PAYMENT_KEY) || "unpaid");
+ // refresh-safe within this tab
 
     // ✅ sex/sext 트리거 감지 (원하는 단어 더 추가/삭제 가능)
 const SEX_TRIGGER_RE = new RegExp(
@@ -2407,7 +2524,7 @@ who.innerHTML = (role === "assistant")
       chatInput.value = "";
       appendMsg("user", text);
       chatHistory.push({ role: "user", content: text });
-saveHistory(chatHistory);
+saveHistory(chatHistory); // async지만 await 없어도 백업은 진행됨
 
       try{
         sendBtn.disabled = true;
@@ -2419,7 +2536,8 @@ saveHistory(chatHistory);
 const textEl = msgEl.querySelector(".text div:last-child"); // 본문 div 잡기
 await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
 chatHistory.push({ role: "assistant", content: reply });
-saveHistory(chatHistory);
+saveHistory(chatHistory); // async지만 await 없어도 백업은 진행됨
+
 
         // ✅ 결제 안 된 상태에서만 + 사용자가 sex 트리거 단어를 쓴 경우
 // ✅ 서버 응답(타자기) 완전히 끝난 "다음" 말풍선으로 속마음 출력
@@ -2537,17 +2655,19 @@ if (!nicknameVal){
 
 
   if (tier === "general"){
-    // ✅ 무료는 즉시 확정 저장
-    try{
-      saveSession(session);
-    }catch(e){
-      console.error(e);
-      session.avatarDataUrl = "";
-      try{ saveSession(session); }catch(_){}
-    }
-    enterChat(session);
-    return;
+  try{
+    saveSession(session);
+  }catch(e){
+    console.error(e);
+    session.avatarDataUrl = "";
+    try{ saveSession(session); }catch(_){}
   }
+
+  const tabID = generateTabID();
+  window.location.href = "/?tabID=" + tabID;
+  return;
+}
+
 
   if (tier === "uncensored"){
     // ✅ 유료(uncensored)는 결제 전까지 저장 금지 (pending)
@@ -2556,7 +2676,7 @@ if (!nicknameVal){
     openPayModal();
     mountPayPalButtons(() => {
       paymentStatus = "paid";
-      sessionStorage.setItem(PAYMENT_KEY, "paid");
+      setPaid(PAYMENT_KEY, "paid");
 
       // ✅ 결제 성공 시점에만 저장
       session.tier = "uncensored";
@@ -2569,7 +2689,8 @@ if (!nicknameVal){
       }
 
       clearPending();
-      enterChat(session);
+      const tabID = generateTabID();
+window.location.href = "/?tabID=" + tabID;
     }, "2.00", "Playing game");
     return;
   }
@@ -2579,7 +2700,7 @@ if (!nicknameVal){
 
     openImgPayModal();
     mountPayPalButtonsImageChat(() => {
-      sessionStorage.setItem(IMAGECHAT_PAID_KEY, "paid");
+      setPaid(IMAGECHAT_PAID_KEY, "paid");
 
       session.tier = "imagechat";
       try{
@@ -2591,7 +2712,8 @@ if (!nicknameVal){
       }
 
       clearPending();
-      window.location.href = "/imagechat/";
+      const tabID = generateTabID();
+window.location.href = "/imagechat/?tabID=" + tabID;
     }, "6.90", "playing image game");
     return;
   }
@@ -2601,7 +2723,7 @@ if (!nicknameVal){
 
     openImgUnlimitedPayModal();
     mountPayPalButtonsImageChatUnlimited(() => {
-      sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
+      setPaid(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
 
       session.tier = "imagechat_unlimited";
       try{
@@ -2613,8 +2735,9 @@ if (!nicknameVal){
       }
 
       clearPending();
-window.location.href =
-  "/imagechat_unlimited";
+clearPending();
+const tabID = generateTabID();
+window.location.href = "/imagechat_unlimited/?tabID=" + tabID;
     }, "25.00", "Upgrade game");
     return;
   }
@@ -2799,7 +2922,7 @@ const CHARACTER_PICS = [
   "0001.jpg","0002.jpg","0003.jpg","0004.jpg","0005.jpg","0006.jpg","0007.jpg","0008.jpg","0009.jpg","0010.jpg",
   "0011.jpg","0012.jpg","0013.jpg","0014.jpg","0015.jpg","0016.jpg","0017.jpg","0018.jpg","0019.jpg","0020.jpg",
   "0021.jpg","0022.jpg","0023.jpg","0024.jpg","0025.jpg","0026.jpg","0027.jpg","0028.jpg","0029.jpg","0030.jpg",
-  "0031.jpg","0032.jpg","0033.jpg","0034.jpg","0035.jpg","0036.jpg"                                 
+  "0031.jpg","0032.jpg","0033.jpg","0034.jpg","0035.jpg","0036.jpg"
 ];
 
 function shuffleArray(arr){
@@ -2809,8 +2932,8 @@ function shuffleArray(arr){
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
-}
-                     
+}  
+
 function buildMarquee(marqueeEl){
   if (!marqueeEl) return;
   const track = marqueeEl.querySelector(".marqueeTrack");
@@ -2883,7 +3006,7 @@ function openPayModalForCurrentChat(){
   mountPayPalButtons(
     () => {
       paymentStatus = "paid";
-      sessionStorage.setItem(PAYMENT_KEY, "paid");
+      setPaid(PAYMENT_KEY, "paid");
 
       const cur = loadSession();
       if (cur){
@@ -2906,25 +3029,54 @@ if (unlockBtn){
 }
 
 
-// ✅ 결제 진행하다 닫았던 상태면: 셋업 화면 유지
-if (!existing){
-  // 세션이 없으면 그냥 셋업 화면
-  show(viewSetup);
-} else if (
-  (existing.tier === "uncensored" && sessionStorage.getItem(PAYMENT_KEY) !== "paid") ||
-  (existing.tier === "imagechat" && sessionStorage.getItem(IMAGECHAT_PAID_KEY) !== "paid") ||
-  (existing.tier === "imagechat_unlimited" && sessionStorage.getItem(IMAGECHAT_UNLIMITED_PAID_KEY) !== "paid")
-){
-  show(viewSetup);
-} else {
-  if (existing.tier === "imagechat"){
-    window.location.href = "/imagechat/";
-  } else if (existing.tier === "imagechat_unlimited"){
-    window.location.href = "/imagechat_unlimited";
-  } else {
-    enterChat(existing);
+// ✅ 결제 진행하다 닫았던 상태면: 셋업 화면 유지 (tabID 백업 복원 기반)
+(async function bootstrapByTabID(){
+  // tabID 확보 (없으면 생성 + URL에 붙임 + window.name 백업)
+  getTabID();
+
+  // 세션/대기 복원 (이 함수들은 네가 앞에서 교체한 버전: localStorage 백업 포함)
+  const existing = loadSession();
+  const pending = loadPending();
+
+  // 결제 상태도 tabID별 백업에서 복원
+  const paidUnc = getPaid(PAYMENT_KEY);
+  const paidImg = getPaid(IMAGECHAT_PAID_KEY);
+  const paidImgUnl = getPaid(IMAGECHAT_UNLIMITED_PAID_KEY);
+
+  // UI 반영
+  setUnlockUIVisibility();
+
+  // 세션 없으면 셋업
+  if (!existing){
+    show(viewSetup);
+    return;
   }
-}
+
+  // 유료 tier인데 paid가 아니면 셋업
+  const needBackToSetup =
+    (existing.tier === "uncensored" && paidUnc !== "paid") ||
+    (existing.tier === "imagechat" && paidImg !== "paid") ||
+    (existing.tier === "imagechat_unlimited" && paidImgUnl !== "paid");
+
+  if (needBackToSetup){
+    show(viewSetup);
+    return;
+  }
+
+  // tier별 라우팅 (tabID 유지)
+  if (existing.tier === "imagechat"){
+    window.location.href = "/imagechat/?tabID=" + getTabID();
+    return;
+  }
+  if (existing.tier === "imagechat_unlimited"){
+    window.location.href = "/imagechat_unlimited/?tabID=" + getTabID();
+    return;
+  }
+
+  // 일반/uncensored는 채팅 진입 (enterChat이 async로 바뀐 버전이면 await)
+  await enterChat(existing);
+})();
+
 
 function setupKeyboardBar(){
   const controls = document.querySelector(".chatControls");
@@ -2975,21 +3127,4 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
