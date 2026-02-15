@@ -946,10 +946,6 @@ async function lfSet(key, val){
 const STORAGE_KEY = "roleplay-chat_session_v1";
 const IMAGECHAT_HISTORY_KEY = "roleplay-chat_imagechat_history_v1";
 const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
-/* =========================
-   ✅ TAB_ID + Local backup keys
-   ========================= */
-const TAB_ID_KEY = "roleplay-chat_tab_id_v1"; // per-tab in sessionStorage
 const LS_BACKUP_PREFIX = "roleplay-chat_backup_v1:"; // + TAB_ID
 
 function getQueryParam(name){
@@ -963,55 +959,20 @@ function getQueryParam(name){
 // ✅ URL 우선(tabId > tab) → 없으면 이 탭에서만 새로 생성
 // ✅ URL 우선(tabId > tab) → 없으면 sessionStorage → 없으면 window.name → 없으면 새로 생성
 function getOrCreateTabId(){
-  const fromUrl = getQueryParam("tabId") || getQueryParam("tab");
-  if (fromUrl) {
-    try { sessionStorage.setItem(TAB_ID_KEY, fromUrl); } catch(e){}
-    try { window.name = "rpc_tabid:" + fromUrl; } catch(e){} // ✅ mirror
-    return fromUrl;
-  }
+  const fromUrl =
+    getQueryParam("tabId") || getQueryParam("tabID") || getQueryParam("tab");
 
-  // ✅ sessionStorage fallback
-  const existing = (() => {
-    try { return sessionStorage.getItem(TAB_ID_KEY); } catch(e){ return null; }
-  })();
-  if (existing){
-    try { window.name = "rpc_tabid:" + existing; } catch(e){} // ✅ mirror
-    return existing;
-  }
+  if (fromUrl) return fromUrl;
 
-  // ✅ window.name fallback (sessionStorage 지워져도 탭 유지 중이면 복구됨)
-  try{
-    if (window.name && window.name.startsWith("rpc_tabid:")){
-      const t = window.name.slice("rpc_tabid:".length);
-      if (t){
-        try { sessionStorage.setItem(TAB_ID_KEY, t); } catch(e){} // ✅ restore
-        return t;
-      }
-    }
-  }catch(e){}
-
-  // ✅ generate new
-  const gen = "tab_" + Math.random().toString(36).slice(2) + "_" + Date.now().toString(36);
-  try { sessionStorage.setItem(TAB_ID_KEY, gen); } catch(e){}
-  try { window.name = "rpc_tabid:" + gen; } catch(e){} // ✅ mirror
-  return gen;
+  // URL에 tabId가 항상 붙는다면 여기로 오면 비정상
+  alert("Missing tabId in URL.");
+  location.href = "https://roleplay-chat.com/";
+  return "missing";
 }
 
 
 const TAB_ID = getOrCreateTabId();  
 const LS_BACKUP_KEY = LS_BACKUP_PREFIX + TAB_ID;
-
-// ✅ TAB_ID를 URL에 박아두기 (sessionStorage 지워져도 URL로 복구됨)
-(function ensureTabIdInUrl(){
-  try{
-    const u = new URL(location.href);
-    if (!u.searchParams.get("tabId") && !u.searchParams.get("tab")){
-      u.searchParams.set("tabId", TAB_ID);
-      history.replaceState(null, "", u.toString());
-    }
-  }catch(e){}
-})();
-  
 
 let session = null;
 let paid = false;
@@ -2299,6 +2260,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
