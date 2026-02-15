@@ -4,12 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Image Chat | roleplay-chat.com</title>
+    <title>Image Chat | roleplay-chat.com</title>
 
   <!-- Fonts (same as main) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 
   <style>
     :root{
@@ -392,11 +394,11 @@ padding: 5px 8px;
   100% { opacity:.3; }
 }
 
+
     body.modalOpen #chatBox{
   overflow: hidden !important;
 }
 
-     
   </style>
 </head>
 
@@ -565,13 +567,79 @@ padding: 5px 8px;
 
 <script>
 
-(async () => {
-  if (!navigator.storage || !navigator.storage.persist) return;
+  (async () => {
+
+  /* =========================
+   tabID (from URL) + key helpers
+   ========================= */
+
+function getOrCreateTabId(){
+  const u = new URL(window.location.href);
+  let tabID = u.searchParams.get("tabID");
+
+  if (tabID && tabID.trim()) return tabID.trim();
+
+  try{
+    const wn = window.name || "";
+    if (wn.startsWith("rp_tab=")){
+      const saved = wn.slice("rp_tab=".length);
+      if (saved) tabID = saved;
+    }
+  }catch(e){}
+
+  if (!tabID){
+    tabID = (crypto?.randomUUID ? crypto.randomUUID() : ("t" + Date.now() + "_" + Math.random().toString(16).slice(2)));
+  }
+
+  try{
+    u.searchParams.set("tabID", tabID);
+    history.replaceState(null, "", u.toString());
+  }catch(e){}
+
+  try{ window.name = "rp_tab=" + tabID; }catch(e){}
+
+  return tabID;
+}
+
+const TAB_ID = getOrCreateTabId();
+const tkey = (base) => `${base}::${TAB_ID}`;
+
+async function pget(base){
+  const k = tkey(base);
+  try{
+    const v = localStorage.getItem(k);
+    if (v != null) return v;
+  }catch(e){}
+  try{
+    if (window.localforage){
+      const v2 = await localforage.getItem(k);
+      return (v2 == null) ? null : String(v2);
+    }
+  }catch(e){}
+  return null;
+}
+
+async function pset(base, value){
+  const k = tkey(base);
+  try{ localStorage.setItem(k, String(value)); }catch(e){}
+  try{ if (window.localforage) await localforage.setItem(k, String(value)); }catch(e){}
+}
+
+async function pdel(base){
+  const k = tkey(base);
+  try{ localStorage.removeItem(k); }catch(e){}
+  try{ if (window.localforage) await localforage.removeItem(k); }catch(e){}
+}
+
+  
+
+if (navigator.storage && navigator.storage.persist){
   try {
     const already = await navigator.storage.persisted();
     if (!already) await navigator.storage.persist();
   } catch (e) {}
-})();
+}
+
   
 /* =========================
    Load character from main
@@ -581,15 +649,36 @@ const STORAGE_KEY = "roleplay-chat_session_v1";
 const IMAGECHAT_HISTORY_KEY = "roleplay-chat_imagechat_history_v1";
 const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
 const IMAGECHAT_UNLIMITED_KEY = "roleplay-chat_imagechat_unlimited_v1";
+// ✅ persistent(=localStorage/localForage) 탭별 저장용 baseKey
+const P_SESSION_KEY   = "roleplay-chat_session_v1";
+const P_HISTORY_KEY   = "roleplay-chat_imagechat_history_v1";
+const P_PAID_KEY      = "roleplay-chat_imagechat_paid_v1";
+const P_UNLIMITED_KEY = "roleplay-chat_imagechat_unlimited_v1";
+  
 
-function readSession(){
+async function readSessionAsync(){
   const raw = sessionStorage.getItem(STORAGE_KEY);
-  try { return raw ? JSON.parse(raw) : null; }
-  catch { return null; }
+  if (raw){
+    try { return JSON.parse(raw); } catch {}
+  }
+
+  const p = await pget(P_SESSION_KEY);
+  if (p){
+    try{
+      sessionStorage.setItem(STORAGE_KEY, p);
+      return JSON.parse(p);
+    }catch{}
+  }
+  return null;
 }
 
+const session = await readSessionAsync();
 
-const session = readSession();
+// ✅ 읽자마자 persistent에 백업(세션 꼬임 방지)
+if (session){
+  try{ await pset(P_SESSION_KEY, JSON.stringify(session)); }catch(e){}
+}
+
 
   // ✅ Page title (browser tab)
 if (session?.name){
@@ -599,53 +688,68 @@ if (session?.name){
 }
 
   
-function setImagechatPaid24hLocal(){
+async function setImagechatPaid24hLocal(){
   const now = Date.now();
   const payload = { status:"paid", paidAt: now, expiresAt: now + 24*60*60*1000 };
-  sessionStorage.setItem(IMAGECHAT_PAID_KEY, JSON.stringify(payload));
+  const s = JSON.stringify(payload);
+
+  sessionStorage.setItem(IMAGECHAT_PAID_KEY, s);
+  await pset(P_PAID_KEY, s);
+
   return payload;
 }
 
-function readImagechatPaid(){
-  const raw = sessionStorage.getItem(IMAGECHAT_PAID_KEY);
+
+async function readImagechatPaidAsync(){
+  let raw = sessionStorage.getItem(IMAGECHAT_PAID_KEY);
+
+  if (!raw){
+    raw = await pget(P_PAID_KEY);
+    if (raw) sessionStorage.setItem(IMAGECHAT_PAID_KEY, raw);
+  }
+
   if (!raw) return null;
 
-  // ✅ 메인에서 "paid" 문자열만 저장해도: 첫 진입 순간 24h 티켓으로 업그레이드
-  if (raw === "paid") return setImagechatPaid24hLocal();
+  if (raw === "paid") return await setImagechatPaid24hLocal();
 
   try { return JSON.parse(raw); } catch { return null; }
 }
 
-function isUnlimited(){
-  return sessionStorage.getItem(IMAGECHAT_UNLIMITED_KEY) === "1";
+
+async function isUnlimitedAsync(){
+  let v = sessionStorage.getItem(IMAGECHAT_UNLIMITED_KEY);
+  if (v == null){
+    v = await pget(P_UNLIMITED_KEY);
+    if (v != null) sessionStorage.setItem(IMAGECHAT_UNLIMITED_KEY, v);
+  }
+  return v === "1";
 }
 
-function setUnlimited(){
+async function setUnlimited(){
   sessionStorage.setItem(IMAGECHAT_UNLIMITED_KEY, "1");
-  // 24h 티켓은 의미 없어지니 지워도 OK
+  await pset(P_UNLIMITED_KEY, "1");
+
   sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
+  await pdel(P_PAID_KEY);
 }
 
+async function isImagechatPaidValidAsync(){
+  if (await isUnlimitedAsync()) return true;
 
-function isImagechatPaidValid(){
-  // ✅ Unlimited면 만료 개념 자체가 없음
-  if (isUnlimited()) return true;
-
-  const p = readImagechatPaid();
+  const p = await readImagechatPaidAsync();
   if (!p || p.status !== "paid" || !p.expiresAt) return false;
 
   if (Date.now() >= p.expiresAt){
     sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
+    await pdel(P_PAID_KEY);
     return false;
   }
   return true;
 }
 
-// ✅ paid 상태 확정 (Unlimited 포함)
-const paid = isImagechatPaidValid();
 
-// ✅ 헤더 타이머/문구 UI 시작
-startHeaderCountdown();
+const paid = await isImagechatPaidValidAsync();
+await startHeaderCountdown();
   
 
 function formatRemaining(ms){
@@ -657,14 +761,13 @@ function formatRemaining(ms){
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
-function startHeaderCountdown(){
+async function startHeaderCountdown(){
   const holder = document.getElementById("paidTimer");
   const bold = holder?.querySelector("b");
   const goLink = document.getElementById("goUnlimitedLink");
   const note = document.getElementById("unlimitedNote");
 
-  // ✅ Unlimited면: 카운트 UI/링크 숨기고 문구만 표시
-  if (isUnlimited()){
+  if (await isUnlimitedAsync()){
     if (holder) holder.style.display = "none";
     if (goLink) goLink.style.display = "none";
     if (note) note.style.display = "inline";
@@ -673,8 +776,8 @@ function startHeaderCountdown(){
 
   if (!holder || !bold) return;
 
-  function tick(){
-    const p = readImagechatPaid();
+  async function tick(){
+    const p = await readImagechatPaidAsync();
     if (!p || p.status !== "paid" || !p.expiresAt){
       holder.style.display = "none";
       if (goLink) goLink.style.display = "none";
@@ -685,6 +788,7 @@ function startHeaderCountdown(){
     const remain = p.expiresAt - Date.now();
     if (remain <= 0){
       sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
+      await pdel(P_PAID_KEY);
       holder.style.display = "none";
       if (goLink) goLink.style.display = "none";
       if (note) note.style.display = "none";
@@ -695,20 +799,21 @@ function startHeaderCountdown(){
     holder.style.display = "inline";
     bold.textContent = `Available: ${formatRemaining(remain)}`;
 
-    // ✅ 카운트 중에는 Go Unlimited 보여주기
     if (goLink) goLink.style.display = "inline";
     if (note) note.style.display = "none";
-
     return true;
   }
 
-  tick();
-  const id = setInterval(() => { if (!tick()) clearInterval(id); }, 1000);
+  await tick();
+  const id = setInterval(() => {
+    tick().then(ok => { if (!ok) clearInterval(id); });
+  }, 1000);
 
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) tick();
   });
 }
+
 
 
 
@@ -733,8 +838,14 @@ if (imgResetBtn){
 }
 
 
-function loadHistory(){
-  const raw = sessionStorage.getItem(IMAGECHAT_HISTORY_KEY);
+async function loadHistoryAsync(){
+  let raw = sessionStorage.getItem(IMAGECHAT_HISTORY_KEY);
+
+  if (!raw){
+    raw = await pget(P_HISTORY_KEY);
+    if (raw) sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, raw);
+  }
+
   try { return raw ? JSON.parse(raw) : []; }
   catch { return []; }
 }
@@ -760,19 +871,26 @@ function trimHistoryLimits(list, {
   return list;
 }
   
-function saveHistory(list){
-  try {
-    sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, JSON.stringify(list));
-  } catch(e) {
-    // ✅ 용량 초과 등으로 저장 실패하면: 이미지 제거 후 텍스트만이라도 저장 재시도
-    try {
+async function saveHistoryAsync(list){
+  // ✅ 저장 전 정리(너 기존 trimHistoryLimits 쓰는 흐름 유지)
+  const s = JSON.stringify(list);
+
+  try{
+    sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, s);
+  }catch(e){
+    try{
       const slim = (Array.isArray(list) ? list : []).map(m => ({ ...m, imageUrl: "" }));
-      sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, JSON.stringify(slim));
-      console.warn("History saved without images due to quota.");
-    } catch(e2) {
-      console.error("History save failed completely", e2);
+      const ss = JSON.stringify(slim);
+      sessionStorage.setItem(IMAGECHAT_HISTORY_KEY, ss);
+      await pset(P_HISTORY_KEY, ss);
+      return;
+    }catch(e2){
+      // 완전 실패해도 조용히
+      return;
     }
   }
+
+  await pset(P_HISTORY_KEY, s);
 }
 
 
@@ -802,7 +920,7 @@ const chatBox = document.getElementById("chatBox");
 const input = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 
-let history = loadHistory(); // ✅ refresh에도 남음
+let history = await loadHistoryAsync();
 
 function escapeText(s){
   return (s ?? "").toString();
@@ -1041,13 +1159,13 @@ history.push({ role: "assistant", content: reply, imageUrl: storedImageUrl });
 // ✅ (선택) 너무 쌓이면 정리
 history = trimHistoryLimits(history, { maxMessages: 120, maxImages: 18 });
 
-saveHistory(history);
+await saveHistoryAsync(history);
 
 
   } catch(e){
     appendMsg("assistant", `Error: ${String(e?.message || e)}`);
     history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
-    saveHistory(history);
+    await saveHistoryAsync(history);
   } finally {
     setBusy(false);
   }
@@ -1083,7 +1201,7 @@ requestAnimationFrame(() => {
   
 
   history.push({ role: "user", content: text });
-  saveHistory(history);
+  await saveHistoryAsync(history);
 
   // Basic session hardening
   if (!session || !session.name){
@@ -1177,14 +1295,14 @@ history.push({ role: "assistant", content: shownText, imageUrl: storedImageUrl }
 // ✅ (선택) 너무 쌓이면 정리
 history = trimHistoryLimits(history, { maxMessages: 120, maxImages: 18 });
 
-saveHistory(history);
+await saveHistoryAsync(history);
 
 
 
   }catch(e){
     appendMsg("assistant", `Error: ${String(e?.message || e)}`);
     history.push({ role: "assistant", content: `Error: ${String(e?.message || e)}` });
-    saveHistory(history);
+    await saveHistoryAsync(history);
   }finally{
     setBusy(false);
   }
@@ -1357,16 +1475,13 @@ async function ensurePayPalUnlimitedButtons(){
 
   paypalUnlimitedReady = true;
 }
+
+    })();
   
 </script>
 
 </body>
 </html>
-
-
-
-
-
 
 
 
