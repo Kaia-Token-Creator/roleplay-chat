@@ -1607,18 +1607,37 @@ function generateTabID(){
   return "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
 }
 
-// URL -> window.name 순으로 tabID "읽기만" (없으면 null)
-function getTabID(){
+function getOrCreateTabID(){
   const qs = new URLSearchParams(location.search);
-  let id = qs.get("tabID") || "";
-  if (!id && window.name && window.name.startsWith("tab_")) id = window.name;
-  return id || null;   // ✅ 생성 금지
+  let id = (qs.get("tabID") || "").trim();
+
+  // window.name 백업에서 복원
+  if (!id && window.name && String(window.name).startsWith("tab_")){
+    id = window.name;
+  }
+
+  // 없으면 생성 + URL + window.name에 고정
+  if (!id){
+    id = generateTabID();
+
+    try{
+      const u = new URL(location.href);
+      u.searchParams.set("tabID", id);
+      history.replaceState(null, "", u.toString());
+    }catch(e){}
+
+    try{
+      window.name = id;
+    }catch(e){}
+  }
+
+  return id;
 }
 
 
 // tabID 전용 저장 키
 function k(type){
-  const tabID = getTabID();
+  const tabID = getOrCreateTabID();
   return `rpc_${type}_${tabID}`;
 }
 
@@ -3148,6 +3167,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
