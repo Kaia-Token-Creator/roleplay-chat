@@ -2680,20 +2680,24 @@ if (!nicknameVal){
 
 
   if (tier === "general"){
-  // 1) tabID 먼저 만들기
-  const tabID = generateTabID();
 
-  // 2) 지금 페이지 URL을 먼저 tabID로 바꿔치기 (중요: 저장보다 먼저!)
+  // ⭐ URL에 이미 tabID가 있으면 그대로 사용
+  // ⭐ 없으면 새로 생성
+  const tabID = getOrCreateTabID();
+
+  // URL에 tabID가 없었을 경우 대비 (이미 있으면 그대로 유지)
   try{
-    history.replaceState(null, "", "/?tabID=" + encodeURIComponent(tabID));
+    const u = new URL(location.href);
+    u.searchParams.set("tabID", tabID);
+    history.replaceState(null, "", u.toString());
   }catch(e){}
 
-  // 3) window.name에도 백업 (너 getTabID가 window.name을 보니까)
+  // window.name 백업
   try{
-    window.name = tabID; // getTabID()가 startsWith("tab_") 검사함 → tab_로 시작하니 OK
+    window.name = tabID;
   }catch(e){}
 
-  // 4) 이제 저장 (이 시점엔 getTabID()가 tabID를 읽을 수 있음)
+  // ⭐ 이제 이 tabID 기준으로 저장됨
   try{
     saveSession(session);
   }catch(e){
@@ -2702,9 +2706,8 @@ if (!nicknameVal){
     try{ saveSession(session); }catch(_){}
   }
 
-  // 5) 이제 “tabID 있는 상태”로 bootstrap을 다시 돌리기
-  //    (href로 다시 들어가도 되고 reload도 됨)
-  window.location.href = "/?tabID=" + encodeURIComponent(tabID);
+  // ⭐ 페이지 재로드 (같은 tabID 유지)
+  window.location.reload();
   return;
 }
 
@@ -3166,6 +3169,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
