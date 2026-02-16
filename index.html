@@ -1974,6 +1974,49 @@ function loadSession(){
   return null;
 }
 
+async function commitSessionStorageToUrlTabID(){
+  // URL tabID 없으면 종료
+  const tabID = (() => {
+    try{
+      const qs = new URLSearchParams(location.search);
+      return (qs.get("tabID") || "").trim() || null;
+    }catch(e){
+      return null;
+    }
+  })();
+  if (!tabID) return;
+
+  // 이미 이 tabID로 localStorage 백업이 있으면 종료
+  const already = localStorage.getItem(`rpc_session_${tabID}`);
+  if (already) return;
+
+  // sessionStorage에 세션이 있으면 그걸 꺼냄
+  let raw = null;
+  try{ raw = sessionStorage.getItem(STORAGE_KEY); }catch(e){}
+  if (!raw) return;
+
+  let sess = null;
+  try{ sess = JSON.parse(raw); }catch(e){}
+  if (!sess) return;
+
+  // ✅ 핵심: 현재 URL tabID로 localStorage 백업 생성
+  try{
+    localStorage.setItem(`rpc_session_${tabID}`, JSON.stringify(sess));
+  }catch(e){
+    console.error("[commit] localStorage failed:", e?.name, e?.message);
+  }
+
+  // (선택) localForage에도 풀 세션 저장
+  try{
+    await localforage.setItem(`rpc_session_full_${tabID}`, sess);
+  }catch(e){
+    console.error("[commit] localForage failed:", e?.name, e?.message);
+  }
+
+  console.log("[commit] sessionStorage -> backup OK for tabID:", tabID);
+}
+    
+
 function clearSession(){
   sessionStorage.removeItem(STORAGE_KEY);
   lsDel(k("session"));
@@ -3114,6 +3157,8 @@ console.log("PENDING ls raw:", localStorage.getItem(k("pending")));
     saveSession(incomingSession);
     clearPending();
   }
+
+  await commitSessionStorageToUrlTabID();
   
   // 세션/대기 복원 (이 함수들은 네가 앞에서 교체한 버전: localStorage 백업 포함)
   const existing = loadSession();
@@ -3208,6 +3253,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
