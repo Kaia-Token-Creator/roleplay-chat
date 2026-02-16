@@ -1527,6 +1527,14 @@ Deleting browser data will erase your character, chat history, and access permis
 
   <script>
 
+    // ⭐ URL tabID 강제 고정 (절대 변경 불가)
+const __TAB_ID_FROM_URL__ = (() => {
+  const qs = new URLSearchParams(location.search);
+  const id = (qs.get("tabID") || "").trim();
+  return id || null;
+})();
+
+
      // --------- Helpers
     const $ = (q) => document.querySelector(q);
     const $$ = (q) => Array.from(document.querySelectorAll(q));
@@ -1593,11 +1601,11 @@ const chatAvatar = $("#chatAvatar");
     const qs = new URLSearchParams(location.search);
     const id = (qs.get("tabID") || "").trim();
     if (id){
-      // window.name은 새 탭/새로고침에서도 유지되는 경우가 많아서 backup용으로 딱 좋음
-      window.name = id;
+      window.name = "rp_tab=" + id;
     }
   }catch(e){}
 })();
+
     
 
     // =========================
@@ -1609,23 +1617,20 @@ function generateTabID(){
 
 function getOrCreateTabID(){
 
-  const qs = new URLSearchParams(location.search);
-  let id = (qs.get("tabID") || "").trim();
-
-  // ⭐ URL에 있으면 무조건 그것 사용
-  if (id){
-    try { window.name = id; } catch(e){}
-    return id;
+  // ⭐ URL에 있으면 무조건 이것 (절대 생성 X)
+  if (__TAB_ID_FROM_URL__) {
+    try { window.name = __TAB_ID_FROM_URL__; } catch(e){}
+    return __TAB_ID_FROM_URL__;
   }
 
-  // ⭐ URL 없으면 window.name
+  // URL 없으면 window.name
   if (window.name){
-    id = String(window.name).trim();
+    const id = String(window.name).trim();
     if (id) return id;
   }
 
-  // ⭐ 둘 다 없을 때만 생성
-  id = generateTabID();
+  // 둘 다 없을 때만 생성
+  const id = generateTabID();
 
   try{
     const u = new URL(location.href);
@@ -1638,11 +1643,22 @@ function getOrCreateTabID(){
   return id;
 }
 
+function getCurrentTabID(){
+  const qs = new URLSearchParams(location.search);
+  const id = (qs.get("tabID") || "").trim();
+
+  // ✅ URL에 있으면 무조건 이걸 사용 (절대 생성 X)
+  if (id) return id;
+
+  // URL에 없을 때만 기존 로직 fallback
+  return getOrCreateTabID();
+}
+   
 
 
 // tabID 전용 저장 키
 function k(type){
-  const tabID = getOrCreateTabID();
+  const tabID = getCurrentTabID();   // ✅ 여기만 교체
   return `rpc_${type}_${tabID}`;
 }
 
@@ -1957,6 +1973,49 @@ function loadSession(){
   }
   return null;
 }
+
+async function commitSessionStorageToUrlTabID(){
+  // URL tabID 없으면 종료
+  const tabID = (() => {
+    try{
+      const qs = new URLSearchParams(location.search);
+      return (qs.get("tabID") || "").trim() || null;
+    }catch(e){
+      return null;
+    }
+  })();
+  if (!tabID) return;
+
+  // 이미 이 tabID로 localStorage 백업이 있으면 종료
+  const already = localStorage.getItem(`rpc_session_${tabID}`);
+  if (already) return;
+
+  // sessionStorage에 세션이 있으면 그걸 꺼냄
+  let raw = null;
+  try{ raw = sessionStorage.getItem(STORAGE_KEY); }catch(e){}
+  if (!raw) return;
+
+  let sess = null;
+  try{ sess = JSON.parse(raw); }catch(e){}
+  if (!sess) return;
+
+  // ✅ 핵심: 현재 URL tabID로 localStorage 백업 생성
+  try{
+    localStorage.setItem(`rpc_session_${tabID}`, JSON.stringify(sess));
+  }catch(e){
+    console.error("[commit] localStorage failed:", e?.name, e?.message);
+  }
+
+  // (선택) localForage에도 풀 세션 저장
+  try{
+    await localforage.setItem(`rpc_session_full_${tabID}`, sess);
+  }catch(e){
+    console.error("[commit] localForage failed:", e?.name, e?.message);
+  }
+
+  console.log("[commit] sessionStorage -> backup OK for tabID:", tabID);
+}
+    
 
 function clearSession(){
   sessionStorage.removeItem(STORAGE_KEY);
@@ -3079,8 +3138,27 @@ if (unlockBtn){
 }
 
 
+// 🔎 DEBUG
+console.log("TAB_ID_FROM_URL:", __TAB_ID_FROM_URL__);
+console.log("CURRENT_TAB_ID:", getCurrentTabID());
+console.log("window.name:", window.name);
+console.log("ls session key:", k("session"));
+console.log("ls session value:", localStorage.getItem(k("session")));
+console.log("PENDING ss:", sessionStorage.getItem(PENDING_KEY));
+console.log("PENDING ls key:", k("pending"));
+console.log("PENDING ls raw:", localStorage.getItem(k("pending")));
+    
+
 // ✅ 결제 진행하다 닫았던 상태면: 셋업 화면 유지 (tabID 백업 복원 기반)
 (async function bootstrapByTabID(){
+
+  const incomingSession = loadPending();
+  if (incomingSession){
+    saveSession(incomingSession);
+    clearPending();
+  }
+
+  await commitSessionStorageToUrlTabID();
   
   // 세션/대기 복원 (이 함수들은 네가 앞에서 교체한 버전: localStorage 백업 포함)
   const existing = loadSession();
@@ -3175,67 +3253,3 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
