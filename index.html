@@ -3038,9 +3038,6 @@ img.onerror = () => {
 buildMarquee(document.getElementById("marqueeTop"));
 buildMarquee(document.getElementById("marqueeSetup"));
 
-    // --------- Restore session if exists
-const existing = loadSession();
-const pending = loadPending();
 
 function setUnlockUIVisibility(){
   const s = loadSession();
@@ -3099,8 +3096,17 @@ if (unlockBtn){
 (async function bootstrapByTabID(){
   
   // 세션/대기 복원 (이 함수들은 네가 앞에서 교체한 버전: localStorage 백업 포함)
-  const existing = loadSession();
-  const pending = loadPending();
+  const urlTabID = getCurrentTabID();
+
+// URL tabID 기준 세션만 사용
+let existing = lsGet(`rpc_session_${urlTabID}`);
+
+if (existing){
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+}
+
+const pending = loadPending();
+
 
   // 결제 상태도 tabID별 백업에서 복원
   const paidUnc = getPaid(PAYMENT_KEY);
@@ -3191,6 +3197,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
