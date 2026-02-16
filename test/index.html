@@ -1586,6 +1586,20 @@ const chatAvatar = $("#chatAvatar");
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
     const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
 
+
+// ✅ 외부에서 ?tabID= 로 들어온 경우: 그 값을 window.name에 고정해서 이후 저장키가 절대 안 꼬이게 함
+(function syncIncomingTabID(){
+  try{
+    const qs = new URLSearchParams(location.search);
+    const id = (qs.get("tabID") || "").trim();
+    if (id){
+      // window.name은 새 탭/새로고침에서도 유지되는 경우가 많아서 backup용으로 딱 좋음
+      window.name = id;
+    }
+  }catch(e){}
+})();
+    
+
     // =========================
 // tabID + backup storage utils
 // =========================
@@ -3134,6 +3148,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
