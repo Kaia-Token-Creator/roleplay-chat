@@ -2217,6 +2217,42 @@ sessionStorage.setItem("tabID", tabID);
 // 세션 저장
 saveSession(session);
 
+// ✅✅ (추가) 메인페이지가 쓰는 tabID 스코프 키로도 저장해주기
+(function mirrorToTabScopedStorage(sess){
+  try{
+    const id = sess.tabID;
+    if (!id) return;
+
+    const sk = `roleplay-chat_session_v1::${id}`;
+    const hk = `roleplay-chat_history_v1::${id}`;
+
+    // localStorage (메인 백업 구조에 맞춤)
+    localStorage.setItem(sk, JSON.stringify(sess));
+    if (!localStorage.getItem(hk)) localStorage.setItem(hk, "[]");
+
+    // localForage에도 같이 (메인이 localForage 백업 쓰면 더 안전)
+    if (window.localforage){
+      const lf = localforage.createInstance({ name: "roleplay-chat", storeName: "tabs" });
+      lf.setItem(sk, sess).catch(()=>{});
+      lf.setItem(hk, []).catch(()=>{});
+    }
+
+    // paid도 localStorage/localForage에 같이 (메인이 sessionStorage가 아니라 localStorage를 볼 수도 있음)
+    localStorage.setItem("roleplay-chat_paid_v1", "paid");
+    localStorage.setItem("roleplay-chat_imagechat_paid_v1", "paid");
+    localStorage.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid");
+
+    if (window.localforage){
+      const auth = localforage.createInstance({ name: "roleplay-chat", storeName: "auth" });
+      auth.setItem("roleplay-chat_paid_v1", "paid").catch(()=>{});
+      auth.setItem("roleplay-chat_imagechat_paid_v1", "paid").catch(()=>{});
+      auth.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid").catch(()=>{});
+    }
+  }catch(e){}
+})(session);    
+
+  
+
 // 🚀 tier별 즉시 이동 (+ tabID 붙이기)
 if (tier === "imagechat"){
   window.location.href = `/imagechat/?tabID=${tabID}`;
@@ -2519,6 +2555,7 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
 
 
 
