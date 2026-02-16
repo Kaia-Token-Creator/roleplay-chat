@@ -1670,22 +1670,22 @@ async function lfDel(key){
 
 
     // Share button
+// Share button
 const shareBtn = document.querySelector("#shareBtn");
+const SHARE_URL = "https://roleplay-chat.com/";
+
 if (shareBtn){
   shareBtn.addEventListener("click", async () => {
-    const url = window.location.href;
+    const url = SHARE_URL; // ✅ tabID 없는 홈만 공유
     try{
       if (navigator.share){
-        await navigator.share({ title: document.title, url });
+        await navigator.share({ title: "roleplay-chat.com", url });
       }else{
         await navigator.clipboard.writeText(url);
-        // optional tiny feedback
         shareBtn.title = "Copied!";
         setTimeout(() => (shareBtn.title = "Share"), 900);
       }
-    }catch(e){
-      // user cancelled or blocked
-    }
+    }catch(e){}
   });
 }
 
@@ -3167,6 +3167,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
