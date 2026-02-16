@@ -1611,10 +1611,9 @@ function getOrCreateTabID(){
   const qs = new URLSearchParams(location.search);
   let id = (qs.get("tabID") || "").trim();
 
-  // window.name 백업에서 복원
-  if (!id && window.name && String(window.name).startsWith("tab_")){
-    id = window.name;
-  }
+ if (!id && window.name){
+  id = String(window.name).trim();
+}
 
   // 없으면 생성 + URL + window.name에 고정
   if (!id){
@@ -3167,6 +3166,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
