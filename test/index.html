@@ -1527,11 +1527,7 @@ Deleting browser data will erase your character, chat history, and access permis
 
   <script>
 
-    function generateTabID(){
-  return "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
-}
-
-    // --------- Helpers
+     // --------- Helpers
     const $ = (q) => document.querySelector(q);
     const $$ = (q) => Array.from(document.querySelectorAll(q));
 
@@ -1597,22 +1593,14 @@ function generateTabID(){
   return "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
 }
 
-// URL -> window.name -> 새 생성 순으로 tabID 확보
+// URL -> window.name 순으로 tabID "읽기만" (없으면 null)
 function getTabID(){
   const qs = new URLSearchParams(location.search);
   let id = qs.get("tabID") || "";
   if (!id && window.name && window.name.startsWith("tab_")) id = window.name;
-  if (!id){
-    id = generateTabID();
-    // URL에 tabID 강제 부여(탭 식별 안정화)
-    const u = new URL(location.href);
-    u.searchParams.set("tabID", id);
-    history.replaceState(null, "", u.toString());
-  }
-  // window.name에도 백업(탭 내 이동/리프레시 안정화)
-  try{ window.name = id; }catch(e){}
-  return id;
+  return id || null;   // ✅ 생성 금지
 }
+
 
 // tabID 전용 저장 키
 function k(type){
@@ -2118,7 +2106,7 @@ function closeImgPayModalFn(){
   // imagechat 결제는 pending을 유지해도 되지만, 닫으면 취소로 보고 지우는 게 깔끔
   clearPending();
 
-  document.body.classList.add("modalOpen");   // ✅ 추가
+  document.body.classList.remove("modalOpen");
 }
 
 if (closeImgPay){
@@ -2660,6 +2648,20 @@ if (!nicknameVal){
 
 
   if (tier === "general"){
+  // 1) tabID 먼저 만들기
+  const tabID = generateTabID();
+
+  // 2) 지금 페이지 URL을 먼저 tabID로 바꿔치기 (중요: 저장보다 먼저!)
+  try{
+    history.replaceState(null, "", "/?tabID=" + encodeURIComponent(tabID));
+  }catch(e){}
+
+  // 3) window.name에도 백업 (너 getTabID가 window.name을 보니까)
+  try{
+    window.name = tabID; // getTabID()가 startsWith("tab_") 검사함 → tab_로 시작하니 OK
+  }catch(e){}
+
+  // 4) 이제 저장 (이 시점엔 getTabID()가 tabID를 읽을 수 있음)
   try{
     saveSession(session);
   }catch(e){
@@ -2668,10 +2670,12 @@ if (!nicknameVal){
     try{ saveSession(session); }catch(_){}
   }
 
-  const tabID = generateTabID();
-  window.location.href = "/?tabID=" + tabID;
+  // 5) 이제 “tabID 있는 상태”로 bootstrap을 다시 돌리기
+  //    (href로 다시 들어가도 되고 reload도 됨)
+  window.location.href = "/?tabID=" + encodeURIComponent(tabID);
   return;
 }
+
 
 
   if (tier === "uncensored"){
@@ -3036,9 +3040,7 @@ if (unlockBtn){
 
 // ✅ 결제 진행하다 닫았던 상태면: 셋업 화면 유지 (tabID 백업 복원 기반)
 (async function bootstrapByTabID(){
-  // tabID 확보 (없으면 생성 + URL에 붙임 + window.name 백업)
-  getTabID();
-
+  
   // 세션/대기 복원 (이 함수들은 네가 앞에서 교체한 버전: localStorage 백업 포함)
   const existing = loadSession();
   const pending = loadPending();
@@ -3132,6 +3134,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
