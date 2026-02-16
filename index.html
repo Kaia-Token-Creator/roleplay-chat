@@ -1527,6 +1527,14 @@ Deleting browser data will erase your character, chat history, and access permis
 
   <script>
 
+    // ⭐ URL tabID 강제 고정 (절대 변경 불가)
+const __TAB_ID_FROM_URL__ = (() => {
+  const qs = new URLSearchParams(location.search);
+  const id = (qs.get("tabID") || "").trim();
+  return id || null;
+})();
+
+
      // --------- Helpers
     const $ = (q) => document.querySelector(q);
     const $$ = (q) => Array.from(document.querySelectorAll(q));
@@ -1609,24 +1617,20 @@ function generateTabID(){
 
 function getOrCreateTabID(){
 
-  const qs = new URLSearchParams(location.search);
-  let id = (qs.get("tabID") || "").trim();
-
-  // ⭐ URL에 있으면 무조건 그것 사용
-  if (id){
-    try { window.name = id; } catch(e){}
-    return id;
+  // ⭐ URL에 있으면 무조건 이것 (절대 생성 X)
+  if (__TAB_ID_FROM_URL__) {
+    try { window.name = __TAB_ID_FROM_URL__; } catch(e){}
+    return __TAB_ID_FROM_URL__;
   }
 
-  // ⭐ URL 없으면 window.name
+  // URL 없으면 window.name
   if (window.name){
-  const wn = String(window.name).trim();
-  if (wn.startsWith("rp_tab=")) return wn.slice("rp_tab=".length);
-  if (wn) return wn;
-}
+    const id = String(window.name).trim();
+    if (id) return id;
+  }
 
-  // ⭐ 둘 다 없을 때만 생성
-  id = generateTabID();
+  // 둘 다 없을 때만 생성
+  const id = generateTabID();
 
   try{
     const u = new URL(location.href);
@@ -3187,6 +3191,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
