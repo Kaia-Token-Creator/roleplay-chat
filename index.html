@@ -1606,33 +1606,62 @@ function generateTabID(){
   return "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
 }
 
-function getOrCreateTabID(){
-  const qs = new URLSearchParams(location.search);
-  let id = (qs.get("tabID") || "").trim();
+function getOrCreateTabId(){
+  const u = new URL(window.location.href);
 
-  // window.name 백업에서 복원
-  if (!id && window.name){
-  id = String(window.name).trim();
-}
+  // ✅ 1) URL이 최우선
+  let tabID =
+    u.searchParams.get("tabID") ||
+    u.searchParams.get("tabId") ||
+    u.searchParams.get("tabid");
 
+  if (tabID && tabID.trim()){
+    tabID = tabID.trim();
 
-  // 없으면 생성 + URL + window.name에 고정
-  if (!id){
-    id = generateTabID();
+    // ✅ URL 값이 있으면 그걸로 "다른 저장소도 전부 동기화"
+    try{ sessionStorage.setItem("tabID", tabID); }catch(e){}
+    try{ window.name = "rp_tab=" + tabID; }catch(e){}
 
+    // (선택) URL 파라미터 표준화: tabID로 통일
     try{
-      const u = new URL(location.href);
-      u.searchParams.set("tabID", id);
+      u.searchParams.set("tabID", tabID);
       history.replaceState(null, "", u.toString());
     }catch(e){}
 
-    try{
-      window.name = id;
-    }catch(e){}
+    return tabID;
   }
 
-  return id;
+  // ✅ 2) URL이 없을 때만 기존 백업값 사용
+  try{
+    const ss = sessionStorage.getItem("tabID");
+    if (ss && ss.trim()) return ss.trim();
+  }catch(e){}
+
+  try{
+    const wn = window.name || "";
+    if (wn.startsWith("rp_tab=")){
+      const saved = wn.slice("rp_tab=".length);
+      if (saved && saved.trim()) return saved.trim();
+    }
+  }catch(e){}
+
+  // ✅ 3) 다 없으면 새로 생성
+  tabID = (crypto?.randomUUID ? crypto.randomUUID() : ("t" + Date.now() + "_" + Math.random().toString(16).slice(2)));
+
+  try{ sessionStorage.setItem("tabID", tabID); }catch(e){}
+  try{ window.name = "rp_tab=" + tabID; }catch(e){}
+
+  try{
+    u.searchParams.set("tabID", tabID);
+    history.replaceState(null, "", u.toString());
+  }catch(e){}
+
+  return tabID;
 }
+
+// ✅ 이게 "모든 키 생성"보다 먼저 실행돼야 함
+const TAB_ID = getOrCreateTabId();
+
 
 
 
@@ -3168,6 +3197,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
