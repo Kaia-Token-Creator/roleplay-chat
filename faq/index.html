@@ -542,29 +542,33 @@ As long as you do not clear your browser data, it will remain accessible for a l
               </div>
             </div>
 
-            <div class="faqItem" data-tags="tab recover restore history">
-              <button class="faqQ" type="button" aria-expanded="false">
-                <span>Can I recover my chat after closing the tab?</span>
-                <span class="tag">Tab</span>
-                <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M6 9l6 6 6-6" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-              <div class="faqA">
-                <p>
-                  Usually, no. The design is intentionally “tab-lifetime”.
-                  If the tab is closed, the browser typically clears the session memory for that tab.
-                </p>
-                <p>
-                  If you accidentally closed the tab:
-                </p>
-                <ul>
-                  <li>Try “Reopen closed tab” immediately (Ctrl+Shift+T on desktop).</li>
-                  <li>If your browser restored the session, you may get the chat back.</li>
-                  <li>If not restored, it’s likely gone.</li>
-                </ul>
-              </div>
-            </div>
+            <div class="faqItem" data-tags="device restart recover restore history">
+  <button class="faqQ" type="button" aria-expanded="false">
+    <span>Is it safe to restart my device?</span>
+    <span class="tag">Device</span>
+    <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div class="faqA">
+    <p>
+      Yes — restarting your device is usually fine.
+      Your chat is saved locally in your browser storage, so it will still be there after a restart
+      unless your browser (or a cleaner/extension) is set to wipe site data on restart.
+    </p>
+    <p>
+      You may lose access only if your browser deletes site data or you manually clear browsing data.
+    </p>
+    <p>
+      To keep your chat recoverable:
+    </p>
+    <ul>
+      <li>Do not clear browsing data (cookies, site data, or local storage).</li>
+      <li>Disable any “clear data on exit/restart” setting, cleaner app, or privacy extension for this site.</li>
+      <li>Bookmark your unique chat link for easy return.</li>
+    </ul>
+  </div>
+</div>
 
             <div class="faqItem" data-tags="privacy data stored server logs">
               <button class="faqQ" type="button" aria-expanded="false">
@@ -576,7 +580,7 @@ As long as you do not clear your browser data, it will remain accessible for a l
               </button>
               <div class="faqA">
                 <p>
-                  The experience is designed to be tab-based and anonymous.
+                  The experience is designed to be device/browser-based and anonymous.
                   The site does not provide an account system or a “chat history dashboard”.
                 </p>
                 <p>
@@ -1272,6 +1276,7 @@ As long as you do not clear your browser data, it will remain accessible for a l
   </script>
 </body>
 </html>
+
 
 
 
