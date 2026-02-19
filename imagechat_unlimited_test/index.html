@@ -913,6 +913,7 @@
     <div class="videoPayBody">
 
       <div style="color:rgba(255,255,255,.85); margin-bottom:10px;">
+        Thank you♥<br>
         Donate any amount (minimum $2) and receive a Secret Gift 🎁
       </div>
 
@@ -921,6 +922,7 @@
              type="number"
              step="0.01"
              min="2"
+             value="2"
              placeholder="Enter amount (USD)" />
 
       <div id="donateError"
@@ -2297,7 +2299,7 @@ async function requestSecretGift(){
 
     appendMsg(
       "assistant",
-      "🎁 Preparing your secret gift...",
+      "Thank you. Preparing your secret gift...",
       undefined,
       undefined,
       { animate:true, italic:true }
@@ -2345,7 +2347,7 @@ if (!res.ok){
 
     history.push({
       role: "assistant",
-      content: "Gift image",
+      content: "Here is my gift♥",
       imageUrl
     });
 
@@ -2484,6 +2486,7 @@ donateModal?.addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
 
