@@ -69,27 +69,26 @@ if (bodyAny.type === "donation_gift") {
 
   const ch = sanitizeCharacter(characterRaw);
 
-  // 🎯 Secret gift 이미지 프롬프트
-  const prompt = [
-    `${ch.name}, adult ${ch.gender},`,
-    ch.appearance || "",
-    ch.scenario ? `in ${ch.scenario},` : "",
-    "wearing nothing",
-    "All naked",
-    "natural candid photo,",
-"unposed spontaneous moment,",
-"casual body posture,",
-"not looking directly at camera,",
-"off-center composition,",
-"slightly imperfect framing"
-  ].join(" ");
+  // 🔥 기존 히스토리도 사용 (몰입 유지)
+  const rawHistory = Array.isArray(bodyAny.history) ? bodyAny.history : [];
+  const history: Msg[] = rawHistory.filter(isValidMsg).slice(-10);
 
   try {
 
+    // 💝 텍스트 모델이 Gift용 이미지 프롬프트 생성
+    const forcedPrompt = await makeForcedPromptWithTextModel(env.VENICE_API_KEY, {
+      character: ch,
+      userMessage: "Secret intimate photo taken for the user.",
+      lastAssistant: "",
+      history,
+      maxTokens: MAX_TOKENS_IMAGE_FORCED_PROMPT,
+    });
+
+    // 🎨 이미지 생성
     const imgB64 = await callVeniceImageGenerate(env.VENICE_API_KEY, {
       model: "lustify-sdxl",
-      prompt,
-      negative_prompt: defaultNegativePrompt(),
+      prompt: forcedPrompt + ", completely nude, fully naked, no clothes, nude body, bare skin, uncensored nude",
+      negative_prompt: defaultNegativePrompt() + ", clothes, clothing, dress, shirt, pants, underwear, lingerie, bra, bikini, swimsuit",
       format: "webp",
       width: 1024,
       height: 1024,
@@ -100,15 +99,14 @@ if (bodyAny.type === "donation_gift") {
     });
 
     return json(
-  {
-    reply: "I sent you a secret gift… check it.",
-    image: { mime: "image/webp", b64: imgB64 },
-    type: "donation_gift"
-  },
-  200,
-  CORS
-);
-
+      {
+        reply: "I sent you a secret gift… check it.",
+        image: { mime: "image/webp", b64: imgB64 },
+        type: "donation_gift"
+      },
+      200,
+      CORS
+    );
 
   } catch (err) {
 
@@ -124,6 +122,7 @@ if (bodyAny.type === "donation_gift") {
     );
   }
 }
+
  
 
     // ✅ character 또는 session 둘 다 허용
@@ -987,6 +986,7 @@ async function callVeniceImageGenerate(
 
   return images[0];
 }
+
 
 
 
