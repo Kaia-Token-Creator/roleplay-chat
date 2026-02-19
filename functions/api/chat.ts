@@ -233,9 +233,9 @@ function sanitizeCharacter(ch: any) {
 
   const gender = safeStr(ch.gender, 30);
   const language = safeStr(ch.language, 30) || "English";
-  const appearance = safeStr(ch.appearance, 300); // ✅ ADDED
-  const personality = safeStr(ch.personality, 300);
-  const scenario = safeStr(ch.scenario, 300);
+  const appearance = safeStr(ch.appearance, 600); // ✅ ADDED
+  const personality = safeStr(ch.personality, 600);
+  const scenario = safeStr(ch.scenario, 600);
 
   const nickname = safeStr(ch.nickname, 40).trim();
   const mbti = normalizeMBTI(safeStr(ch.mbti, 8));
@@ -570,6 +570,7 @@ const SEX_KEYWORDS = [
   "nsfw","erotic","kink","fetish","bdsm","spank","ejaculate","masturbate","jerk","stroke","lick","licking","rim",
   "69","one night","fuck me","make love","take off","nude"
 ];
+
 
 
 
