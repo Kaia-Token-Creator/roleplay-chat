@@ -616,7 +616,7 @@ padding: 5px 8px;
     <div style="display:flex; align-items:center; justify-content:space-between;">
       <div id="donateTitle"
      style="font-family:'Baloo 2', Inter, sans-serif; font-weight:800; font-size:16px;">
-  Donate & Receive Secret Gift 🎁
+  Donate & Receive Special Gift 🎁
 </div>
       <button id="donateCloseBtn" class="xBtn">✕</button>
     </div>
@@ -624,7 +624,7 @@ padding: 5px 8px;
     <div style="margin-top:10px; font-size:13px; color:rgba(255,255,255,.75);">
       Thank you ❤️<br>
       Donate any amount (minimum $2).<br><br>
-      <span class="highlightCTA">Donate and receive a Secret gift🎁</span>
+      <span class="highlightCTA">Donate and receive a Special gift🎁</span>
     </div>
 
     <div style="margin-top:12px;">
@@ -1758,7 +1758,7 @@ async function requestSecretGift(meta = {}){
       imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
     }
 
-    const giftText = "Thank you❤️ Secret gift for you🎁";
+    const giftText = "Thank you❤️ Special gift for you🎁";
 appendMsg("assistant", giftText, imageUrl || undefined, { animate: true });
 
 // ✅ 저장용만 압축
@@ -1796,6 +1796,7 @@ await saveHistoryAsync(history);
 
 </body>
 </html>
+
 
 
 
