@@ -57,6 +57,69 @@ export const onRequestPost: PagesFunction<{
       return json({ error: "Invalid body." }, 400, CORS);
     }
 
+   // ======================================================
+// 🎁 Donation Secret Gift 요청 처리 (채팅 로직보다 먼저)
+// ======================================================
+if (bodyAny.type === "donation_gift") {
+
+  const characterRaw = bodyAny.session;
+  if (!characterRaw) {
+    return json({ error: "Missing character/session." }, 400, CORS);
+  }
+
+  const ch = sanitizeCharacter(characterRaw);
+
+  // 🎯 Secret gift 이미지 프롬프트
+  const prompt = [
+    `${ch.name}, adult ${ch.gender},`,
+    ch.appearance || "",
+    "wearing an elegant white dress,",
+    "romantic pose, soft smile,",
+    "highly detailed realistic photo,",
+    "cinematic lighting, shallow depth of field,",
+    "8k, ultra realistic, professional photography"
+  ].join(" ");
+
+  try {
+
+    const imgB64 = await callVeniceImageGenerate(env.VENICE_API_KEY, {
+      model: "lustify-sdxl",
+      prompt,
+      negative_prompt: defaultNegativePrompt(),
+      format: "webp",
+      width: 1024,
+      height: 1024,
+      cfg_scale: 7.0,
+      safe_mode: false,
+      hide_watermark: true,
+      variants: 1,
+    });
+
+    return json(
+      {
+        image: { mime: "image/webp", b64: imgB64 },
+        type: "donation_gift"
+      },
+      200,
+      CORS
+    );
+
+  } catch (err) {
+
+    const serialized = serializeErr(err);
+
+    return json(
+      {
+        error: "Gift generation failed.",
+        detail: serialized
+      },
+      500,
+      CORS
+    );
+  }
+}
+ 
+
     // ✅ character 또는 session 둘 다 허용
     const characterRaw = bodyAny.character || bodyAny.session;
     if (!characterRaw) {
@@ -918,6 +981,7 @@ async function callVeniceImageGenerate(
 
   return images[0];
 }
+
 
 
 
