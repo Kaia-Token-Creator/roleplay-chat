@@ -1584,7 +1584,7 @@ async function ensurePayPalDonateButtons(){
       return actions.order.create({
         purchase_units: [{
           amount: { value: value.toFixed(2), currency_code: "USD" },
-          description: "Donation"
+          description: "Donation Game"
         }]
       });
     },
@@ -1727,5 +1727,6 @@ await saveHistoryAsync(history);
 
 </body>
 </html>
+
 
 
