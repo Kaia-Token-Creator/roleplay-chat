@@ -1522,19 +1522,14 @@ async function ensurePayPalUnlimitedButtons(){
     style: { layout: "vertical" },
 
     createOrder: (data, actions) => {
-  const v = validateDonateAmount({ clamp:false });
-  if (!v.ok){
-    // ✅ 위 페이지처럼: 최소 금액이면 결제 자체를 막음
-    throw new Error("Minimum donation is $2");
-  }
-
   return actions.order.create({
     purchase_units: [{
-      amount: { value: v.value.toFixed(2), currency_code: "USD" },
-      description: "Donation Game"
+      amount: { value: "20.00", currency_code: "USD" },
+      description: "Go Unlimited image chat"
     }]
   });
 },
+
 
 
     onApprove: async (data, actions) => {
@@ -1574,6 +1569,7 @@ async function ensurePayPalUnlimitedButtons(){
    ========================= */
 
 let paypalDonateReady = false;
+let donateActionsRef = null; // ✅ PayPal 버튼 enable/disable 컨트롤용
 
 async function ensurePayPalDonateButtons(){
   if (paypalDonateReady) return;
@@ -1582,49 +1578,72 @@ async function ensurePayPalDonateButtons(){
   if (!mount) return;
 
   await loadPayPalSdkOnce();
-
   mount.innerHTML = "";
 
   window.paypal.Buttons({
 
+    // ✅ 처음엔 비활성화 → 금액이 2 이상이면 enable
+    onInit: (data, actions) => {
+  donateActionsRef = actions;
+  actions.disable();
+
+  // ✅ 현재 입력값(기본 2) 기준으로 즉시 enable/disable 동기화
+  try{
+    const v = validateDonateAmount({ clamp:false });
+    if (v.ok) actions.enable();
+    else actions.disable();
+  }catch(e){}
+},
+
+
     createOrder: (data, actions) => {
+      const v = validateDonateAmount({ clamp: false });
 
-      const amountInput = document.getElementById("donateAmount");
-      let value = parseFloat(amountInput.value || "0");
-
-      if (!value || value < 2) value = 2;
+      // ✅ 2 미만이면 결제 자체를 아예 안 열리게 막기
+      if (!v.ok){
+        if (donateError) donateError.style.display = "block";
+        // PayPal SDK에서 createOrder는 reject하면 플로우가 중단됨
+        return Promise.reject(new Error("Minimum donation is $2"));
+      }
 
       return actions.order.create({
         purchase_units: [{
-          amount: { value: value.toFixed(2), currency_code: "USD" },
+          amount: { value: v.value.toFixed(2), currency_code: "USD" },
           description: "Donation Game"
         }]
       });
     },
 
     onApprove: async (data, actions) => {
+      const details = await actions.order.capture();
 
-  const details = await actions.order.capture();
+      closeDonateModal();
 
-  closeDonateModal();
+      const paidValue =
+        details?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value
+        || null;
 
-  const paidValue =
-    details?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value
-    || null;
+      await requestSecretGift({ paidValue, orderId: data?.orderID });
+    },
 
-  await requestSecretGift({ paidValue, orderId: data?.orderID });
-
-},
-
-
-    onError: () => {
+    onError: (err) => {
+      // ✅ reject로 떨어진 경우도 여기로 올 수 있음 → 조용히 안내만
+      if (String(err?.message || "").includes("Minimum donation is $2")){
+        if (donateError) donateError.style.display = "block";
+        return;
+      }
       alert("Payment error. Please try again.");
+      console.error(err);
     }
 
   }).render("#paypalDonateButtons");
 
   paypalDonateReady = true;
+
+  // ✅ 버튼 렌더 후 입력값에 따라 enable/disable 연결
+  bindDonateAmountToPayPal();
 }
+
     
 
 /* =========================
@@ -1655,6 +1674,24 @@ function validateDonateAmount({ clamp = false } = {}){
   if (donateError) donateError.style.display = "none";
   return { ok:true, value:v };
 }
+
+function bindDonateAmountToPayPal(){
+  const amountInput = document.getElementById("donateAmount");
+  if (!amountInput) return;
+
+  const sync = () => {
+    const v = validateDonateAmount({ clamp: false });
+    if (!donateActionsRef) return;
+
+    if (v.ok) donateActionsRef.enable();
+    else donateActionsRef.disable();
+  };
+
+  sync();
+  amountInput.addEventListener("input", sync);
+  amountInput.addEventListener("blur", sync);
+}
+    
 
 if (donateAmount){
   donateAmount.addEventListener("blur", ()=> validateDonateAmount({ clamp:true }));
@@ -1759,6 +1796,7 @@ await saveHistoryAsync(history);
 
 </body>
 </html>
+
 
 
 
