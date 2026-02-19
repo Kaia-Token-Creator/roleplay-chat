@@ -295,16 +295,18 @@ padding: 5px 8px;
 }
 
 /* ===== Image chat top bar ===== */
+/* ===== Image chat top bar ===== */
 .imgChatTop{
   display:flex;
-  align-items:center;
-  justify-content:space-between;
+  flex-direction: column;     /* ✅ 가로 → 세로 스택 */
+  align-items: flex-start;    /* ✅ 왼쪽 정렬 */
+  justify-content: flex-start;
+  gap: 6px;                   /* ✅ 둘 사이 간격(좁게) */
   padding: 8px 14px;
   border-bottom: 1px solid rgba(255,255,255,.14);
   background: rgba(0,0,0,.65);
   backdrop-filter: blur(8px);
 }
-
 
 .imgChatTitle{
   font-family: "Baloo 2", Inter, sans-serif;
@@ -325,9 +327,10 @@ padding: 5px 8px;
 
 /* ===== Image chat: New character button highlight ===== */
 #imgResetBtn{
-  background: #e0b400;          /* 노란 배경 */
-  border: 1px solid #c9a200;    /* 노란 테두리 */
-  color: #000;                  /* 검은 글씨 */
+  align-self: flex-start;     /* ✅ 혹시라도 영향받아도 왼쪽 고정 */
+  background: #e0b400;
+  border: 1px solid #c9a200;
+  color: #000;
   font-weight: 800;
 }
 
@@ -1482,6 +1485,7 @@ async function ensurePayPalUnlimitedButtons(){
 
 </body>
 </html>
+
 
 
 
