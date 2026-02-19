@@ -45,10 +45,10 @@ export const onRequestPost: PagesFunction<{
     const MAX_TOKENS_TEXT = 500;
 
     // image plan tokens (same text model, separate call)
-    const MAX_TOKENS_IMAGE_PLAN = 300;
+    const MAX_TOKENS_IMAGE_PLAN = 500;
 
     // if user explicitly asks for an image and plan prompt is empty, generate forced prompt via text model
-    const MAX_TOKENS_IMAGE_FORCED_PROMPT = 250;
+    const MAX_TOKENS_IMAGE_FORCED_PROMPT = 500;
     // ---------------------------------------
 
     // ✅ body는 딱 1번만 읽어야 함
@@ -364,9 +364,9 @@ function sanitizeCharacter(ch: any) {
 
   const gender = safeStr(ch.gender, 30);
   const language = safeStr(ch.language, 30) || "English";
-  const appearance = safeStr(ch.appearance, 500);
-  const personality = safeStr(ch.personality, 500);
-  const scenario = safeStr(ch.scenario, 500);
+  const appearance = safeStr(ch.appearance, 600);
+  const personality = safeStr(ch.personality, 600);
+  const scenario = safeStr(ch.scenario, 600);
 
   const nickname = safeStr(ch.nickname, 40).trim();
   const mbti = normalizeMBTI(safeStr(ch.mbti, 8));
@@ -918,5 +918,6 @@ async function callVeniceImageGenerate(
 
   return images[0];
 }
+
 
 
