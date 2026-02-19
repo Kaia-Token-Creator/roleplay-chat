@@ -761,7 +761,16 @@
 
 <div class="imgChatTop">
   <div class="imgChatTitle" id="imgChatTitle">Image chat</div>
-  <button class="xBtn" id="imgResetBtn" type="button">New character</button>
+
+  <div style="display:flex; gap:8px;">
+    <button class="xBtn" id="imgResetBtn" type="button">New character</button>
+
+    <!-- ✅ Donate 버튼 -->
+    <button class="xBtn" id="donateBtn" type="button"
+            style="background:#ff2f92; border:1px solid #ff2f92; color:#fff; font-weight:800;">
+      Donate
+    </button>
+  </div>
 </div>
 
 <div class="chatShell">
@@ -889,6 +898,44 @@
     </div>
   </div>
 </div>
+
+<!-- =========================
+     Donate Modal
+     ========================= -->
+<div class="videoPayModal" id="donateModal" aria-hidden="true">
+  <div class="videoPayCard" role="dialog" aria-modal="true">
+
+    <div class="videoPayTop">
+      <div class="videoPayTitle" id="donateTitle">Donate</div>
+      <button class="videoPayX" id="donateCloseX" type="button">✕</button>
+    </div>
+
+    <div class="videoPayBody">
+
+      <div style="color:rgba(255,255,255,.85); margin-bottom:10px;">
+        Donate any amount (minimum $2) and receive a Secret Gift 🎁
+      </div>
+
+      <input id="donateAmount"
+             class="promptInput"
+             type="number"
+             step="0.01"
+             min="2"
+             placeholder="Enter amount (USD)" />
+
+      <div id="donateError"
+           style="color:#ff4d4d; font-size:12px; margin-top:6px; display:none;">
+        Minimum donation is $2
+      </div>
+
+      <div class="paypalArea">
+        <div id="paypalDonateButtons"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+  
 
 <script>
 
@@ -2188,6 +2235,128 @@ if (infoBtn && infoMenu){
   });
 }
 
+let paypalDonateReady = false;
+
+async function ensurePayPalDonateButtons(){
+
+  if (paypalDonateReady) return;
+
+  const mount = document.getElementById("paypalDonateButtons");
+  if (!mount) return;
+
+  mount.innerHTML = "";
+
+  paypal.Buttons({
+
+    createOrder: (data, actions) => {
+
+      const amountInput = document.getElementById("donateAmount");
+      const err = document.getElementById("donateError");
+
+      let value = parseFloat(amountInput.value || "0");
+
+      if (!value || value < 2){
+        err.style.display = "block";
+        throw new Error("Minimum $2");
+      }
+
+      err.style.display = "none";
+
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: value.toFixed(2),
+            currency_code: "USD"
+          },
+          description: "Donation"
+        }]
+      });
+    },
+
+    onApprove: async (data, actions) => {
+
+      await actions.order.capture();
+
+      closeDonateModal();
+
+      await requestSecretGift();
+    },
+
+    onError: () => {
+      alert("Payment error. Please try again.");
+    }
+
+  }).render("#paypalDonateButtons");
+
+  paypalDonateReady = true;
+}
+
+async function requestSecretGift(){
+
+  try{
+
+    appendMsg(
+      "assistant",
+      "🎁 Preparing your secret gift...",
+      undefined,
+      undefined,
+      { animate:true, italic:true }
+    );
+
+    const payload = {
+      type: "donation_gift",
+      session: session,
+      tabID: TAB_ID
+    };
+
+    const res = await fetch("/api/imagechat", {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const raw = await res.text().catch(() => "");
+let data = {};
+
+try {
+  data = raw ? JSON.parse(raw) : {};
+} catch {
+  data = { raw };
+}
+
+if (!res.ok){
+  throw new Error(data?.error || data?.detail || `HTTP ${res.status}`);
+}
+
+
+    let imageUrl = "";
+
+    if (data.image && data.image.b64){
+      imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
+    }
+
+    appendMsg(
+      "assistant",
+      "Here is your gift 🎁",
+      imageUrl || undefined,
+      undefined,
+      { animate:true }
+    );
+
+    history.push({
+      role: "assistant",
+      content: "Gift image",
+      imageUrl
+    });
+
+    await pruneHistoryAndUI();
+
+  }catch(e){
+    appendMsg("assistant", "Gift failed. Please try again.");
+  }
+}
+ 
+
 /* =========================
    Secret Gift popup (paid only)
    ========================= */
@@ -2275,10 +2444,47 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
     if (paid) openSecretModal();
   }
 })();
+
+/* =========================
+   Donate Modal logic
+   ========================= */
+
+const donateBtn = document.getElementById("donateBtn");
+const donateModal = document.getElementById("donateModal");
+const donateCloseX = document.getElementById("donateCloseX");
+
+function openDonateModal(){
+
+  // 제목: Donate to 캐릭터명
+  const t = document.getElementById("donateTitle");
+  if (t && session?.name){
+    t.textContent = `Donate to ${session.name}`;
+  }
+
+  document.body.classList.add("modalOpen");
+  donateModal.style.display = "flex";
+
+  ensurePayPalDonateButtons();
+}
+
+function closeDonateModal(){
+  document.body.classList.remove("modalOpen");
+  donateModal.style.display = "none";
+}
+
+if (donateBtn) donateBtn.onclick = openDonateModal;
+if (donateCloseX) donateCloseX.onclick = closeDonateModal;
+
+// 바깥 클릭 시 닫기
+donateModal?.addEventListener("click", e => {
+  if (e.target === donateModal) closeDonateModal();
+});
+  
 </script>
 
 </body>
 </html>
+
 
 
 
