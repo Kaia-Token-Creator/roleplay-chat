@@ -635,6 +635,12 @@ padding: 5px 8px;
         background:#000; color:#fff;">
     </div>
 
+    <!-- ✅ 추가: 최소 금액 안내/에러 -->
+<div id="donateError"
+     style="display:none; margin-top:6px; color:#ff4d4d; font-size:12px;">
+  Minimum donation is $2
+</div>
+
     <div style="margin-top:12px; padding:10px; border-radius:14px;
                 background:rgba(255,255,255,.06);
                 border:1px solid rgba(255,255,255,.12);">
@@ -1516,13 +1522,20 @@ async function ensurePayPalUnlimitedButtons(){
     style: { layout: "vertical" },
 
     createOrder: (data, actions) => {
-      return actions.order.create({
-        purchase_units: [{
-          amount: { value: "20.00", currency_code: "USD" },
-          description: "Upgrade game"
-        }]
-      });
-    },
+  const v = validateDonateAmount({ clamp:false });
+  if (!v.ok){
+    // ✅ 위 페이지처럼: 최소 금액이면 결제 자체를 막음
+    throw new Error("Minimum donation is $2");
+  }
+
+  return actions.order.create({
+    purchase_units: [{
+      amount: { value: v.value.toFixed(2), currency_code: "USD" },
+      description: "Donation Game"
+    }]
+  });
+},
+
 
     onApprove: async (data, actions) => {
       const details = await actions.order.capture();
@@ -1622,11 +1635,30 @@ const donateBtn = document.getElementById("donateBtn");
 const donateModal = document.getElementById("donateModal");
 const donateCloseBtn = document.getElementById("donateCloseBtn");
 const donateAmount = document.getElementById("donateAmount");
+const donateError = document.getElementById("donateError");
+
+function validateDonateAmount({ clamp = false } = {}){
+  const amountInput = document.getElementById("donateAmount");
+  if (!amountInput) return { ok:false, value:0 };
+
+  let v = parseFloat(amountInput.value || "0");
+
+  // NaN 처리
+  if (!isFinite(v)) v = 0;
+
+  if (v < 2){
+    if (donateError) donateError.style.display = "block";
+    if (clamp) amountInput.value = "2";
+    return { ok:false, value:v };
+  }
+
+  if (donateError) donateError.style.display = "none";
+  return { ok:true, value:v };
+}
+
 if (donateAmount){
-  donateAmount.addEventListener("blur", ()=>{
-    let v = parseFloat(donateAmount.value || "0");
-    if (!v || v < 2) donateAmount.value = "2";
-  });
+  donateAmount.addEventListener("blur", ()=> validateDonateAmount({ clamp:true }));
+  donateAmount.addEventListener("input", ()=> validateDonateAmount({ clamp:false }));
 }
   
 
@@ -1727,6 +1759,5 @@ await saveHistoryAsync(history);
 
 </body>
 </html>
-
 
 
