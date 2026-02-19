@@ -275,14 +275,16 @@
     @keyframes blink { 50% { opacity: 0; } }
 
     .imgChatTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 8px 14px;
-      border-bottom: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.65);
-      backdrop-filter: blur(8px);
-    }
+  display:flex;
+  flex-direction: column;     /* ✅ 가로 → 세로 스택 */
+  align-items: flex-start;    /* ✅ 왼쪽 정렬 */
+  justify-content: flex-start;
+  gap: 6px;                   /* ✅ 둘 사이 간격(좁게) */
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(8px);
+}
 
     .imgChatTitle{
       font-family: "Baloo 2", Inter, sans-serif;
@@ -301,12 +303,14 @@
       border: 1px solid rgba(255,255,255,.14);
     }
 
-    #imgResetBtn{
-      background: #e0b400;
-      border: 1px solid #c9a200;
-      color: #000;
-      font-weight: 800;
-    }
+    /* 버튼은 왼쪽에 붙게 */
+#imgResetBtn{
+  align-self: flex-start;     /* ✅ 혹시라도 영향받아도 왼쪽 고정 */
+  background: #e0b400;
+  border: 1px solid #c9a200;
+  color: #000;
+  font-weight: 800;
+}
 
     #imgResetBtn:hover{ background: #f0c800; }
     #imgResetBtn:active{ background: #cfa600; }
@@ -2275,6 +2279,7 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
 </body>
 </html>
+
 
 
 
