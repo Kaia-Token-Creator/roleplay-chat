@@ -914,7 +914,7 @@
 
       <div style="color:rgba(255,255,255,.85); margin-bottom:10px;">
         Thank you♥<br>
-        Donate any amount (minimum $2) and receive a Secret Gift 🎁
+        Donate any amount (minimum $2) and receive a Special Gift 🎁
       </div>
 
       <input id="donateAmount"
@@ -1074,6 +1074,8 @@ let history = [];
     return;
   }
 
+  maybeShowSecretGift();
+  
   // 5) render history + prune
   renderHistory();
   await pruneHistoryAndUI();
@@ -2299,7 +2301,7 @@ async function requestSecretGift(){
 
     appendMsg(
       "assistant",
-      "Thank you. Preparing your secret gift...",
+      "Thank you. Preparing your special gift...",
       undefined,
       undefined,
       { animate:true, italic:true }
@@ -2339,7 +2341,7 @@ if (!res.ok){
 
     appendMsg(
       "assistant",
-      "Thank you❤️ Here is my gift 🎁",
+      "Thank you❤️ Here is your gift 🎁",
       imageUrl || undefined,
       undefined,
       { animate:true }
@@ -2347,7 +2349,7 @@ if (!res.ok){
 
     history.push({
       role: "assistant",
-      content: "Thank you❤️ Here is my gift 🎁",
+      content: "Thank you❤️ Here is your gift 🎁",
       imageUrl
     });
 
@@ -2436,7 +2438,7 @@ if (secretLinkText){
 
 const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
 
-(function maybeShowSecretGift(){
+function maybeShowSecretGift(){
   try{
     if (!paid) return;
     if (sessionStorage.getItem(SECRET_POPUP_SHOWN_KEY) === "1") return;
@@ -2445,8 +2447,8 @@ const SECRET_POPUP_SHOWN_KEY = "roleplay-chat_secret_popup_shown_v1";
   }catch(e){
     if (paid) openSecretModal();
   }
-})();
-
+}
+  
 /* =========================
    Donate Modal logic
    ========================= */
