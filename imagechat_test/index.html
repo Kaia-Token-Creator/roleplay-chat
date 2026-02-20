@@ -711,13 +711,36 @@ async function pset(base, value){
   try{ if (window.localforage) await localforage.setItem(k, String(value)); }catch(e){}
 }
 
+const IMAGECHAT_PAID_ANCHOR_KEY = "roleplay-chat_imagechat_paid_anchor_v1";
+const P_PAID_ANCHOR_KEY        = "roleplay-chat_imagechat_paid_anchor_v1";
+
 async function pdel(base){
   const k = tkey(base);
   try{ localStorage.removeItem(k); }catch(e){}
   try{ if (window.localforage) await localforage.removeItem(k); }catch(e){}
 }
 
-  
+async function readPaidAnchorAsync(){
+  let raw = sessionStorage.getItem(IMAGECHAT_PAID_ANCHOR_KEY);
+
+  if (!raw){
+    raw = await pget(P_PAID_ANCHOR_KEY);
+    if (raw) sessionStorage.setItem(IMAGECHAT_PAID_ANCHOR_KEY, raw);
+  }
+
+  const v = raw ? parseInt(raw, 10) : NaN;
+  return Number.isFinite(v) ? v : null;
+}
+
+async function writePaidAnchorOnce(ts){
+  const exist = await readPaidAnchorAsync();
+  if (exist) return exist; // ✅ 절대 덮어쓰지 않음
+
+  const s = String(ts);
+  sessionStorage.setItem(IMAGECHAT_PAID_ANCHOR_KEY, s);
+  await pset(P_PAID_ANCHOR_KEY, s);
+  return ts;
+}
 
 if (navigator.storage && navigator.storage.persist){
   try {
@@ -776,7 +799,19 @@ if (session?.name){
   
 async function setImagechatPaid24hLocal(){
   const now = Date.now();
-  const payload = { status:"paid", paidAt: now, expiresAt: now + 24*60*60*1000 };
+
+  // ✅ 24시간 시작 시각을 "앵커"로 고정 (한 번만 생성)
+  let paidAt = await readPaidAnchorAsync();
+  if (!paidAt){
+    paidAt = await writePaidAnchorOnce(now);
+  }
+
+  const payload = {
+    status: "paid",
+    paidAt,
+    expiresAt: paidAt + 24*60*60*1000
+  };
+
   const s = JSON.stringify(payload);
 
   sessionStorage.setItem(IMAGECHAT_PAID_KEY, s);
@@ -817,6 +852,10 @@ async function setUnlimited(){
 
   sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
   await pdel(P_PAID_KEY);
+
+  // ✅ 앵커도 제거
+  sessionStorage.removeItem(IMAGECHAT_PAID_ANCHOR_KEY);
+  await pdel(P_PAID_ANCHOR_KEY);
 }
 
 async function isImagechatPaidValidAsync(){
@@ -826,10 +865,14 @@ async function isImagechatPaidValidAsync(){
   if (!p || p.status !== "paid" || !p.expiresAt) return false;
 
   if (Date.now() >= p.expiresAt){
-    sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
-    await pdel(P_PAID_KEY);
-    return false;
-  }
+  sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
+  await pdel(P_PAID_KEY);
+
+  sessionStorage.removeItem(IMAGECHAT_PAID_ANCHOR_KEY); // ✅ 추가
+  await pdel(P_PAID_ANCHOR_KEY);                        // ✅ 추가
+
+  return false;
+}
   return true;
 }
 
@@ -873,14 +916,18 @@ async function startHeaderCountdown(){
 
     const remain = p.expiresAt - Date.now();
     if (remain <= 0){
-      sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
-      await pdel(P_PAID_KEY);
-      holder.style.display = "none";
-      if (goLink) goLink.style.display = "none";
-      if (note) note.style.display = "none";
-      window.location.href = "/?expired=imagechat";
-      return false;
-    }
+  sessionStorage.removeItem(IMAGECHAT_PAID_KEY);
+  await pdel(P_PAID_KEY);
+
+  sessionStorage.removeItem(IMAGECHAT_PAID_ANCHOR_KEY); // ✅ 추가
+  await pdel(P_PAID_ANCHOR_KEY);                        // ✅ 추가
+
+  holder.style.display = "none";
+  if (goLink) goLink.style.display = "none";
+  if (note) note.style.display = "none";
+  window.location.href = "/?expired=imagechat";
+  return false;
+}
 
     holder.style.display = "inline";
     bold.textContent = `Available: ${formatRemaining(remain)}`;
@@ -1796,6 +1843,7 @@ await saveHistoryAsync(history);
 
 </body>
 </html>
+
 
 
 
