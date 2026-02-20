@@ -1031,8 +1031,16 @@ const CURRENT_TABID_KEY = "rp_imagechat_current_tabid_v1";
   let prev = null;
   try{ prev = sessionStorage.getItem(CURRENT_TABID_KEY); }catch(e){}
 
-  if (prev && prev === newTabId) return;
+  // ✅ 첫 진입(prev 없음)에서는 절대 지우지 말고 그냥 현재 tabId만 기록
+  if (!prev){
+    try{ sessionStorage.setItem(CURRENT_TABID_KEY, newTabId); }catch(e){}
+    return;
+  }
 
+  // ✅ 같은 tabId면 그대로 유지
+  if (prev === newTabId) return;
+
+  // ✅ "같은 탭에서 tabId가 바뀐 경우"에만 초기화
   const keysToClear = [
     "roleplay-chat_session_v1",
     "roleplay-chat_imagechat_history_v1",
@@ -2511,6 +2519,7 @@ donateModal?.addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
 
