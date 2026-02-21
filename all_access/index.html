@@ -2326,35 +2326,10 @@ if (!nicknameVal){
 
 
 
-// 🔓 ALL ACCESS → 모든 페이지에서 paid 인식 보장
-const PAID_KEYS = [
-  "roleplay-chat_paid_v1",
-  "roleplay-chat_imagechat_paid_v1",
-  "roleplay-chat_imagechat_unlimited_paid_v1"
-];
-
-try{
-  PAID_KEYS.forEach(k => sessionStorage.setItem(k, "paid"));
-}catch(e){}
-
-try{
-  PAID_KEYS.forEach(k => localStorage.setItem(k, "paid"));
-}catch(e){}
-
-// ⭐ 메인 페이지가 localForage auth store 볼 경우 대비
-try{
-  if (window.localforage){
-    const auth = localforage.createInstance({
-      name: "roleplay-chat",
-      storeName: "auth"
-    });
-    PAID_KEYS.forEach(k => auth.setItem(k, "paid").catch(()=>{}));
-  }
-}catch(e){}
-
-// ✅ 여기!!! All-access 권한 플래그(공통)
-try{ localStorage.setItem("ROLEPLAY_CHAT_ALL_ACCESS_V1", "paid"); }catch(e){}  
-  
+  // 🔓 FREE PASS: 무조건 paid
+sessionStorage.setItem("roleplay-chat_paid_v1", "paid");
+sessionStorage.setItem("roleplay-chat_imagechat_paid_v1", "paid");
+sessionStorage.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid");
 
 // ✅ tabID 생성 + 세션에 박기 + 탭에도 저장
 const tabID = generateTabID();
@@ -2682,4 +2657,3 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
-
