@@ -2531,7 +2531,8 @@ if (!nicknameVal){
     try{
       await persistSessionForTab(tabID, session);
       await persistHistoryForTab(tabID, []); // 처음 생성이니 빈 히스토리
-    }catch(e){}
+    try{ sessionStorage.setItem("roleplay-chat_session_v1", JSON.stringify(session)); }catch(e){}
+try{ sessionStorage.setItem("roleplay-chat_history_v1", JSON.stringify([])); }catch(e){}
     // ✅ 같은 오리진이면 상대경로가 더 안전
     window.location.assign("/?tabID=" + encodeURIComponent(tabID));
   })();
@@ -2561,7 +2562,8 @@ if (!nicknameVal){
       try{
         await persistSessionForTab(tabID, session);
         await persistHistoryForTab(tabID, []); // 처음이니 빈 히스토리
-      }catch(e){}
+      try{ sessionStorage.setItem("roleplay-chat_session_v1", JSON.stringify(session)); }catch(e){}
+try{ sessionStorage.setItem("roleplay-chat_history_v1", JSON.stringify([])); }catch(e){}
       clearPending();
       window.location.assign("/?tabID=" + encodeURIComponent(tabID));
     })();
@@ -2933,6 +2935,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
