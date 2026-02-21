@@ -1461,65 +1461,74 @@ Deleting browser data will erase your character, chat history, and access permis
 
   <script>
 
-    // =========================
-// TAB-ID based persistence (same style as main/all_access fix)
 // =========================
-const TABID_KEY = "roleplay-chat_tabID_v1"; // optional helper key
+// TAB-ID based persistence (FIX: save to same localforage instances as main)
+// =========================
+const TABID_KEY = "roleplay-chat_tabID_v1";
 
 function tabSessionKey(tabID){ return `roleplay-chat_session_v1__${tabID}`; }
 function tabHistoryKey(tabID){ return `roleplay-chat_history_v1__${tabID}`; }
 
-// 메인에서 tabID를 window.name으로도 복원한다면 이게 중요
 function persistTabID(tabID){
   try{ window.name = tabID; }catch(e){}
   try{ sessionStorage.setItem(TABID_KEY, tabID); }catch(e){}
   try{ localStorage.setItem(TABID_KEY, tabID); }catch(e){}
 }
 
-// 메인과 동일하게: localStorage + localforage에 "tabID별"로 저장
+// ✅ 메인이 사용할 가능성이 높은 localforage 인스턴스들 (DB/스토어 고정)
+function lfSession(){
+  return localforage.createInstance({ name: "roleplay-chat", storeName: "session" });
+}
+function lfHistory(){
+  return localforage.createInstance({ name: "roleplay-chat", storeName: "history" });
+}
+function lfAuth(){
+  return localforage.createInstance({ name: "roleplay-chat", storeName: "auth" });
+}
+
 async function persistSessionForTab(tabID, sessionObj){
   persistTabID(tabID);
 
-  // ✅ 0) sessionStorage (메인이 이걸 먼저 보는 경우가 많아서 필수)
-  try{
-    sessionStorage.setItem(tabSessionKey(tabID), JSON.stringify(sessionObj));
-    sessionStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj)); // 호환용
-  }catch(e){}
-
-  // 1) localStorage (fast fallback)
+  // 1) localStorage (tab scoped + legacy)
   try{
     localStorage.setItem(tabSessionKey(tabID), JSON.stringify(sessionObj));
-    localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj)); // 호환용
+    localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj)); // legacy
   }catch(e){}
 
-  // 2) localforage (backup)
+  // 2) localforage (✅ main과 동일 인스턴스에 저장)
   try{
     if (window.localforage){
-      await localforage.setItem(tabSessionKey(tabID), sessionObj);
+      await lfSession().setItem(tabSessionKey(tabID), sessionObj);
+      await lfSession().setItem("roleplay-chat_session_v1", sessionObj); // legacy
     }
   }catch(e){}
 }
 
-// 히스토리도 메인이 tabID로 찾는 구조면 같이 저장
 async function persistHistoryForTab(tabID, historyArr){
-  const h = historyArr || [];
-
-  // ✅ 0) sessionStorage
-  try{
-    sessionStorage.setItem(tabHistoryKey(tabID), JSON.stringify(h));
-    sessionStorage.setItem("roleplay-chat_history_v1", JSON.stringify(h)); // 호환용
-  }catch(e){}
+  const arr = historyArr || [];
 
   // 1) localStorage
   try{
-    localStorage.setItem(tabHistoryKey(tabID), JSON.stringify(h));
-    localStorage.setItem("roleplay-chat_history_v1", JSON.stringify(h)); // 호환용
+    localStorage.setItem(tabHistoryKey(tabID), JSON.stringify(arr));
+    localStorage.setItem("roleplay-chat_history_v1", JSON.stringify(arr)); // legacy
   }catch(e){}
 
-  // 2) localforage
+  // 2) localforage (✅ main과 동일 인스턴스에 저장)
   try{
     if (window.localforage){
-      await localforage.setItem(tabHistoryKey(tabID), h);
+      await lfHistory().setItem(tabHistoryKey(tabID), arr);
+      await lfHistory().setItem("roleplay-chat_history_v1", arr); // legacy
+    }
+  }catch(e){}
+}
+
+// ✅ paid 플래그도 메인이 어디서 보든 통과하게 저장소 3군데에 씀
+async function persistPaidFlag(key, val){
+  try{ sessionStorage.setItem(key, val); }catch(e){}
+  try{ localStorage.setItem(key, val); }catch(e){}
+  try{
+    if (window.localforage){
+      await lfAuth().setItem(key, val);
     }
   }catch(e){}
 }
@@ -1852,11 +1861,11 @@ function show(view){
 
     // --------- Save & load (tab-scoped)
     function saveSession(data){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
     function loadSession(){
       try{
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = sessionStorage.getItem(STORAGE_KEY);
         if (!raw) return null;
         return JSON.parse(raw);
       }catch(e){
@@ -1885,11 +1894,11 @@ function clearPending(){
 
     // --------- Save & load (chat history, tab-scoped)
 function saveHistory(history){
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
 function loadHistory(){
   try{
-    const raw = localStorage.getItem(HISTORY_KEY);
+    const raw = sessionStorage.getItem(HISTORY_KEY);
     return raw ? JSON.parse(raw) : [];
   }catch(e){
     return [];
@@ -2536,7 +2545,6 @@ if (!nicknameVal){
   if (tier === "general"){
   const tabID = createTabID();
   session.tabID = tabID;
-  persistTabID(tabID);  
 
     // ✅ (메인 페이지가 옛 키로 읽는 경우 대비: 호환 저장)
   try{ saveSession(session); }catch(e){}
@@ -2562,28 +2570,25 @@ if (!nicknameVal){
 
   openPayModal();
 
-  mountPayPalButtons(() => {
-    paymentStatus = "paid";
+  mountPayPalButtons(async () => {
+  paymentStatus = "paid";
 
-    sessionStorage.setItem(PAYMENT_KEY, "paid");
-    try{ localStorage.setItem(PAYMENT_KEY, "paid"); }catch(e){}
+  // ✅ paid를 sessionStorage/localStorage/localforage(auth)에 모두 기록
+  await persistPaidFlag(PAYMENT_KEY, "paid");
 
-    session.tier = "uncensored";
+  session.tier = "uncensored";
 
-    const tabID = createTabID();
-    session.tabID = tabID;
-    persistTabID(tabID);
+  const tabID = createTabID();
+  session.tabID = tabID;
 
-    (async () => {
-      try{
-        await persistSessionForTab(tabID, session);
-        await persistHistoryForTab(tabID, []); // 처음이니 빈 히스토리
-      }catch(e){}
-      clearPending();
-      window.location.assign("/?tabID=" + encodeURIComponent(tabID));
-    })();
+  try{
+    await persistSessionForTab(tabID, session);
+    await persistHistoryForTab(tabID, []);
+  }catch(e){}
 
-  }, "1.00", "Playing game");
+  clearPending();
+  window.location.assign("/?tabID=" + encodeURIComponent(tabID));
+}, "1.00", "Playing game");
 
   return;
 }
@@ -2950,4 +2955,5 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
