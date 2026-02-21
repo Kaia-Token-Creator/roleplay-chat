@@ -1366,8 +1366,7 @@ body.modalOpen{
 
               <div class="actions">
                 <button id="createBtn" class="btn btnPrimary" type="submit">Create</button>
-              
-         
+                       
 <div class="note">
   <span style="color:#FFD600; font-weight:600;">No log-in. No sign-up</span><br />
   <span style="opacity:.8;">
@@ -1392,6 +1391,7 @@ Deleting browser data will erase your character, chat history, and access permis
   </span>
 </div>
                 </div>
+            
           </form>
         </div>
   
@@ -1476,7 +1476,7 @@ Deleting browser data will erase your character, chat history, and access permis
           - <span class="highlightCTA">Available for 24hrs.</span> (Time limit)<br>
           - <span class="highlightCTA">Unlimited image generation during chat</span><br>
           - <span class="highlightCTA">Fully uncensored</span><br>
-          - Unlimited access in your device's browser via unique URL for 24hrs.<br>
+           - Unlimited access in your device's browser via unique URL for 24hrs.<br>
           - Image Gen matching the roleplay context.<br>
           - Longer replies. Richer memory.<br>
           - More detail. More tension.<br>
@@ -1597,7 +1597,20 @@ const chatAvatar = $("#chatAvatar");
     const unlockBtn = $("#unlockBtn");
 
     const STORAGE_KEY = "roleplay-chat_session_v1";
+    const STORAGE_TABID_KEY = STORAGE_KEY + "_tabid";
     const HISTORY_KEY = "roleplay-chat_history_v1";
+const HISTORY_TABID_KEY = HISTORY_KEY + "_tabid";
+
+function TAB_SESSION_KEY(){
+  return `rpc_session_${getCurrentTabID()}`;
+}
+function TAB_HISTORY_KEY(){
+  return `rpc_history_${getCurrentTabID()}`;
+}
+function TAB_PAID_KEY(keyName){
+  return `rpc_paid_${keyName}_${getCurrentTabID()}`;
+}    
+
     const PENDING_KEY = "roleplay-chat_pending_session_v1";
     const MAX_HISTORY = 120;
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
@@ -1963,23 +1976,54 @@ function show(view){
 
     // --------- Save & load (tab-scoped) + Backup by tabID
 function saveSession(data){
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data)); // 기존(빠른)
-  lsSet(k("session"), data);                                 // localStorage 백업
+  const tabID = getCurrentTabID();
+
+  // ✅ (호환) 기존 키도 그대로 저장: 다른 페이지가 STORAGE_KEY로 보내도 계속 동작
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  sessionStorage.setItem(STORAGE_TABID_KEY, tabID);
+
+  // ✅ (핵심) tabID별 sessionStorage도 저장
+  sessionStorage.setItem(TAB_SESSION_KEY(), JSON.stringify(data));
+
+  // ✅ localStorage 백업(기존 유지)
+  lsSet(k("session"), data);
 }
 
 function loadSession(){
-  // 1) sessionStorage 우선
+  const tabID = getCurrentTabID();
+
+  // 1) ✅ tabID 전용 sessionStorage 우선
   try{
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    const rawTab = sessionStorage.getItem(TAB_SESSION_KEY());
+    if (rawTab) return JSON.parse(rawTab);
   }catch(e){}
 
-  // 2) localStorage 복원
+  // 2) ✅ (호환) STORAGE_KEY는 "같은 tabID에서 저장된 것"일 때만 허용
+  try{
+    const meta = sessionStorage.getItem(STORAGE_TABID_KEY);
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw && meta === tabID){
+      const sess = JSON.parse(raw);
+
+      // 이후 안정 위해 tabID키에도 복제
+      try{ sessionStorage.setItem(TAB_SESSION_KEY(), JSON.stringify(sess)); }catch(e){}
+      return sess;
+    }
+  }catch(e){}
+
+  // 3) ✅ localStorage(tabID별) 백업 복원
   const b = lsGet(k("session"));
   if (b){
-    try{ sessionStorage.setItem(STORAGE_KEY, JSON.stringify(b)); }catch(e){}
+    try{
+      sessionStorage.setItem(TAB_SESSION_KEY(), JSON.stringify(b));
+
+      // (호환) STORAGE_KEY 유지 + meta 기록
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(b));
+      sessionStorage.setItem(STORAGE_TABID_KEY, tabID);
+    }catch(e){}
     return b;
   }
+
   return null;
 }
 
@@ -2000,8 +2044,19 @@ async function commitSessionStorageToUrlTabID(){
   if (already) return;
 
   // sessionStorage에 세션이 있으면 그걸 꺼냄
+  // ✅ 우선: tabID 전용 키에서 찾기
   let raw = null;
-  try{ raw = sessionStorage.getItem(STORAGE_KEY); }catch(e){}
+  try{
+    raw = sessionStorage.getItem(TAB_SESSION_KEY());
+
+    // ✅ 없으면: STORAGE_KEY(호환) — 단, 같은 tabID일 때만
+    if (!raw){
+      const meta = sessionStorage.getItem(STORAGE_TABID_KEY);
+      if (meta === tabID){
+        raw = sessionStorage.getItem(STORAGE_KEY);
+      }
+    }
+  }catch(e){}
   if (!raw) return;
 
   let sess = null;
@@ -2027,7 +2082,12 @@ async function commitSessionStorageToUrlTabID(){
     
 
 function clearSession(){
+  sessionStorage.removeItem(TAB_SESSION_KEY());
+
+  // (호환키는 남길지/지울지 선택인데, 보통은 지우는게 안전)
   sessionStorage.removeItem(STORAGE_KEY);
+  sessionStorage.removeItem(STORAGE_TABID_KEY);
+
   lsDel(k("session"));
 }
 
@@ -2059,30 +2119,59 @@ async function saveHistory(history){
   if (Array.isArray(history) && history.length > MAX_HISTORY){
     history = history.slice(-MAX_HISTORY);
   }
-  // 빠른용 sessionStorage
-  sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 
-  // 큰 데이터는 localForage 백업(탭별)
+  const tabID = getCurrentTabID();
+
+  // ✅ (호환) 기존 HISTORY_KEY 유지
+  sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  sessionStorage.setItem(HISTORY_TABID_KEY, tabID);
+
+  // ✅ (핵심) tabID별 history sessionStorage
+  sessionStorage.setItem(TAB_HISTORY_KEY(), JSON.stringify(history));
+
+  // ✅ localForage(기존 tabID별) 유지
   await lfSet(k("history"), history);
 }
 
 async function loadHistory(){
-  // 1) sessionStorage 우선
+  const tabID = getCurrentTabID();
+
+  // 1) ✅ tabID 전용 sessionStorage 우선
   try{
-    const raw = sessionStorage.getItem(HISTORY_KEY);
+    const raw = sessionStorage.getItem(TAB_HISTORY_KEY());
     if (raw){
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) return parsed.slice(-MAX_HISTORY);
     }
   }catch(e){}
 
-  // 2) localForage 복원
+  // 2) ✅ (호환) HISTORY_KEY는 같은 tabID일 때만
+  try{
+    const meta = sessionStorage.getItem(HISTORY_TABID_KEY);
+    const raw = sessionStorage.getItem(HISTORY_KEY);
+    if (raw && meta === tabID){
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)){
+        try{ sessionStorage.setItem(TAB_HISTORY_KEY(), JSON.stringify(parsed)); }catch(e){}
+        return parsed.slice(-MAX_HISTORY);
+      }
+    }
+  }catch(e){}
+
+  // 3) ✅ localForage 복원 (tabID별)
   const b = await lfGet(k("history"));
   if (Array.isArray(b)){
     const clipped = b.slice(-MAX_HISTORY);
-    try{ sessionStorage.setItem(HISTORY_KEY, JSON.stringify(clipped)); }catch(e){}
+    try{
+      sessionStorage.setItem(TAB_HISTORY_KEY(), JSON.stringify(clipped));
+
+      // (호환) HISTORY_KEY도 유지 + meta
+      sessionStorage.setItem(HISTORY_KEY, JSON.stringify(clipped));
+      sessionStorage.setItem(HISTORY_TABID_KEY, tabID);
+    }catch(e){}
     return clipped;
   }
+
   return [];
 }
 
@@ -2428,15 +2517,26 @@ function mountPayPalButtons(onSuccess, priceUsd = "2.00", description = "Playing
     let chatHistory = []; // {role:"user"|"assistant", content:string}
     const PAYMENT_KEY = "roleplay-chat_paid_v1";
     function setPaid(keyName, value){
-  sessionStorage.setItem(keyName, value);
-  lsSet(k(keyName), value);
+  const pk = TAB_PAID_KEY(keyName);
+
+  // ✅ tabID 스코프로만 저장
+  sessionStorage.setItem(pk, value);
+  lsSet(pk, value);
+
+  // ✅ (레거시) 예전 전역 paid가 남아있으면 제거해서 누수 방지
+  try{ sessionStorage.removeItem(keyName); }catch(e){}
 }
+
 function getPaid(keyName){
-  const s = sessionStorage.getItem(keyName);
+  const pk = TAB_PAID_KEY(keyName);
+
+  // ✅ tabID 스코프만 조회
+  const s = sessionStorage.getItem(pk);
   if (s) return s;
-  const b = lsGet(k(keyName));
+
+  const b = lsGet(pk);
   if (b){
-    sessionStorage.setItem(keyName, b);
+    sessionStorage.setItem(pk, b);
     return b;
   }
   return null;
@@ -2511,7 +2611,7 @@ function containsSexTrigger(text){
 // ✅ “결제 안 됨” 상태인지 판단 (general 채팅 + 아직 paid 아님)
 function isUnpaidGeneral(){
   const s = loadSession();
-  const isPaid = sessionStorage.getItem(PAYMENT_KEY) === "paid";
+  const isPaid = getPaid(PAYMENT_KEY) === "paid";
   return !!(s && s.tier === "general" && !isPaid);
 }
 
@@ -2807,7 +2907,7 @@ if (!nicknameVal){
       }
 
       clearPending();
-      const tabID = generateTabID();
+      const tabID = getCurrentTabID();   // ✅ 기존 tabID 유지
 window.location.href = "/?tabID=" + tabID;
     }, "2.00", "Playing game");
     return;
@@ -3096,7 +3196,7 @@ const pending = loadPending();
 
 function setUnlockUIVisibility(){
   const s = loadSession();
-  const isPaid = sessionStorage.getItem(PAYMENT_KEY) === "paid";
+  const isPaid = getPaid(PAYMENT_KEY) === "paid";
   const isGeneral = s && s.tier === "general";
   if (unlockBtn){
     unlockBtn.style.display = (isGeneral && !isPaid) ? "inline-flex" : "none";
@@ -3146,7 +3246,7 @@ if (unlockBtn){
   });
 }
 
-   
+    
 
 // ✅ 결제 진행하다 닫았던 상태면: 셋업 화면 유지 (tabID 백업 복원 기반)
 (async function bootstrapByTabID(){
@@ -3190,11 +3290,11 @@ if (unlockBtn){
 
   // tier별 라우팅 (tabID 유지)
   if (existing.tier === "imagechat"){
-    window.location.href = "/imagechat/?tabID=" + getTabID();
+    window.location.href = "/imagechat/?tabID=" + getCurrentTabID();
     return;
   }
   if (existing.tier === "imagechat_unlimited"){
-    window.location.href = "/imagechat_unlimited/?tabID=" + getTabID();
+    window.location.href = "/imagechat_unlimited/?tabID=" + getCurrentTabID();
     return;
   }
 
@@ -3252,15 +3352,3 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
