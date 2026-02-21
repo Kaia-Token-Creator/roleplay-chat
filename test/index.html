@@ -1598,7 +1598,7 @@ const chatAvatar = $("#chatAvatar");
 
     const STORAGE_KEY = "roleplay-chat_session_v1";
     const STORAGE_TABID_KEY = STORAGE_KEY + "_tabid";
-
+    const HISTORY_KEY = "roleplay-chat_history_v1";
 const HISTORY_TABID_KEY = HISTORY_KEY + "_tabid";
 
 function TAB_SESSION_KEY(){
@@ -1607,8 +1607,7 @@ function TAB_SESSION_KEY(){
 function TAB_HISTORY_KEY(){
   return `rpc_history_${getCurrentTabID()}`;
 }
-    
-    const HISTORY_KEY = "roleplay-chat_history_v1";
+
     const PENDING_KEY = "roleplay-chat_pending_session_v1";
     const MAX_HISTORY = 120;
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
@@ -3277,11 +3276,11 @@ if (unlockBtn){
 
   // tier별 라우팅 (tabID 유지)
   if (existing.tier === "imagechat"){
-    window.location.href = "/imagechat_test/?tabID=" + getTabID();
+    window.location.href = "/imagechat_test/?tabID=" + getCurrentTabID();
     return;
   }
   if (existing.tier === "imagechat_unlimited"){
-    window.location.href = "/imagechat_unlimited_test/?tabID=" + getTabID();
+    window.location.href = "/imagechat_unlimited_test/?tabID=" + getCurrentTabID();
     return;
   }
 
@@ -3339,6 +3338,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
