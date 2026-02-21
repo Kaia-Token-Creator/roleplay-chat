@@ -2510,18 +2510,30 @@ function mountPayPalButtons(onSuccess, priceUsd = "1.00", description = "Playing
     let chatHistory = []; // {role:"user"|"assistant", content:string}
     const PAYMENT_KEY = "roleplay-chat_paid_v1";
     function setPaid(keyName, value){
+  const tabKey = k(keyName);
+
+  // ⭐ tabID 전용 저장
+  sessionStorage.setItem(tabKey, value);
+  lsSet(tabKey, value);
+
+  // ⭐ (선택) 기존 전역 키도 유지 — 다른 페이지 호환용
   sessionStorage.setItem(keyName, value);
-  lsSet(k(keyName), value);
 }
 function getPaid(keyName){
-  const s = sessionStorage.getItem(keyName);
+  const tabKey = k(keyName);
+
+  // ⭐ 1) tabID 전용 sessionStorage
+  const s = sessionStorage.getItem(tabKey);
   if (s) return s;
-  const b = lsGet(k(keyName));
+
+  // ⭐ 2) tabID 전용 localStorage 백업
+  const b = lsGet(tabKey);
   if (b){
-    sessionStorage.setItem(keyName, b);
+    sessionStorage.setItem(tabKey, b);
     return b;
   }
-  return null;
+
+  return null; // ❌ 전역 키는 절대 보지 않음
 }
 
     let paymentStatus = (getPaid(PAYMENT_KEY) || "unpaid");
@@ -2593,7 +2605,7 @@ function containsSexTrigger(text){
 // ✅ “결제 안 됨” 상태인지 판단 (general 채팅 + 아직 paid 아님)
 function isUnpaidGeneral(){
   const s = loadSession();
-  const isPaid = sessionStorage.getItem(PAYMENT_KEY) === "paid";
+  const isPaid = getPaid(PAYMENT_KEY) === "paid";
   return !!(s && s.tier === "general" && !isPaid);
 }
 
@@ -3178,7 +3190,7 @@ const pending = loadPending();
 
 function setUnlockUIVisibility(){
   const s = loadSession();
-  const isPaid = sessionStorage.getItem(PAYMENT_KEY) === "paid";
+  const isPaid = getPaid(PAYMENT_KEY) === "paid";
   const isGeneral = s && s.tier === "general";
   if (unlockBtn){
     unlockBtn.style.display = (isGeneral && !isPaid) ? "inline-flex" : "none";
@@ -3350,5 +3362,6 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
