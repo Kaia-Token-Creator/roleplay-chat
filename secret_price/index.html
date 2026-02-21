@@ -1480,11 +1480,16 @@ function persistTabID(tabID){
 async function persistSessionForTab(tabID, sessionObj){
   persistTabID(tabID);
 
+  // ✅ 0) sessionStorage (메인이 이걸 먼저 보는 경우가 많아서 필수)
+  try{
+    sessionStorage.setItem(tabSessionKey(tabID), JSON.stringify(sessionObj));
+    sessionStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj)); // 호환용
+  }catch(e){}
+
   // 1) localStorage (fast fallback)
   try{
     localStorage.setItem(tabSessionKey(tabID), JSON.stringify(sessionObj));
-    // 호환용(기존 키도 유지하고 싶으면)
-    localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj));
+    localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj)); // 호환용
   }catch(e){}
 
   // 2) localforage (backup)
@@ -1497,14 +1502,24 @@ async function persistSessionForTab(tabID, sessionObj){
 
 // 히스토리도 메인이 tabID로 찾는 구조면 같이 저장
 async function persistHistoryForTab(tabID, historyArr){
+  const h = historyArr || [];
+
+  // ✅ 0) sessionStorage
   try{
-    localStorage.setItem(tabHistoryKey(tabID), JSON.stringify(historyArr || []));
-    localStorage.setItem("roleplay-chat_history_v1", JSON.stringify(historyArr || [])); // 호환용
+    sessionStorage.setItem(tabHistoryKey(tabID), JSON.stringify(h));
+    sessionStorage.setItem("roleplay-chat_history_v1", JSON.stringify(h)); // 호환용
   }catch(e){}
 
+  // 1) localStorage
+  try{
+    localStorage.setItem(tabHistoryKey(tabID), JSON.stringify(h));
+    localStorage.setItem("roleplay-chat_history_v1", JSON.stringify(h)); // 호환용
+  }catch(e){}
+
+  // 2) localforage
   try{
     if (window.localforage){
-      await localforage.setItem(tabHistoryKey(tabID), historyArr || []);
+      await localforage.setItem(tabHistoryKey(tabID), h);
     }
   }catch(e){}
 }
@@ -2531,8 +2546,7 @@ if (!nicknameVal){
     try{
       await persistSessionForTab(tabID, session);
       await persistHistoryForTab(tabID, []); // 처음 생성이니 빈 히스토리
-    try{ sessionStorage.setItem("roleplay-chat_session_v1", JSON.stringify(session)); }catch(e){}
-try{ sessionStorage.setItem("roleplay-chat_history_v1", JSON.stringify([])); }catch(e){}
+    }catch(e){}
     // ✅ 같은 오리진이면 상대경로가 더 안전
     window.location.assign("/?tabID=" + encodeURIComponent(tabID));
   })();
@@ -2562,8 +2576,7 @@ try{ sessionStorage.setItem("roleplay-chat_history_v1", JSON.stringify([])); }ca
       try{
         await persistSessionForTab(tabID, session);
         await persistHistoryForTab(tabID, []); // 처음이니 빈 히스토리
-      try{ sessionStorage.setItem("roleplay-chat_session_v1", JSON.stringify(session)); }catch(e){}
-try{ sessionStorage.setItem("roleplay-chat_history_v1", JSON.stringify([])); }catch(e){}
+      }catch(e){}
       clearPending();
       window.location.assign("/?tabID=" + encodeURIComponent(tabID));
     })();
@@ -2935,51 +2948,5 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
