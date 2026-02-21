@@ -1500,6 +1500,33 @@ const chatAvatar = $("#chatAvatar");
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
     const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
 
+    // ✅ tabID 기준 영구 저장소(localStorage + localForage)
+const lfTabs = (window.localforage)
+  ? localforage.createInstance({ name: "roleplay-chat", storeName: "tabs" })
+  : null;
+
+function tabSessionKey(tabID){ return `roleplay-chat_session_v1::${tabID}`; }
+function tabHistoryKey(tabID){ return `roleplay-chat_history_v1::${tabID}`; }
+
+async function persistTabData(tabID, session, history){
+  const sKey = tabSessionKey(tabID);
+  const hKey = tabHistoryKey(tabID);
+
+  // localStorage
+  try{
+    localStorage.setItem(sKey, JSON.stringify(session));
+    localStorage.setItem(hKey, JSON.stringify(history || []));
+  }catch(e){}
+
+  // localForage (fallback)
+  if (lfTabs){
+    try{
+      await lfTabs.setItem(sKey, session);
+      await lfTabs.setItem(hKey, history || []);
+    }catch(e){}
+  }
+}
+
     // Share button
 const shareBtn = document.querySelector("#shareBtn");
 if (shareBtn){
@@ -2131,7 +2158,7 @@ if (isUnpaidGeneral() && containsSexTrigger(text)){
 
 
     // --------- Submit flow
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const name = nameInput.value.trim();
@@ -2225,6 +2252,7 @@ sessionStorage.setItem("tabID", tabID);
 
 // 세션 저장
 saveSession(session);
+await persistTabData(tabID, session, []);  
 
 
 // 🚀 tier별 즉시 이동 (+ tabID 붙이기)
@@ -2532,3 +2560,4 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
