@@ -1489,17 +1489,25 @@ function lfAuth(){
 async function persistSessionForTab(tabID, sessionObj){
   persistTabID(tabID);
 
-  // 1) localStorage (tab scoped + legacy)
+  // 1) localStorage (tab + legacy)
   try{
     localStorage.setItem(tabSessionKey(tabID), JSON.stringify(sessionObj));
-    localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj)); // legacy
+    localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj));
   }catch(e){}
 
-  // 2) localforage (✅ main과 동일 인스턴스에 저장)
+  // 2) localforage "default" (메인이 createInstance 안 쓰는 경우 대비)
+  try{
+    if (window.localforage){
+      await localforage.setItem(tabSessionKey(tabID), sessionObj);
+      await localforage.setItem("roleplay-chat_session_v1", sessionObj);
+    }
+  }catch(e){}
+
+  // 3) localforage instance (메인이 instance 쓰는 경우 대비)
   try{
     if (window.localforage){
       await lfSession().setItem(tabSessionKey(tabID), sessionObj);
-      await lfSession().setItem("roleplay-chat_session_v1", sessionObj); // legacy
+      await lfSession().setItem("roleplay-chat_session_v1", sessionObj);
     }
   }catch(e){}
 }
@@ -1507,27 +1515,38 @@ async function persistSessionForTab(tabID, sessionObj){
 async function persistHistoryForTab(tabID, historyArr){
   const arr = historyArr || [];
 
-  // 1) localStorage
+  // 1) localStorage (tab + legacy)
   try{
     localStorage.setItem(tabHistoryKey(tabID), JSON.stringify(arr));
-    localStorage.setItem("roleplay-chat_history_v1", JSON.stringify(arr)); // legacy
+    localStorage.setItem("roleplay-chat_history_v1", JSON.stringify(arr));
   }catch(e){}
 
-  // 2) localforage (✅ main과 동일 인스턴스에 저장)
+  // 2) localforage "default"
+  try{
+    if (window.localforage){
+      await localforage.setItem(tabHistoryKey(tabID), arr);
+      await localforage.setItem("roleplay-chat_history_v1", arr);
+    }
+  }catch(e){}
+
+  // 3) localforage instance
   try{
     if (window.localforage){
       await lfHistory().setItem(tabHistoryKey(tabID), arr);
-      await lfHistory().setItem("roleplay-chat_history_v1", arr); // legacy
+      await lfHistory().setItem("roleplay-chat_history_v1", arr);
     }
   }catch(e){}
 }
 
-// ✅ paid 플래그도 메인이 어디서 보든 통과하게 저장소 3군데에 씀
 async function persistPaidFlag(key, val){
+  // 1) session/local
   try{ sessionStorage.setItem(key, val); }catch(e){}
   try{ localStorage.setItem(key, val); }catch(e){}
+
+  // 2) localforage default + instance (둘 다)
   try{
     if (window.localforage){
+      await localforage.setItem(key, val);
       await lfAuth().setItem(key, val);
     }
   }catch(e){}
@@ -2863,7 +2882,7 @@ function openPayModalForCurrentChat(){
   mountPayPalButtons(
     () => {
       paymentStatus = "paid";
-      sessionStorage.setItem(PAYMENT_KEY, "paid");
+      persistPaidFlag(PAYMENT_KEY, "paid");
 
       const cur = loadSession();
       if (cur){
@@ -2955,5 +2974,6 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
