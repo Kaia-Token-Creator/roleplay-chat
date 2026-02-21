@@ -911,6 +911,88 @@ padding: 5px 8px;
   </div>
 
   <script>
+
+    /* 🔥 DevTools Warning — Characters Page */
+
+(function warnOnEntry(){
+  const msg = [
+    "🚫 STOP",
+    "",
+    "Unauthorized access or modification of this site is strictly prohibited.",
+    "",
+    "Attempting to bypass payments or access controls may constitute",
+    "theft of service and fraud.",
+    "",
+    "Abuse attempts may be logged (timestamps, device/browser data, IP/network metadata where available).",
+    "Service access may be revoked and this device/browser may be permanently blocked.",
+    "",
+    "Evidence may be retained and used for disputes, chargebacks,",
+    "and legal action."
+  ].join("\n");
+
+  console.log(
+    "%c" + msg,
+    [
+      "color:#ffcc00",
+      "background:#000",
+      "padding:14px 16px",
+      "border:2px solid #ffcc00",
+      "border-radius:14px",
+      "font-size:13px",
+      "font-weight:900",
+      "line-height:1.45"
+    ].join(";")
+  );
+})();
+
+(function watchPaidTamper(){
+
+  const KEYS = [
+    "roleplay-chat_paid_v1",
+    "roleplay-chat_imagechat_paid_v1",
+    "roleplay-chat_imagechat_unlimited_paid_v1"
+  ];
+
+  function warn(k){
+    const msg = [
+      "🚨 SECURITY ALERT — TAMPERING DETECTED",
+      "",
+      `Key: ${k}`,
+      "",
+      "Unauthorized modification of payment or access controls detected.",
+      "",
+      "This may constitute theft of service and fraud.",
+      "Service access may be immediately revoked.",
+      "This device/browser may be permanently blocked.",
+      "",
+      "Evidence may be preserved for dispute resolution and legal action."
+    ].join("\n");
+
+    console.log(
+      "%c" + msg,
+      [
+        "color:#ff3b3b",
+        "background:#000",
+        "padding:12px 14px",
+        "border:2px solid #ff3b3b",
+        "border-radius:12px",
+        "font-size:13px",
+        "font-weight:900",
+        "line-height:1.45"
+      ].join(";")
+    );
+  }
+
+  try{
+    const _set = sessionStorage.setItem.bind(sessionStorage);
+    sessionStorage.setItem = function(k, v){
+      if (KEYS.includes(String(k))) warn(k);
+      return _set(k, v);
+    };
+  }catch(e){}
+
+})();
+    
     // Helpers
     const $ = (q) => document.querySelector(q);
     const $$ = (q) => Array.from(document.querySelectorAll(q));
@@ -2304,6 +2386,7 @@ applySearchFilter();
   </script>
 </body>
 </html>
+
 
 
 
