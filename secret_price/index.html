@@ -1461,111 +1461,6 @@ Deleting browser data will erase your character, chat history, and access permis
 
   <script>
 
-// =========================
-// ✅ Robust handoff storage (match main page variants)
-// =========================
-function safeJsonSet(storage, key, value){
-  try{ storage.setItem(key, typeof value === "string" ? value : JSON.stringify(value)); }catch(e){}
-}
-
-function safeSet(storage, key, value){
-  try{ storage.setItem(key, value); }catch(e){}
-}
-
-function lfInstance(name, storeName){
-  try{
-    if (!window.localforage) return null;
-    return localforage.createInstance({ name, storeName });
-  }catch(e){ return null; }
-}
-
-// 메인이 어떤 조합을 쓰든 잡히게 여러 인스턴스에 저장
-const LF = {
-  session: [
-    lfInstance("roleplay-chat", "session"),
-    lfInstance("roleplay-chat", "sessions"),
-    lfInstance("roleplay_chat", "session"),
-    lfInstance("roleplay", "session"),
-    window.localforage || null, // default도 같이
-  ].filter(Boolean),
-
-  history: [
-    lfInstance("roleplay-chat", "history"),
-    lfInstance("roleplay-chat", "chat"),
-    lfInstance("roleplay_chat", "history"),
-    window.localforage || null,
-  ].filter(Boolean),
-
-  auth: [
-    lfInstance("roleplay-chat", "auth"),
-    lfInstance("roleplay-chat", "flags"),
-    lfInstance("roleplay_chat", "auth"),
-    window.localforage || null,
-  ].filter(Boolean),
-
-  meta: [
-    lfInstance("roleplay-chat", "meta"),
-    lfInstance("roleplay-chat", "tabs"),
-    lfInstance("roleplay_chat", "meta"),
-    window.localforage || null,
-  ].filter(Boolean),
-};
-
-async function lfSetMany(instances, key, value){
-  for (const inst of instances){
-    try{ await inst.setItem(key, value); }catch(e){}
-  }
-}
-
-async function persistTabIDEverywhere(tabID){
-  // window.name + sessionStorage/localStorage
-  try{ window.name = tabID; }catch(e){}
-  safeSet(sessionStorage, TABID_KEY, tabID);
-  safeSet(localStorage, TABID_KEY, tabID);
-
-  // localforage/meta에도
-  await lfSetMany(LF.meta, TABID_KEY, tabID);
-}
-
-async function persistSessionEverywhere(tabID, sessionObj){
-  await persistTabIDEverywhere(tabID);
-
-  const kTab = tabSessionKey(tabID);               // roleplay-chat_session_v1__{tabID}
-  const kLegacy = "roleplay-chat_session_v1";      // 레거시 호환
-
-  // sessionStorage/localStorage 둘 다
-  safeJsonSet(sessionStorage, kTab, sessionObj);
-  safeJsonSet(sessionStorage, kLegacy, sessionObj);
-  safeJsonSet(localStorage,  kTab, sessionObj);
-  safeJsonSet(localStorage,  kLegacy, sessionObj);
-
-  // localforage 여러 인스턴스에
-  await lfSetMany(LF.session, kTab, sessionObj);
-  await lfSetMany(LF.session, kLegacy, sessionObj);
-}
-
-async function persistHistoryEverywhere(tabID, historyArr){
-  const kTab = tabHistoryKey(tabID);
-  const kLegacy = "roleplay-chat_history_v1";
-
-  const value = historyArr || [];
-
-  safeJsonSet(sessionStorage, kTab, value);
-  safeJsonSet(sessionStorage, kLegacy, value);
-  safeJsonSet(localStorage,  kTab, value);
-  safeJsonSet(localStorage,  kLegacy, value);
-
-  await lfSetMany(LF.history, kTab, value);
-  await lfSetMany(LF.history, kLegacy, value);
-}
-
-async function persistPaidEverywhere(key, val){
-  // paid 플래그는 메인이 localStorage/localforage 기준일 가능성이 큼
-  safeSet(sessionStorage, key, val);
-  safeSet(localStorage, key, val);
-  await lfSetMany(LF.auth, key, val);
-}
-
     // =========================
 // TAB-ID based persistence (same style as main/all_access fix)
 // =========================
@@ -1579,37 +1474,53 @@ function persistTabID(tabID){
   try{ window.name = tabID; }catch(e){}
   try{ sessionStorage.setItem(TABID_KEY, tabID); }catch(e){}
   try{ localStorage.setItem(TABID_KEY, tabID); }catch(e){}
+  try{ if(window.localforage) localforage.setItem(TABID_KEY, tabID); }catch(e){} // ✅ 여기 추가
 }
 
+// 메인과 동일하게: localStorage + localforage에 "tabID별"로 저장
 // 메인과 동일하게: localStorage + localforage에 "tabID별"로 저장
 async function persistSessionForTab(tabID, sessionObj){
   persistTabID(tabID);
 
+  const json = (() => {
+    try { return JSON.stringify(sessionObj); }
+    catch(e){ return ""; }
+  })();
+
   // 1) localStorage (fast fallback)
   try{
-    localStorage.setItem(tabSessionKey(tabID), JSON.stringify(sessionObj));
-    // 호환용(기존 키도 유지하고 싶으면)
-    localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj));
+    localStorage.setItem(tabSessionKey(tabID), json);
+    // 호환용(기존 키도 유지)
+    localStorage.setItem("roleplay-chat_session_v1", json);
   }catch(e){}
 
-  // 2) localforage (backup)
+  // 2) localforage (backup)  ✅ 반드시 "문자열"로 저장 (메인이 JSON.parse 할 가능성)
   try{
     if (window.localforage){
-      await localforage.setItem(tabSessionKey(tabID), sessionObj);
+      await localforage.setItem(tabSessionKey(tabID), json);
+      // 호환용(메인이 이 키를 localforage에서 읽을 수도 있음)
+      await localforage.setItem("roleplay-chat_session_v1", json);
     }
   }catch(e){}
 }
 
 // 히스토리도 메인이 tabID로 찾는 구조면 같이 저장
 async function persistHistoryForTab(tabID, historyArr){
+  const safeArr = Array.isArray(historyArr) ? historyArr : [];
+  const json = (() => {
+    try { return JSON.stringify(safeArr); }
+    catch(e){ return "[]"; }
+  })();
+
   try{
-    localStorage.setItem(tabHistoryKey(tabID), JSON.stringify(historyArr || []));
-    localStorage.setItem("roleplay-chat_history_v1", JSON.stringify(historyArr || [])); // 호환용
+    localStorage.setItem(tabHistoryKey(tabID), json);
+    localStorage.setItem("roleplay-chat_history_v1", json); // 호환용
   }catch(e){}
 
   try{
     if (window.localforage){
-      await localforage.setItem(tabHistoryKey(tabID), historyArr || []);
+      await localforage.setItem(tabHistoryKey(tabID), json);
+      await localforage.setItem("roleplay-chat_history_v1", json); // 호환용
     }
   }catch(e){}
 }
@@ -2633,12 +2544,13 @@ if (!nicknameVal){
 
   // ✅ 메인과 동일한 방식으로 저장(핵심)
   (async () => {
-  try{
-    await persistSessionEverywhere(tabID, session);
-    await persistHistoryEverywhere(tabID, []); // 처음 생성이니 빈 히스토리
-  }catch(e){}
-  window.location.assign("/?tabID=" + encodeURIComponent(tabID));
-})();
+    try{
+      await persistSessionForTab(tabID, session);
+      await persistHistoryForTab(tabID, []); // 처음 생성이니 빈 히스토리
+    }catch(e){}
+    // ✅ 같은 오리진이면 상대경로가 더 안전
+    window.location.assign("/?tabID=" + encodeURIComponent(tabID));
+  })();
 
   return;
 }
@@ -2653,24 +2565,22 @@ if (!nicknameVal){
   mountPayPalButtons(() => {
     paymentStatus = "paid";
 
+    sessionStorage.setItem(PAYMENT_KEY, "paid");
+    try{ localStorage.setItem(PAYMENT_KEY, "paid"); }catch(e){}
+
+    session.tier = "uncensored";
+
+    const tabID = createTabID();
+    session.tabID = tabID;
+
     (async () => {
-  paymentStatus = "paid";
-
-  await persistPaidEverywhere(PAYMENT_KEY, "paid"); // ✅ 핵심 (localforage 포함)
-
-  session.tier = "uncensored";
-
-  const tabID = createTabID();
-  session.tabID = tabID;
-
-  try{
-    await persistSessionEverywhere(tabID, session);
-    await persistHistoryEverywhere(tabID, []);
-  }catch(e){}
-
-  clearPending();
-  window.location.assign("/?tabID=" + encodeURIComponent(tabID));
-})();
+      try{
+        await persistSessionForTab(tabID, session);
+        await persistHistoryForTab(tabID, []); // 처음이니 빈 히스토리
+      }catch(e){}
+      clearPending();
+      window.location.assign("/?tabID=" + encodeURIComponent(tabID));
+    })();
 
   }, "1.00", "Playing game");
 
@@ -3039,4 +2949,5 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
