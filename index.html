@@ -2906,7 +2906,7 @@ if (!nicknameVal){
 
       clearPending();
       const tabID = getCurrentTabID();   // ✅ 기존 tabID 유지
-window.location.href = "/test/?tabID=" + tabID;
+window.location.href = "/?tabID=" + tabID;
     }, "2.00", "Playing game");
     return;
   }
@@ -2929,7 +2929,7 @@ window.location.href = "/test/?tabID=" + tabID;
 
       clearPending();
       const tabID = generateTabID();
-window.location.href = "/imagechat_test/?tabID=" + tabID;
+window.location.href = "/imagechat/?tabID=" + tabID;
     }, "6.90", "playing image game");
     return;
   }
@@ -2953,7 +2953,7 @@ window.location.href = "/imagechat_test/?tabID=" + tabID;
       clearPending();
 clearPending();
 const tabID = generateTabID();
-window.location.href = "/imagechat_unlimited_test/?tabID=" + tabID;
+window.location.href = "/imagechat_unlimited/?tabID=" + tabID;
     }, "25.00", "Upgrade game");
     return;
   }
@@ -3304,11 +3304,11 @@ if (unlockBtn){
 
   // tier별 라우팅 (tabID 유지)
   if (existing.tier === "imagechat"){
-    window.location.href = "/imagechat_test/?tabID=" + getCurrentTabID();
+    window.location.href = "/imagechat/?tabID=" + getCurrentTabID();
     return;
   }
   if (existing.tier === "imagechat_unlimited"){
-    window.location.href = "/imagechat_unlimited_test/?tabID=" + getCurrentTabID();
+    window.location.href = "/imagechat_unlimited/?tabID=" + getCurrentTabID();
     return;
   }
 
@@ -3366,4 +3366,5 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
