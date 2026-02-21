@@ -1852,11 +1852,11 @@ function show(view){
 
     // --------- Save & load (tab-scoped)
     function saveSession(data){
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
     function loadSession(){
       try{
-        const raw = sessionStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return null;
         return JSON.parse(raw);
       }catch(e){
@@ -1885,11 +1885,11 @@ function clearPending(){
 
     // --------- Save & load (chat history, tab-scoped)
 function saveHistory(history){
-  sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
 function loadHistory(){
   try{
-    const raw = sessionStorage.getItem(HISTORY_KEY);
+    const raw = localStorage.getItem(HISTORY_KEY);
     return raw ? JSON.parse(raw) : [];
   }catch(e){
     return [];
@@ -2950,6 +2950,4 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
-
-
 
