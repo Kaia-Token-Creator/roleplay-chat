@@ -2522,6 +2522,10 @@ if (!nicknameVal){
   const tabID = createTabID();
   session.tabID = tabID;
 
+    // ✅ (메인 페이지가 옛 키로 읽는 경우 대비: 호환 저장)
+  try{ saveSession(session); }catch(e){}
+  try{ saveHistory([]); }catch(e){}
+
   // ✅ 메인과 동일한 방식으로 저장(핵심)
   (async () => {
     try{
@@ -2537,41 +2541,35 @@ if (!nicknameVal){
 
 
   if (tier === "uncensored"){
-    // ✅ 유료(uncensored)는 결제 전까지 저장 금지 (pending)
-    savePending(session);
+  // ✅ 결제 전까지는 pending에만 저장
+  savePending(session);
 
-    openPayModal();
-    mountPayPalButtons(() => {
-  paymentStatus = "paid";
+  openPayModal();
 
-  sessionStorage.setItem(PAYMENT_KEY, "paid");
-  try{ localStorage.setItem(PAYMENT_KEY, "paid"); }catch(e){} // ✅ 복원 대비
+  mountPayPalButtons(() => {
+    paymentStatus = "paid";
 
-  session.tier = "uncensored";
+    sessionStorage.setItem(PAYMENT_KEY, "paid");
+    try{ localStorage.setItem(PAYMENT_KEY, "paid"); }catch(e){}
 
-  const tabID = createTabID();
-  session.tabID = tabID;
+    session.tier = "uncensored";
 
-  (async () => {
-    try{
-      await persistSessionForTab(tabID, session);
-      await persistHistoryForTab(tabID, []);
-    }catch(e){}
-    clearPending();
-    window.location.assign("/?tabID=" + encodeURIComponent(tabID));
-  })();
+    const tabID = createTabID();
+    session.tabID = tabID;
 
-}, "1.00", "Playing game");
-session.tabID = tabID;
+    (async () => {
+      try{
+        await persistSessionForTab(tabID, session);
+        await persistHistoryForTab(tabID, []); // 처음이니 빈 히스토리
+      }catch(e){}
+      clearPending();
+      window.location.assign("/?tabID=" + encodeURIComponent(tabID));
+    })();
 
-clearPending();
+  }, "1.00", "Playing game");
 
-window.location.href =
-  "https://roleplay-chat.com/?tabID=" + tabID;
-
-    }, "1.00", "Playing game");
-    return;
-  }
+  return;
+}
 
   if (tier === "imagechat"){
     savePending(session);
