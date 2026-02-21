@@ -3277,6 +3277,92 @@ if (unlockBtn){
   const existing = loadSession();
   const pending = loadPending();
 
+  (function devtoolsWarning(){
+  if (window.__rpc_warned__) return;
+  window.__rpc_warned__ = true;
+
+  const msg = [
+    "🚫 SECURITY WARNING",
+    "",
+    "Do NOT modify payment flags (localStorage/sessionStorage).",
+    "Unauthorized tampering may constitute fraud / theft of service.",
+    "",
+    "This site can log abuse signals (device/browser fingerprints, timestamps, IP/network metadata where available).",
+    "Evidence may be preserved and used for chargebacks disputes, account/device bans, and legal action.",
+    "",
+    "If you have a billing issue, contact support instead of tampering."
+  ].join("\n");
+
+  try{
+    console.log("%c" + msg, [
+      "color:#ffcc00",
+      "background:#000",
+      "padding:14px 16px",
+      "border:2px solid #ffcc00",
+      "border-radius:14px",
+      "font-size:14px",
+      "font-weight:900",
+      "line-height:1.45"
+    ].join(";"));
+  }catch(e){
+    console.log(msg);
+  }
+})();
+
+(function watchPaidTamper(){
+  const KEYS = [
+    "roleplay-chat_paid_v1",
+    "roleplay-chat_imagechat_paid_v1",
+    "roleplay-chat_imagechat_unlimited_paid_v1"
+  ];
+
+  function warn(k, v){
+    const msg = [
+      "🚨 TAMPERING DETECTED",
+      `key: ${k}`,
+      `value: ${String(v).slice(0,120)}`,
+      "",
+      "Stop now.",
+      "Unauthorized modification may be treated as fraud/theft of service.",
+      "This device/browser may be blocked and evidence may be preserved for disputes or legal action."
+    ].join("\n");
+
+    try{
+      console.log(
+        "%c" + msg,
+        [
+          "color:#ff3b3b",
+          "background:#000",
+          "padding:12px 14px",
+          "border:2px solid #ff3b3b",
+          "border-radius:12px",
+          "font-size:13px",
+          "font-weight:900",
+          "line-height:1.45"
+        ].join(";")
+      );
+    }catch(e){
+      console.log(msg);
+    }
+  }
+
+  try{
+    const _set = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(k, v){
+      if (KEYS.includes(String(k))) warn(k, v);
+      return _set(k, v);
+    };
+  }catch(e){}
+
+  try{
+    const _setS = sessionStorage.setItem.bind(sessionStorage);
+    sessionStorage.setItem = function(k, v){
+      if (KEYS.includes(String(k))) warn(k, v);
+      return _setS(k, v);
+    };
+  }catch(e){}
+})();
+
   // 결제 상태도 tabID별 백업에서 복원
   const paidUnc = getPaid(PAYMENT_KEY);
   const paidImg = getPaid(IMAGECHAT_PAID_KEY);
@@ -3366,5 +3452,6 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
