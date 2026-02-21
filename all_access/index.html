@@ -1442,12 +1442,30 @@ Deleting browser data will erase your character, chat history, and access permis
 
   <script>
 
-    // 🔓 FREE PASS MODE — force paid
+// 🔓 FREE PASS MODE — force paid (sessionStorage + localStorage + localForage)
 (function forcePaid(){
+  const keys = [
+    "roleplay-chat_paid_v1",
+    "roleplay-chat_imagechat_paid_v1",
+    "roleplay-chat_imagechat_unlimited_paid_v1"
+  ];
+
+  // 1) sessionStorage
   try{
-    sessionStorage.setItem("roleplay-chat_paid_v1", "paid");
-    sessionStorage.setItem("roleplay-chat_imagechat_paid_v1", "paid");
-    sessionStorage.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid");
+    keys.forEach(k => sessionStorage.setItem(k, "paid"));
+  }catch(e){}
+
+  // 2) localStorage (메인이 localStorage만 볼 때 대비)
+  try{
+    keys.forEach(k => localStorage.setItem(k, "paid"));
+  }catch(e){}
+
+  // 3) localForage (메인이 localForage auth store만 볼 때 대비)
+  try{
+    if (window.localforage){
+      const auth = localforage.createInstance({ name: "roleplay-chat", storeName: "auth" });
+      keys.forEach(k => auth.setItem(k, "paid").catch(()=>{}));
+    }
   }catch(e){}
 })();
 
@@ -2226,6 +2244,18 @@ sessionStorage.setItem("tabID", tabID);
 // 세션 저장
 saveSession(session);
 
+// ✅ [ADD] 메인 페이지가 sessionStorage를 안 볼 수도 있으니 handoff용 pending을 localStorage/localForage에도 저장
+try{
+  localStorage.setItem("roleplay-chat_pending_session_v1", JSON.stringify(session));
+}catch(e){}
+
+try{
+  if (window.localforage){
+    const lfSession = localforage.createInstance({ name: "roleplay-chat", storeName: "session" });
+    lfSession.setItem("roleplay-chat_pending_session_v1", session).catch(()=>{});
+  }
+}catch(e){}  
+
 
 // 🚀 tier별 즉시 이동 (+ tabID 붙이기)
 if (tier === "imagechat"){
@@ -2532,4 +2562,5 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
 
