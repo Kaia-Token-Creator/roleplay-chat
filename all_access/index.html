@@ -2244,7 +2244,7 @@ if (isUnpaidGeneral() && containsSexTrigger(text)){
 
 
     // --------- Submit flow
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const name = nameInput.value.trim();
@@ -2331,27 +2331,67 @@ sessionStorage.setItem("roleplay-chat_paid_v1", "paid");
 sessionStorage.setItem("roleplay-chat_imagechat_paid_v1", "paid");
 sessionStorage.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid");
 
+// ✅ 메인이 localStorage / cookie / localForage(auth) 중 어디를 보든 통과시키기
+try{
+  localStorage.setItem("roleplay-chat_paid_v1", "paid");
+  localStorage.setItem("roleplay-chat_imagechat_paid_v1", "paid");
+  localStorage.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid");
+}catch(e){}
+
+// ✅ 쿠키 보험 (메인에서 cookie 기반 체크하는 경우 대비)
+try{
+  const maxAge = 60*60*24*365*5; // 5년
+  document.cookie = `roleplay-chat_paid_v1=paid; path=/; max-age=${maxAge}; samesite=lax`;
+  document.cookie = `roleplay-chat_imagechat_paid_v1=paid; path=/; max-age=${maxAge}; samesite=lax`;
+  document.cookie = `roleplay-chat_imagechat_unlimited_paid_v1=paid; path=/; max-age=${maxAge}; samesite=lax`;
+}catch(e){}
+
+// ✅ localForage(auth)에도 paid 저장 (메인이 lf auth만 보는 경우 대비)
+try{
+  if (window.localforage){
+    const auth = localforage.createInstance({ name: "roleplay-chat", storeName: "auth" });
+    auth.setItem("roleplay-chat_paid_v1", "paid").catch(()=>{});
+    auth.setItem("roleplay-chat_imagechat_paid_v1", "paid").catch(()=>{});
+    auth.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid").catch(()=>{});
+  }
+}catch(e){}  
+
 // ✅ tabID 생성 + 세션에 박기 + 탭에도 저장
 const tabID = generateTabID();
 session.tabID = tabID;
 sessionStorage.setItem("tabID", tabID);
 
-// 세션 저장
+// 세션 저장 (기존 유지)
 saveSession(session);
 
-// ✅ [ADD] 메인 페이지가 sessionStorage를 안 볼 수도 있으니 handoff용 pending을 localStorage/localForage에도 저장
+// ✅ (핵심) 메인 페이지가 pending 키로만 복구하는 경우 대비: sessionStorage에도 pending 저장
+try{
+  savePending(session); // <- 너 위에 이미 정의돼 있음(PENDING_KEY 사용)
+}catch(e){
+  // 혹시 savePending이 없거나 문제면 직접 키로 박기
+  try{ sessionStorage.setItem("roleplay-chat_pending_session_v1", JSON.stringify(session)); }catch(_){}
+}
+
+// ✅ localStorage에도 pending 저장 (기존 유지/강화)
 try{
   localStorage.setItem("roleplay-chat_pending_session_v1", JSON.stringify(session));
 }catch(e){}
 
+// ✅ localForage에도 pending 저장 (auth + session 둘 다 보험)
 try{
   if (window.localforage){
+    const lfAuth = localforage.createInstance({ name: "roleplay-chat", storeName: "auth" });
     const lfSession = localforage.createInstance({ name: "roleplay-chat", storeName: "session" });
+
+    // pending은 object 그대로 저장 (메인 코드가 object로 읽는 경우 대비)
+    lfAuth.setItem("roleplay-chat_pending_session_v1", session).catch(()=>{});
     lfSession.setItem("roleplay-chat_pending_session_v1", session).catch(()=>{});
   }
-}catch(e){}  
+}catch(e){}
 
-
+// ✅ localForage flush timing 이슈 방지용 아주 짧은 텀
+await new Promise(r => setTimeout(r, 80));
+  
 // 🚀 tier별 즉시 이동 (+ tabID 붙이기)
 if (tier === "imagechat"){
   window.location.href = `/imagechat/?tabID=${tabID}`;
@@ -2363,6 +2403,7 @@ if (tier === "imagechat_unlimited"){
   return;
 }
 
+  
 // ✅ general / uncensored → 메인으로 이동 (+ tabID 붙이기)
 window.location.href = `https://roleplay-chat.com/?tabID=${tabID}`;
 return;
@@ -2657,6 +2698,7 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
 
 
 
