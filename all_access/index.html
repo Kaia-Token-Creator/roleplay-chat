@@ -1438,21 +1438,16 @@ Deleting browser data will erase your character, chat history, and access permis
     </div>
   </div>
 
+
+
   <script>
 
     // 🔓 FREE PASS MODE — force paid
 (function forcePaid(){
   try{
-    // 현재 탭용
     sessionStorage.setItem("roleplay-chat_paid_v1", "paid");
     sessionStorage.setItem("roleplay-chat_imagechat_paid_v1", "paid");
     sessionStorage.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid");
-
-    // 🔥 다른 탭 / 새 페이지 복원용
-    localStorage.setItem("roleplay-chat_paid_v1", "paid");
-    localStorage.setItem("roleplay-chat_imagechat_paid_v1", "paid");
-    localStorage.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid");
-
   }catch(e){}
 })();
 
@@ -2231,11 +2226,6 @@ sessionStorage.setItem("tabID", tabID);
 // 세션 저장
 saveSession(session);
 
-// 🔥 NEW: 다른 탭/새로 연 메인페이지가 복원할 수 있게 localStorage에도 저장
-try{
-  localStorage.setItem("roleplay-chat_session_" + tabID, JSON.stringify(session));
-}catch(e){}
-
 
 // 🚀 tier별 즉시 이동 (+ tabID 붙이기)
 if (tier === "imagechat"){
@@ -2542,37 +2532,3 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
