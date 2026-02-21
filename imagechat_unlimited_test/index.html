@@ -937,6 +937,101 @@
     </div>
   </div>
 </div>
+
+<!-- 🔥 NEW: DevTools / Tamper Warning -->
+<script>
+(function devtoolsWarning(){
+  if (window.__imgchat_warned__) return;
+  window.__imgchat_warned__ = true;
+
+  const msg = [
+    "🚫 SECURITY WARNING",
+    "",
+    "Do not modify or interfere with this site's code or functionality.",
+    "Unauthorized tampering may constitute fraud / theft of service.",
+    "",
+    "Abuse signals may be logged (device/browser fingerprints, timestamps, network metadata where available).",
+    "Evidence may be preserved for disputes, bans, or legal action.",
+    "",
+    "If you have an issue, contact support."
+  ].join("\n");
+
+  try{
+    console.clear?.();
+    console.log("%c" + msg, [
+      "color:#ffcc00",
+      "background:#000",
+      "padding:14px 16px",
+      "border:2px solid #ffcc00",
+      "border-radius:14px",
+      "font-size:14px",
+      "font-weight:900",
+      "line-height:1.45"
+    ].join(";"));
+  }catch(e){
+    console.log(msg);
+  }
+})();
+
+(function watchPaidTamper(){
+
+  const KEYS = [
+    "roleplay-chat_imagechat_unlimited_paid_v1", // ⭐ 핵심
+    "roleplay-chat_paid_v1",
+    "roleplay-chat_imagechat_paid_v1"
+  ];
+
+  function warn(k, v){
+    const msg = [
+      "🚨 TAMPERING DETECTED",
+      `key: ${k}`,
+      `value: ${String(v).slice(0,120)}`,
+      "",
+      "Unauthorized modification detected.",
+      "Service access may be revoked.",
+      "This device/browser may be blocked.",
+      "Evidence may be preserved for legal action."
+    ].join("\n");
+
+    try{
+      console.log(
+        "%c" + msg,
+        [
+          "color:#ff3b3b",
+          "background:#000",
+          "padding:12px 14px",
+          "border:2px solid #ff3b3b",
+          "border-radius:12px",
+          "font-size:13px",
+          "font-weight:900",
+          "line-height:1.45"
+        ].join(";")
+      );
+    }catch(e){
+      console.log(msg);
+    }
+  }
+
+  // localStorage 감시
+  try{
+    const _set = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(k, v){
+      if (KEYS.includes(String(k))) warn(k, v);
+      return _set(k, v);
+    };
+  }catch(e){}
+
+  // sessionStorage 감시
+  try{
+    const _setS = sessionStorage.setItem.bind(sessionStorage);
+    sessionStorage.setItem = function(k, v){
+      if (KEYS.includes(String(k))) warn(k, v);
+      return _setS(k, v);
+    };
+  }catch(e){}
+})();
+
+</script>
   
 
 <script>
@@ -2519,6 +2614,7 @@ donateModal?.addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
 
