@@ -3237,6 +3237,22 @@ if (unlockBtn){
 // ✅ 결제 진행하다 닫았던 상태면: 셋업 화면 유지 (tabID 백업 복원 기반)
 (async function bootstrapByTabID(){
 
+    // ✅ [ADD] 다른 탭/페이지에서 저장된 "전역 pending"이 있으면 먼저 복원
+  // (all_access_purchase 같은 곳에서 tabID 없이 저장했을 때를 커버)
+  try{
+    const rawGlobal = localStorage.getItem(PENDING_KEY); // "roleplay-chat_pending_session_v1"
+    if (rawGlobal){
+      const pendingGlobal = JSON.parse(rawGlobal);
+
+      // ✅ 세션으로 승격
+      saveSession(pendingGlobal);
+
+      // ✅ pending 제거
+      localStorage.removeItem(PENDING_KEY);
+      try{ sessionStorage.removeItem(PENDING_KEY); }catch(e){}
+    }
+  }catch(e){}
+
   const incomingSession = loadPending();
   if (incomingSession){
     saveSession(incomingSession);
