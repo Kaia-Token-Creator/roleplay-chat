@@ -3282,29 +3282,32 @@ if (unlockBtn){
   window.__rpc_warned__ = true;
 
   const msg = [
-    "⚠️ STOP",
-    "Modifying payment flags (localStorage/sessionStorage) is unauthorized.",
-    "This may be considered theft/fraud and may result in legal action.",
-    "If you think there's a billing issue, contact support."
+    "🚫 SECURITY WARNING",
+    "",
+    "Do NOT modify payment flags (localStorage/sessionStorage).",
+    "Unauthorized tampering may constitute fraud / theft of service.",
+    "",
+    "This site can log abuse signals (device/browser fingerprints, timestamps, IP/network metadata where available).",
+    "Evidence may be preserved and used for chargebacks disputes, account/device bans, and legal action.",
+    "",
+    "If you have a billing issue, contact support instead of tampering."
   ].join("\n");
 
   try{
-    console.clear?.();
     console.log("%c" + msg, [
       "color:#ffcc00",
       "background:#000",
-      "padding:12px 14px",
+      "padding:14px 16px",
       "border:2px solid #ffcc00",
-      "border-radius:12px",
+      "border-radius:14px",
       "font-size:14px",
       "font-weight:900",
-      "line-height:1.4"
+      "line-height:1.45"
     ].join(";"));
   }catch(e){
     console.log(msg);
   }
 })();
-
 
 (function watchPaidTamper(){
   const KEYS = [
@@ -3314,13 +3317,29 @@ if (unlockBtn){
   ];
 
   function warn(k, v){
-    const msg =
-      `⚠️ Payment flag tampering detected\nkey: ${k}\nvalue: ${String(v).slice(0,120)}\nUnauthorized changes may result in legal action.`;
+    const msg = [
+      "🚨 TAMPERING DETECTED",
+      `key: ${k}`,
+      `value: ${String(v).slice(0,120)}`,
+      "",
+      "Stop now.",
+      "Unauthorized modification may be treated as fraud/theft of service.",
+      "This device/browser may be blocked and evidence may be preserved for disputes or legal action."
+    ].join("\n");
 
     try{
       console.log(
         "%c" + msg,
-        "color:#ff3b3b;font-weight:900;font-size:13px;background:#000;padding:10px;border:2px solid #ff3b3b;border-radius:10px;"
+        [
+          "color:#ff3b3b",
+          "background:#000",
+          "padding:12px 14px",
+          "border:2px solid #ff3b3b",
+          "border-radius:12px",
+          "font-size:13px",
+          "font-weight:900",
+          "line-height:1.45"
+        ].join(";")
       );
     }catch(e){
       console.log(msg);
@@ -3433,6 +3452,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
