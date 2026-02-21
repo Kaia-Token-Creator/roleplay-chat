@@ -66,7 +66,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <!-- PayPal SDK (for in-page popup/overlay checkout). Note: The "buttons" flow opens PayPal in an overlay/mini-window. -->
-  <script src="https://www.paypal.com/sdk/js?client-id=AW41UQ3EzJV10FZHqYPy8yqdlDbklB4VjuT6hzu7DVoS-G9cJgKx9nHfxCRZpVSgs1dczhkPj4oM0VXv&currency=USD&intent=capture"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=ASts4hxcd4-DkLEL8b-PbbawSaCD4G5pQiuJM9aZYawixhxWbQ2upSru10WQNZa4HzCqHUcGC8Z1RIrW&currency=USD&intent=capture"></script>
 
   <style>
     :root{
@@ -1480,11 +1480,16 @@ function persistTabID(tabID){
 async function persistSessionForTab(tabID, sessionObj){
   persistTabID(tabID);
 
+  // ✅ 0) sessionStorage (메인이 이걸 먼저 보는 경우가 많아서 필수)
+  try{
+    sessionStorage.setItem(tabSessionKey(tabID), JSON.stringify(sessionObj));
+    sessionStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj)); // 호환용
+  }catch(e){}
+
   // 1) localStorage (fast fallback)
   try{
     localStorage.setItem(tabSessionKey(tabID), JSON.stringify(sessionObj));
-    // 호환용(기존 키도 유지하고 싶으면)
-    localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj));
+    localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(sessionObj)); // 호환용
   }catch(e){}
 
   // 2) localforage (backup)
@@ -1497,14 +1502,24 @@ async function persistSessionForTab(tabID, sessionObj){
 
 // 히스토리도 메인이 tabID로 찾는 구조면 같이 저장
 async function persistHistoryForTab(tabID, historyArr){
+  const h = historyArr || [];
+
+  // ✅ 0) sessionStorage
   try{
-    localStorage.setItem(tabHistoryKey(tabID), JSON.stringify(historyArr || []));
-    localStorage.setItem("roleplay-chat_history_v1", JSON.stringify(historyArr || [])); // 호환용
+    sessionStorage.setItem(tabHistoryKey(tabID), JSON.stringify(h));
+    sessionStorage.setItem("roleplay-chat_history_v1", JSON.stringify(h)); // 호환용
   }catch(e){}
 
+  // 1) localStorage
+  try{
+    localStorage.setItem(tabHistoryKey(tabID), JSON.stringify(h));
+    localStorage.setItem("roleplay-chat_history_v1", JSON.stringify(h)); // 호환용
+  }catch(e){}
+
+  // 2) localforage
   try{
     if (window.localforage){
-      await localforage.setItem(tabHistoryKey(tabID), historyArr || []);
+      await localforage.setItem(tabHistoryKey(tabID), h);
     }
   }catch(e){}
 }
@@ -2933,5 +2948,4 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
-
 
