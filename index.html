@@ -3249,6 +3249,8 @@ if (unlockBtn){
 // ✅ 결제 진행하다 닫았던 상태면: 셋업 화면 유지 (tabID 백업 복원 기반)
 (async function bootstrapByTabID(){
 
+  getOrCreateTabID();  // ⭐⭐⭐ 이 줄 추가
+
     // ✅ [ADD] 다른 탭/페이지에서 저장된 "전역 pending"이 있으면 먼저 복원
   // (all_access_purchase 같은 곳에서 tabID 없이 저장했을 때를 커버)
   try{
@@ -3452,6 +3454,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
