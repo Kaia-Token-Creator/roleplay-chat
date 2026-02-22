@@ -2336,8 +2336,25 @@ const tabID = generateTabID();
 session.tabID = tabID;
 sessionStorage.setItem("tabID", tabID);
 
+// ✅ tabID 생성 + 세션에 박기 + 탭에도 저장
+const tabID = generateTabID();
+session.tabID = tabID;
+
+try{ sessionStorage.setItem("tabID", tabID); }catch(e){}
+
+// 🔥 추가: 메인이 탭 격리 로직에서 LS/window.name을 볼 수 있으니 같이 심기
+try{ localStorage.setItem("tabID", tabID); }catch(e){}
+try{ window.name = "rpc_tab_" + tabID; }catch(e){}                      
+
 // 세션 저장
 saveSession(session);
+
+// 🔥 추가: 메인이 LS를 기준으로 세션을 복구/검증할 수 있음
+try{
+  localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(session));
+}catch(e){}
+
+  
 
 // ✅ [ADD] 메인 페이지가 sessionStorage를 안 볼 수도 있으니 handoff용 pending을 localStorage/localForage에도 저장
 try{
@@ -2351,6 +2368,9 @@ try{
   }
 }catch(e){}  
 
+try{
+  localStorage.setItem("roleplay-chat_pending_session_v1", JSON.stringify(session));
+}catch(e){}  
 
 // 🚀 tier별 즉시 이동 (+ tabID 붙이기)
 if (tier === "imagechat"){
@@ -2657,3 +2677,4 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
