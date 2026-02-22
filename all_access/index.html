@@ -2340,7 +2340,7 @@ try{ sessionStorage.setItem("tabID", tabID); }catch(e){}
 
 // 🔥 추가: 메인이 탭 격리 로직에서 LS/window.name을 볼 수 있으니 같이 심기
 try{ localStorage.setItem("tabID", tabID); }catch(e){}
-try{ window.name = "rpc_tab_" + tabID; }catch(e){}                      
+try{ window.name = "rp_tab=" + tabID; }catch(e){}                    
 
 // 세션 저장
 saveSession(session);
@@ -2669,5 +2669,6 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
 
 
