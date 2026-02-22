@@ -2460,8 +2460,8 @@ sessionStorage.setItem("roleplay-chat_imagechat_paid_v1", "paid");
 sessionStorage.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid");
 
 
-// ✅ tabID 생성 + 세션에 박기 + 탭에도 저장
-const tabID = generateTabID();
+// ✅ tabID는 이 탭에서 이미 만들어진 TAB_ID를 재사용 (새로 생성 X)
+const tabID = TAB_ID;
 session.tabID = tabID;
 
 try{ sessionStorage.setItem("tabID", tabID); }catch(e){}
@@ -2488,10 +2488,14 @@ if (tier === "imagechat_unlimited"){
   return;
 }
 
-// ✅ general / uncensored → 메인으로 이동 (+ tabID 붙이기)
-setTimeout(() => {
-  window.location.href = `https://roleplay-chat.com/?tabID=${tabID}`;
-}, 30);
+// ✅ general / uncensored → all_access 페이지에서 바로 채팅 시작
+try{
+  // URL도 all_access로 유지 + tabID 붙여서 “이 탭 스코프” 고정
+  history.replaceState(null, "", `/all_access?tabID=${encodeURIComponent(tabID)}`);
+}catch(e){}
+
+// ✅ 화면 전환 + 채팅 진입 (리다이렉트 X)
+enterChat(session);
 return;
 
 });  
@@ -2791,6 +2795,7 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
 
 
 
