@@ -1051,6 +1051,10 @@ body.chatMode #viewChat .chatFooter{
 <script>  
 (async function enforceAllAccessGuard(){
   const ALL_ACCESS_KEY = "ROLEPLAY_CHAT_ALL_ACCESS_V1";
+ const ALL_ACCESS_SCOPED =
+    "rpc:" + location.pathname + ":" +
+    (sessionStorage.getItem("tabID") || "default") +
+    ":ROLEPLAY_CHAT_ALL_ACCESS_V1"; 
 
   // localForage instance (scoped)
   const store = (window.localforage)
@@ -1058,25 +1062,27 @@ body.chatMode #viewChat .chatFooter{
     : null;
 
   async function readPaid(){
-    // 1) localStorage 우선
+  // 1) localStorage 우선: 전역키 또는 스코프키 중 하나라도 paid면 OK
+  try{
+    const v1 = localStorage.getItem(ALL_ACCESS_KEY);
+    const v2 = localStorage.getItem(ALL_ACCESS_SCOPED);
+    if (v1 === "paid" || v2 === "paid") return "paid";
+  }catch(e){}
+
+  // 2) localForage fallback
+  if (store){
     try{
-      const v = localStorage.getItem(ALL_ACCESS_KEY);
-      if (v === "paid") return "paid";
+      const v1 = await store.getItem(ALL_ACCESS_KEY);
+      const v2 = await store.getItem(ALL_ACCESS_SCOPED);
+      if (v1 === "paid" || v2 === "paid") return "paid";
+
+      if (v1 && typeof v1 === "object" && v1.value === "paid") return "paid";
+      if (v2 && typeof v2 === "object" && v2.value === "paid") return "paid";
     }catch(e){}
-
-    // 2) localForage fallback
-    if (store){
-      try{
-        const v = await store.getItem(ALL_ACCESS_KEY);
-        if (v === "paid") return "paid";
-
-        // 혹시 객체로 저장했을 가능성 대비
-        if (v && typeof v === "object" && v.value === "paid") return "paid";
-      }catch(e){}
-    }
-
-    return null;
   }
+
+  return null;
+}
 
   async function backupPaid(){
     // localStorage에 paid가 있으면 localForage에 “자주” 백업
@@ -1101,11 +1107,28 @@ body.chatMode #viewChat .chatFooter{
       return;
     }
 
-    // ✅ 복구 성공이면 localStorage도 다시 채워두기(다른 페이지 호환)
-    try{ localStorage.setItem(ALL_ACCESS_KEY, "paid"); }catch(e){}
 
-    // ✅ 그리고 localForage에도 백업(혹시 localStorage만 있고 lf가 비어있던 케이스)
-    await backupPaid();
+// ✅ all_access 권한키도 전역+스코프 모두 paid로 고정(동기화)
+try{
+  sessionStorage.setItem(ALL_ACCESS_KEY, "paid");
+  sessionStorage.setItem(ALL_ACCESS_SCOPED, "paid");
+}catch(e){}
+
+try{
+  localStorage.setItem(ALL_ACCESS_KEY, "paid");
+  localStorage.setItem(ALL_ACCESS_SCOPED, "paid");
+}catch(e){}
+
+try{
+  if (window.localforage){
+    const auth = localforage.createInstance({
+      name:"roleplay-chat",
+      storeName:"auth"
+    });
+    auth.setItem(ALL_ACCESS_KEY, "paid").catch(()=>{});
+    auth.setItem(ALL_ACCESS_SCOPED, "paid").catch(()=>{});
+  }
+}catch(e){}
 
     // 🧷 저장소 영속성 요청 (지원 브라우저 한정)
 if (navigator.storage && navigator.storage.persist){
@@ -1537,29 +1560,26 @@ Deleting browser data will erase your character, chat history, and access permis
 
   <script>
 
-// 🔓 FREE PASS MODE — force paid (sessionStorage + localStorage + localForage)
-(function forcePaid(){
-  const keys = [
+// 🔓 ALL-ACCESS PAGE: force paid everywhere (+ All-access key)
+(function forcePaidAllAccess(){
+  const PAID_KEYS = [
+    "ROLEPLAY_CHAT_ALL_ACCESS_V1",         // ⭐ all_access 접근권한 키
     "roleplay-chat_paid_v1",
     "roleplay-chat_imagechat_paid_v1",
     "roleplay-chat_imagechat_unlimited_paid_v1"
   ];
 
   // 1) sessionStorage
-  try{
-    keys.forEach(k => sessionStorage.setItem(k, "paid"));
-  }catch(e){}
+  try{ PAID_KEYS.forEach(k => sessionStorage.setItem(k, "paid")); }catch(e){}
 
-  // 2) localStorage (메인이 localStorage만 볼 때 대비)
-  try{
-    keys.forEach(k => localStorage.setItem(k, "paid"));
-  }catch(e){}
+  // 2) localStorage
+  try{ PAID_KEYS.forEach(k => localStorage.setItem(k, "paid")); }catch(e){}
 
-  // 3) localForage (메인이 localForage auth store만 볼 때 대비)
+  // 3) localForage auth store
   try{
     if (window.localforage){
       const auth = localforage.createInstance({ name: "roleplay-chat", storeName: "auth" });
-      keys.forEach(k => auth.setItem(k, "paid").catch(()=>{}));
+      PAID_KEYS.forEach(k => auth.setItem(k, "paid").catch(()=>{}));
     }
   }catch(e){}
 })();
@@ -1567,6 +1587,64 @@ Deleting browser data will erase your character, chat history, and access permis
     // --------- Helpers
     const $ = (q) => document.querySelector(q);
     const $$ = (q) => Array.from(document.querySelectorAll(q));
+
+   // =========================
+// ✅ Scope = urlScope + tabID (NO MIX)
+// =========================
+
+// 1) urlScope: all_access가 “고유 URL”로 구분돼야 한다면
+//    - 외부 구매페이지에서 ?aa=... 같은 토큰을 붙여주는 게 가장 확실함.
+//    - 지금 당장 파라미터가 없다면, 일단 pathname 기준 + (있으면) aa 파라미터 사용.
+function getUrlScope(){
+  try{
+    const u = new URL(location.href);
+    // 외부 구매페이지가 넘겨줄 법한 토큰 키들(원하는 이름으로 맞춰도 됨)
+    const token = u.searchParams.get("aa") || u.searchParams.get("access") || u.searchParams.get("token");
+    return token ? `aa:${token}` : `path:${u.pathname}`;
+  }catch(e){
+    return "path:/all_access";
+  }
+}
+
+// 2) tabID: 이 “탭”을 구분하는 값 (한 탭에서는 고정)
+function getOrCreateTabID(){
+  // 우선순위: (a) URL tabID (있으면) > (b) sessionStorage(tab) > (c) window.name > (d) 새로 생성
+  try{
+    const u = new URL(location.href);
+    const q = u.searchParams.get("tabID");
+    if (q) {
+      sessionStorage.setItem("tabID", q);
+      return q;
+    }
+  }catch(e){}
+
+  try{
+    const ss = sessionStorage.getItem("tabID");
+    if (ss) return ss;
+  }catch(e){}
+
+  try{
+    const m = String(window.name || "").match(/rp_tab=([a-zA-Z0-9_-]+)/);
+    if (m && m[1]){
+      sessionStorage.setItem("tabID", m[1]);
+      return m[1];
+    }
+  }catch(e){}
+
+  const tid = generateTabID();
+  try{ sessionStorage.setItem("tabID", tid); }catch(e){}
+  try{ window.name = "rp_tab=" + tid; }catch(e){}
+  return tid;
+}
+
+const URL_SCOPE = getUrlScope();
+const TAB_ID = getOrCreateTabID();
+
+// 3) 스코프 키 생성기
+function scopedKey(base){
+  // 키가 길어지는 거 싫으면 더 짧게 줄여도 됨
+  return `rpc:${URL_SCOPE}:${TAB_ID}:${base}`;
+} 
 
     // ✅ tabID generator (query-string용)
 function generateTabID(){
@@ -1607,9 +1685,15 @@ const chatAvatar = $("#chatAvatar");
     const gameBtn = $("#gameBtn");
     const vpnBtn = $("#vpnBtn");
 
-    const STORAGE_KEY = "roleplay-chat_session_v1";
-    const HISTORY_KEY = "roleplay-chat_history_v1";
-    const PENDING_KEY = "roleplay-chat_pending_session_v1";
+    // ✅ tabID+urlScope 기반으로 완전 분리
+const STORAGE_KEY = scopedKey("session_v1");
+const HISTORY_KEY = scopedKey("history_v1");
+const PENDING_KEY = scopedKey("pending_session_v1");
+
+// ✅ 올액세스 권한도 “스코프 안”에 백업해둘 키(섞임 방지)
+// (전역키도 유지하되, 스코프에도 같이 저장)
+const ALL_ACCESS_KEY = "ROLEPLAY_CHAT_ALL_ACCESS_V1";
+const ALL_ACCESS_SCOPED = scopedKey("ROLEPLAY_CHAT_ALL_ACCESS_V1");
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
     const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
 
@@ -1875,57 +1959,101 @@ function show(view){
   }
 }
 
-    // --------- Save & load (tab-scoped)
-    function saveSession(data){
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    // =========================
+// ✅ Scoped storage: SS primary + LS backup + LF(session) backup
+// =========================
+const lfSession = (window.localforage)
+  ? localforage.createInstance({ name: "roleplay-chat", storeName: "session" })
+  : null;
+
+function safeJsonParse(raw, fallback){
+  try{ return JSON.parse(raw); }catch(e){ return fallback; }
+}
+
+async function setEverywhere(key, value){
+  // value: string
+  try{ sessionStorage.setItem(key, value); }catch(e){}
+  try{ localStorage.setItem(key, value); }catch(e){}
+  if (lfSession){
+    try{ await lfSession.setItem(key, value); }catch(e){}
+  }
+}
+
+async function getFromSomewhere(key){
+  // SS -> LS -> LF 순서
+  try{
+    const v = sessionStorage.getItem(key);
+    if (v != null) return v;
+  }catch(e){}
+
+  try{
+    const v = localStorage.getItem(key);
+    if (v != null){
+      try{ sessionStorage.setItem(key, v); }catch(e){}
+      return v;
     }
-    function loadSession(){
-      try{
-        const raw = sessionStorage.getItem(STORAGE_KEY);
-        if (!raw) return null;
-        return JSON.parse(raw);
-      }catch(e){
-        return null;
+  }catch(e){}
+
+  if (lfSession){
+    try{
+      const v = await lfSession.getItem(key);
+      if (v != null){
+        try{ sessionStorage.setItem(key, v); }catch(e){}
+        try{ localStorage.setItem(key, v); }catch(e){}
+        return v;
       }
-    }
-    function clearSession(){
-      sessionStorage.removeItem(STORAGE_KEY);
-    }
+    }catch(e){}
+  }
 
-    function savePending(session){
-  sessionStorage.setItem(PENDING_KEY, JSON.stringify(session));
+  return null;
 }
-function loadPending(){
-  try{
-    const raw = sessionStorage.getItem(PENDING_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){
-    return null;
+
+async function removeEverywhere(key){
+  try{ sessionStorage.removeItem(key); }catch(e){}
+  try{ localStorage.removeItem(key); }catch(e){}
+  if (lfSession){
+    try{ await lfSession.removeItem(key); }catch(e){}
   }
 }
-function clearPending(){
-  sessionStorage.removeItem(PENDING_KEY);
+
+// ---------- session (character/session object)
+async function saveSessionScoped(data){
+  await setEverywhere(STORAGE_KEY, JSON.stringify(data));
+}
+async function loadSessionScoped(){
+  const raw = await getFromSomewhere(STORAGE_KEY);
+  return raw ? safeJsonParse(raw, null) : null;
+}
+async function clearSessionScoped(){
+  await removeEverywhere(STORAGE_KEY);
 }
 
+// ---------- pending (handoff/restore)
+async function savePendingScoped(sess){
+  await setEverywhere(PENDING_KEY, JSON.stringify(sess));
+}
+async function loadPendingScoped(){
+  const raw = await getFromSomewhere(PENDING_KEY);
+  return raw ? safeJsonParse(raw, null) : null;
+}
+async function clearPendingScoped(){
+  await removeEverywhere(PENDING_KEY);
+}
 
-    // --------- Save & load (chat history, tab-scoped)
-function saveHistory(history){
-  sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+// ---------- history (chat messages)
+async function saveHistoryScoped(history){
+  await setEverywhere(HISTORY_KEY, JSON.stringify(history));
 }
-function loadHistory(){
-  try{
-    const raw = sessionStorage.getItem(HISTORY_KEY);
-    return raw ? JSON.parse(raw) : [];
-  }catch(e){
-    return [];
-  }
+async function loadHistoryScoped(){
+  const raw = await getFromSomewhere(HISTORY_KEY);
+  return raw ? safeJsonParse(raw, []) : [];
 }
-function clearHistory(){
-  sessionStorage.removeItem(HISTORY_KEY);
+async function clearHistoryScoped(){
+  await removeEverywhere(HISTORY_KEY);
 }
 
     // --------- Fill chat view (NULL-SAFE)
-function enterChat(session){
+async function enterChat(session){
   // ✅ 채팅 타이틀 변경
   const chatTitle = document.getElementById("chatTitle");
   if (chatTitle){
@@ -1959,7 +2087,7 @@ function enterChat(session){
 
 
   // ✅ history restore
-  chatHistory = loadHistory();
+  chatHistory = await loadHistoryScoped();
 
   // 채팅 UI 비우고 다시 그리기
   const box = document.getElementById("chatBox");
@@ -2000,7 +2128,7 @@ function enterChat(session){
         const data = await res.json();
         appendMsg("assistant", data.reply);
         chatHistory = [{ role: "assistant", content: data.reply }];
-        saveHistory(chatHistory);
+        await saveHistoryScoped(chatHistory);
       }catch(e){
         console.error(e);
       }
@@ -2196,7 +2324,7 @@ who.innerHTML = (role === "assistant")
       chatInput.value = "";
       appendMsg("user", text);
       chatHistory.push({ role: "user", content: text });
-saveHistory(chatHistory);
+await saveHistoryScoped(chatHistory);
 
       try{
         sendBtn.disabled = true;
@@ -2208,7 +2336,7 @@ saveHistory(chatHistory);
 const textEl = msgEl.querySelector(".text div:last-child"); // 본문 div 잡기
 await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
 chatHistory.push({ role: "assistant", content: reply });
-saveHistory(chatHistory);
+await saveHistoryScoped(chatHistory);
 
 // ✅ 결제 안 된 상태에서만 + 사용자가 sex 트리거 단어를 쓴 경우
 // ✅ 서버 응답(타자기) 완전히 끝난 "다음" 말풍선으로 속마음 출력
@@ -2342,31 +2470,12 @@ try{ sessionStorage.setItem("tabID", tabID); }catch(e){}
 try{ localStorage.setItem("tabID", tabID); }catch(e){}
 try{ window.name = "rp_tab=" + tabID; }catch(e){}                    
 
-// 세션 저장
-saveSession(session);
+// ✅ scoped session 저장 (SS+LS+LF)
+saveSessionScoped(session);
 
-// 🔥 추가: 메인이 LS를 기준으로 세션을 복구/검증할 수 있음
-try{
-  localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(session));
-}catch(e){}
 
-  
 
-// ✅ handoff용 pending을 SS + LS + LF(session) 모두에 저장
-(function savePendingEverywhere(sess){
-  const k = "roleplay-chat_pending_session_v1";
-  const raw = JSON.stringify(sess);
-
-  try{ sessionStorage.setItem(k, raw); }catch(e){}
-  try{ localStorage.setItem(k, raw); }catch(e){}
-
-  try{
-    if (window.localforage){
-      const lfSession = localforage.createInstance({ name: "roleplay-chat", storeName: "session" });
-      lfSession.setItem(k, sess).catch(()=>{});
-    }
-  }catch(e){}
-})(session);
+savePendingScoped(session);
 
 // 🚀 tier별 즉시 이동 (+ tabID 붙이기)
 if (tier === "imagechat"){
@@ -2564,19 +2673,26 @@ function pick(arr){
 
 
     // --------- Restore session if exists
-const existing = loadSession();
+(async function bootAllAccess(){
+  const existing = await loadSessionScoped();
 
-if (!existing){
-  show(viewSetup);
-} else {
+  if (!existing){
+    show(viewSetup);
+    return;
+  }
+
+  // imagechat / unlimited은 그대로 유지 (건들지 않기)
   if (existing.tier === "imagechat"){
     window.location.href = "/imagechat/";
-  } else if (existing.tier === "imagechat_unlimited"){
-    window.location.href = "/imagechat_unlimited";
-  } else {
-    enterChat(existing);
+    return;
   }
-}
+  if (existing.tier === "imagechat_unlimited"){
+    window.location.href = "/imagechat_unlimited";
+    return;
+  }
+
+  await enterChat(existing)
+})();
 
 function setupKeyboardBar(){
   const controls = document.querySelector(".chatControls");
@@ -2675,6 +2791,7 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
 
 
 
