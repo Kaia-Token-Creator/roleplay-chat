@@ -2331,10 +2331,6 @@ sessionStorage.setItem("roleplay-chat_paid_v1", "paid");
 sessionStorage.setItem("roleplay-chat_imagechat_paid_v1", "paid");
 sessionStorage.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid");
 
-// ✅ tabID 생성 + 세션에 박기 + 탭에도 저장
-const tabID = generateTabID();
-session.tabID = tabID;
-sessionStorage.setItem("tabID", tabID);
 
 // ✅ tabID 생성 + 세션에 박기 + 탭에도 저장
 const tabID = generateTabID();
@@ -2366,10 +2362,6 @@ try{
     const lfSession = localforage.createInstance({ name: "roleplay-chat", storeName: "session" });
     lfSession.setItem("roleplay-chat_pending_session_v1", session).catch(()=>{});
   }
-}catch(e){}  
-
-try{
-  localStorage.setItem("roleplay-chat_pending_session_v1", JSON.stringify(session));
 }catch(e){}  
 
 // 🚀 tier별 즉시 이동 (+ tabID 붙이기)
@@ -2677,4 +2669,5 @@ function setupKeyboardBar(){
 </script>  
 </body>
 </html>
+
 
