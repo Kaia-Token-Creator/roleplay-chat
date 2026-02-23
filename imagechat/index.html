@@ -745,12 +745,13 @@ const tkey = (base) => `${base}::${TAB_ID}`;
 /* (1) 진입 경고: 콘솔에 크게 한 번 띄우기 */
 (function warnOnEntry(){
   const msg = [
-    "⚠️ STOP",
-    "This browser console is for developers.",
-    "If someone told you to paste code here, it may be a scam.",
-    "",
-    "Unauthorized access / modification attempts will be logged.",
-    "Service access may be revoked and this device/browser may be blocked."
+    "🚨 SECURITY WARNING",
+    "🚫 MODIFYING THIS CONSOLE IS A CRIMINAL OFFENSE.",
+    "Do not modify or interfere with this site's code or security mechanisms.",
+    "Unauthorized tampering may constitute fraud / theft of service.",
+    "This site can log abuse signals (device/browser fingerprints, timestamps, IP/network metadata where available).",
+    "Evidence may be preserved and used for chargebacks disputes, account/device bans, and legal action.",
+     "If you have a billing issue, contact support instead of tampering."
   ].join("\n");
 
   try{
@@ -804,7 +805,8 @@ const tkey = (base) => `${base}::${TAB_ID}`;
       `action: ${action}`,
       `key: ${k}`,
       (v !== undefined ? `value: ${String(v).slice(0,160)}` : ""),
-      "",
+      "STOP NOW.",
+      "🚫 MODIFYING THIS CONSOLE IS A CRIMINAL OFFENSE.",
       "Unauthorized modification detected.",
       "Service access may be revoked.",
       "This device/browser may be blocked.",
@@ -2039,6 +2041,7 @@ await saveHistoryAsync(history);
 
 </body>
 </html>
+
 
 
 
