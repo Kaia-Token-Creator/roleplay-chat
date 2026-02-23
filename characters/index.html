@@ -916,18 +916,13 @@ padding: 5px 8px;
 
 (function warnOnEntry(){
   const msg = [
-    "🚫 STOP",
-    "",
-    "Unauthorized access or modification of this site is strictly prohibited.",
-    "",
-    "Attempting to bypass payments or access controls may constitute",
-    "theft of service and fraud.",
-    "",
-    "Abuse attempts may be logged (timestamps, device/browser data, IP/network metadata where available).",
-    "Service access may be revoked and this device/browser may be permanently blocked.",
-    "",
-    "Evidence may be retained and used for disputes, chargebacks,",
-    "and legal action."
+    "🚨 SECURITY WARNING",
+    "🚫 MODIFYING THIS CONSOLE IS A CRIMINAL OFFENSE.",
+    "Do not modify or interfere with this site's code or security mechanisms.",
+    "Unauthorized tampering may constitute fraud / theft of service.",
+    "This site can log abuse signals (device/browser fingerprints, timestamps, IP/network metadata where available).",
+    "Evidence may be preserved and used for chargebacks disputes, account/device bans, and legal action.",
+     "If you have a billing issue, contact support instead of tampering."
   ].join("\n");
 
   console.log(
@@ -958,9 +953,9 @@ padding: 5px 8px;
       "🚨 SECURITY ALERT — TAMPERING DETECTED",
       "",
       `Key: ${k}`,
-      "",
+      "STOP NOW.",
+      "🚫 MODIFYING THIS CONSOLE IS A CRIMINAL OFFENSE.",
       "Unauthorized modification of payment or access controls detected.",
-      "",
       "This may constitute theft of service and fraud.",
       "Service access may be immediately revoked.",
       "This device/browser may be permanently blocked.",
@@ -2389,6 +2384,7 @@ applySearchFilter();
   </script>
 </body>
 </html>
+
 
 
 
