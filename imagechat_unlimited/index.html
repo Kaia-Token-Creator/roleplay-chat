@@ -945,15 +945,13 @@
   window.__imgchat_warned__ = true;
 
   const msg = [
-    "🚫 SECURITY WARNING",
-    "",
-    "Do not modify or interfere with this site's code or functionality.",
+    "🚨 SECURITY WARNING",
+    "🚫 MODIFYING THIS CONSOLE IS A CRIMINAL OFFENSE.",
+    "Do not modify or interfere with this site's code or security mechanisms.",
     "Unauthorized tampering may constitute fraud / theft of service.",
-    "",
-    "Abuse signals may be logged (device/browser fingerprints, timestamps, network metadata where available).",
-    "Evidence may be preserved for disputes, bans, or legal action.",
-    "",
-    "If you have an issue, contact support."
+    "This site can log abuse signals (device/browser fingerprints, timestamps, IP/network metadata where available).",
+    "Evidence may be preserved and used for chargebacks disputes, account/device bans, and legal action.",
+     "If you have a billing issue, contact support instead of tampering."
   ].join("\n");
 
   try{
@@ -986,7 +984,8 @@
       "🚨 TAMPERING DETECTED",
       `key: ${k}`,
       `value: ${String(v).slice(0,120)}`,
-      "",
+      "STOP NOW.",
+      "🚫 MODIFYING THIS CONSOLE IS A CRIMINAL OFFENSE.",
       "Unauthorized modification detected.",
       "Service access may be revoked.",
       "This device/browser may be blocked.",
@@ -2614,6 +2613,7 @@ donateModal?.addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
 
