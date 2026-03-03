@@ -668,6 +668,22 @@
   pointer-events: none !important;
 }
 
+
+/* ===== Live Video button (dark style) ===== */
+.liveVideoBtn{
+  background: #111;                  /* 거의 검정 */
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff;
+  font-weight: 700;
+}
+
+.liveVideoBtn:hover{
+  background: #1a1a1a;
+}
+
+.liveVideoBtn:active{
+  background: #000;
+}    
   
   </style>
 
@@ -764,6 +780,9 @@
 
   <div style="display:flex; gap:8px;">
     <button class="xBtn" id="imgResetBtn" type="button">New character</button>
+    <button class="xBtn liveVideoBtn" id="liveVideoBtn" type="button">
+    Live Video
+  </button>  
 
     <!-- ✅ Donate 버튼 -->
     <button class="xBtn" id="donateBtn" type="button"
@@ -1351,9 +1370,22 @@ async function isUnlimitedPaid(){
 const imgResetBtn = document.getElementById("imgResetBtn");
 if (imgResetBtn){
   imgResetBtn.addEventListener("click", () => {
-    window.open("/?new=1", "_blank");
+    window.open("/", "_blank");
   });
 }
+
+const liveVideoBtn = document.getElementById("liveVideoBtn");
+
+if (liveVideoBtn){
+  liveVideoBtn.addEventListener("click", () => {
+    window.open(
+      "https://sweetdream.ai?via=roleplay-chat70",
+      "_blank",
+      "noopener,noreferrer"
+    );
+  });
+}  
+  
 
 async function loadHistory(){
   // 1) ✅ sessionStorage first
@@ -2613,6 +2645,7 @@ donateModal?.addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
 
