@@ -420,6 +420,22 @@ padding: 5px 8px;
 .donateBtn:active{
   background: #d61a6b;
 }
+
+/* ===== Live Video button (dark style) ===== */
+.liveVideoBtn{
+  background: #111;                  /* 거의 검정 */
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff;
+  font-weight: 700;
+}
+
+.liveVideoBtn:hover{
+  background: #1a1a1a;
+}
+
+.liveVideoBtn:active{
+  background: #000;
+}
     
   </style>
 </head>
@@ -527,6 +543,9 @@ padding: 5px 8px;
 
   <div style="display:flex; gap:8px;">
     <button class="xBtn" id="imgResetBtn" type="button">New character</button>
+    <button class="xBtn liveVideoBtn" id="liveVideoBtn" type="button">
+    Live Video
+  </button>
     <button class="xBtn donateBtn" id="donateBtn" type="button">Donate</button>
   </div>
 </div>
@@ -1162,6 +1181,18 @@ if (imgResetBtn){
     a.target = "_blank";
     a.rel = "noopener noreferrer";
     a.click();
+  });
+}
+
+const liveVideoBtn = document.getElementById("liveVideoBtn");
+
+if (liveVideoBtn){
+  liveVideoBtn.addEventListener("click", () => {
+    window.open(
+      "https://sweetdream.ai?via=roleplay-chat70",
+      "_blank",
+      "noopener,noreferrer"
+    );
   });
 }
 
@@ -2043,6 +2074,7 @@ await saveHistoryAsync(history);
 
 </body>
 </html>
+
 
 
 
