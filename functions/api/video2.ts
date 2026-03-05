@@ -3,12 +3,12 @@
 
 type QueueBody = {
   action: "queue";
+  orderID: string;
   duration?: "5s" | "10s";
   imageDataUrl: string;
   prompt?: string;
   // 네가 원하면 모델도 프론트에서 넘겨서 쓰게 할 수 있음:
-  model?: string;
-  orderID: string;
+  model?: string;  
 };
 
 type RetrieveBody = {
@@ -51,6 +51,127 @@ function bestErrMsg(data: any, fallback: string) {
     (typeof data?.detail === "string" && data.detail) ||
     fallback
   );
+}
+
+// ✅ Paste this into functions/api/video.ts (anywhere above onRequestPost)
+// It throws on failure; if it returns, payment is verified.
+
+async function verifyPaypalOrder(
+  orderID: string,
+  duration: "5s" | "10s",
+  ctx: any
+){
+  if (!orderID || typeof orderID !== "string") {
+    throw new Error("Missing PayPal orderID");
+  }
+
+  const env = (ctx.env || {}) as any;
+
+  // ⚠️ Put these in Cloudflare Pages env vars (never in frontend code)
+  const PAYPAL_ENV = (env.PAYPAL_ENV || "sandbox").toLowerCase(); // "sandbox" | "live"
+  const PAYPAL_CLIENT_ID = env.PAYPAL_CLIENT_ID;
+  const PAYPAL_CLIENT_SECRET = env.PAYPAL_CLIENT_SECRET;
+  const PAYPAL_MERCHANT_ID = env.PAYPAL_MERCHANT_ID; // e.g. "B37RU4LAJ9FKA"
+
+  if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+    throw new Error("Missing PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET in env");
+  }
+  if (!PAYPAL_MERCHANT_ID) {
+    throw new Error("Missing PAYPAL_MERCHANT_ID in env");
+  }
+
+  const base =
+    PAYPAL_ENV === "live"
+      ? "https://api-m.paypal.com"
+      : "https://api-m.sandbox.paypal.com";
+
+  const expectedValue = duration === "10s" ? "2.00" : "1.50";
+  const expectedCurrency = "USD";
+
+  // --- 1) Get PayPal access token ---
+  const tokenRes = await fetch(`${base}/v1/oauth2/token`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Basic ${btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`)}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: "grant_type=client_credentials",
+  });
+
+  const tokenJson: any = await tokenRes.json().catch(() => ({}));
+  if (!tokenRes.ok || !tokenJson?.access_token) {
+    const msg = tokenJson?.error_description || tokenJson?.error || "PayPal token failed";
+    throw new Error(`${msg} (status=${tokenRes.status})`);
+  }
+
+  const accessToken = tokenJson.access_token as string;
+
+  // --- 2) Fetch order details ---
+  const orderRes = await fetch(`${base}/v2/checkout/orders/${encodeURIComponent(orderID)}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const order: any = await orderRes.json().catch(() => ({}));
+  if (!orderRes.ok) {
+    const msg = order?.message || order?.name || "PayPal order lookup failed";
+    throw new Error(`${msg} (status=${orderRes.status})`);
+  }
+
+  // --- 3) Validate status ---
+  const status = String(order?.status || "");
+  if (status !== "COMPLETED") {
+    throw new Error(`PayPal order not COMPLETED (status=${status})`);
+  }
+
+  // --- 4) Validate amount/currency ---
+  // Most common: purchase_units[0].amount
+  const pu0 = Array.isArray(order?.purchase_units) ? order.purchase_units[0] : null;
+
+  const amountObj =
+    pu0?.amount ||
+    // fallback: sometimes amount is inside captures
+    pu0?.payments?.captures?.[0]?.amount ||
+    null;
+
+  const currency = String(amountObj?.currency_code || "");
+  const value = typeof amountObj?.value === "string"
+    ? amountObj.value
+    : (amountObj?.value != null ? String(amountObj.value) : "");
+
+  // normalize value like "1.5" -> "1.50"
+  const norm = (v: string) => {
+    const n = Number(v);
+    if (!isFinite(n)) return "";
+    return n.toFixed(2);
+  };
+
+  if (currency !== expectedCurrency) {
+    throw new Error(`Wrong currency (got=${currency}, expected=${expectedCurrency})`);
+  }
+  if (norm(value) !== expectedValue) {
+    throw new Error(`Wrong amount (got=${norm(value)}, expected=${expectedValue})`);
+  }
+
+  // --- 5) Validate receiver (merchant) ---
+  // Common fields:
+  // purchase_units[0].payee.merchant_id
+  // or capture.payee.merchant_id
+  const payeeMerchant =
+    pu0?.payee?.merchant_id ||
+    pu0?.payments?.captures?.[0]?.payee?.merchant_id ||
+    "";
+
+  if (String(payeeMerchant) !== String(PAYPAL_MERCHANT_ID)) {
+    throw new Error(
+      `Wrong merchant (got=${String(payeeMerchant)}, expected=${String(PAYPAL_MERCHANT_ID)})`
+    );
+  }
+
+  // ✅ If we reach here, payment is valid for this duration.
 }
 
 // ✅ OPTIONS preflight
@@ -211,5 +332,6 @@ export const onRequestPost: PagesFunction = async (ctx) => {
     return json({ error: "Server error", detail: String(e?.message || e) }, { status: 500, headers: cors(origin) });
   }
 };
+
 
 
