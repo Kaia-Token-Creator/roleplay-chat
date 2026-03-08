@@ -2631,6 +2631,22 @@ function appendLockedInnerThought(){
   return typeWriter(textEl, inner, 14);
 }
 
+
+function formatMessage(text){
+  if (!text) return "";
+
+  // HTML escape
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // *action* → italic
+  const italic = escaped.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+
+  // 줄바꿈 유지
+  return italic.replace(/\n/g, "<br>");
+}
     
     function appendMsg(role, content){
       const currentSession = loadSession();
@@ -2663,7 +2679,7 @@ who.innerHTML = (role === "assistant")
                             <div style="color: rgba(255,255,255,.86); white-space:pre-wrap;"></div>`;
       }
 
-      bubble.querySelector("div:last-child").textContent = content;
+      bubble.querySelector("div:last-child").innerHTML = formatMessage(content);
 
       msg.appendChild(who);
       msg.appendChild(bubble);
@@ -3456,6 +3472,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
