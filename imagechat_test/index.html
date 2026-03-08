@@ -236,6 +236,16 @@ padding: 5px 8px;
   line-height: 1.25;
 }
 
+/* ===== action description in image chat ===== */
+.bubble .action{
+  display:block;
+  font-style:italic;
+  font-size:11px;
+  line-height:1.35;
+  opacity:.72;
+  margin-bottom:8px;
+}    
+
 /* 이미지도 살짝 덜 두껍게 */
 .bubble img{
   width:100%;
@@ -284,15 +294,6 @@ padding: 5px 8px;
 @keyframes blink { 50% { opacity: 0; } }
 
 
-    /* assistant text color should follow character color */
-.bubble .asstText{
-  color: var(--chatColor);
-}
-
-/* user text stays white */
-.bubble .userText{
-  color: #fff;
-}
 
 /* ===== Image chat top bar ===== */
 /* ===== Image chat top bar ===== */
@@ -1285,6 +1286,19 @@ function escapeText(s){
   return (s ?? "").toString();
 }
 
+function formatMessageHtml(s){
+  const text = (s ?? "").toString();
+
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  const withActions = escaped.replace(/\*([^*]+)\*/g, '<em class="action">$1</em>');
+
+  return withActions.replace(/\n/g, "<br>");
+}    
+
 async function compressDataUrl(dataUrl, {
   maxW = 300,      // 저장용 최대 가로폭 (추천: 512~1024)
   maxH = 300,      // 저장용 최대 세로폭
@@ -1335,34 +1349,33 @@ async function compressDataUrl(dataUrl, {
 
 
 async function typewriter(el, text, speed=14){
-  el.textContent = "";
+  el.innerHTML = "";
+
   const cursor = document.createElement("span");
   cursor.className = "typeCursor";
   cursor.textContent = "▍";
-  el.appendChild(cursor);
 
-  // ✅ 사용자가 스크롤을 위로 올려서 읽는 중이면 자동 스크롤 방해 안 하려고 플래그
   const shouldAutoScroll = () => {
-    const threshold = 80; // 바닥에서 80px 이내면 "바닥에 붙어있다"고 판단
+    const threshold = 80;
     const distFromBottom = chatBox.scrollHeight - (chatBox.scrollTop + chatBox.clientHeight);
     return distFromBottom < threshold;
   };
 
   for (let i = 0; i < text.length; i++){
-    cursor.remove();
-    el.append(text[i]);
+    const partial = text.slice(0, i + 1);
+    el.innerHTML = formatMessageHtml(partial);
     el.appendChild(cursor);
 
-    // ✅ 타이핑 중 높이가 늘어날 때마다 바닥으로 따라가기
     if (shouldAutoScroll()){
       chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
     }
 
     await new Promise(r => setTimeout(r, speed));
   }
-  cursor.remove();
 
-  // ✅ 끝났을 때도 한 번 확실히 바닥
+  cursor.remove();
+  el.innerHTML = formatMessageHtml(text);
+
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
 }
 
@@ -1407,11 +1420,11 @@ function appendMsg(role, text, imageUrl, opts = {}){
 
     const safe = escapeText(text);
 
-    if (animate){
-      typewriter(body, safe, 14);
-    } else {
-      body.textContent = safe;
-    }
+if (animate){
+  typewriter(body, safe, 14);
+} else {
+  body.innerHTML = formatMessageHtml(safe);
+}
   } else {
     const name = document.createElement("div");
     name.innerHTML = "<b>You</b>";
@@ -1485,7 +1498,7 @@ async function bootstrapFirstMessage(){
   try{
     setBusy(true);
 
-    const res = await fetch("/api/imagechat", {
+    const res = await fetch("/api/imagechat2", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(payload),
@@ -1606,7 +1619,7 @@ requestAnimationFrame(() => {
 });
 
 
-   const res = await fetch("/api/imagechat", {
+   const res = await fetch("/api/imagechat2", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(payload),
@@ -1624,7 +1637,7 @@ if (typeof data.appearanceProfile === "string" && data.appearanceProfile.trim())
   sessionStorage.setItem("appearanceProfile", data.appearanceProfile.trim());
 }
 
-    // Expected server response shape (you’ll implement in /functions/api/imagechat.ts):
+    // Expected server response shape (you’ll implement in /functions/api/imagechat2.ts):
     // {
     //   reply: "text reply",
     //   imageUrl?: "https://...." OR "data:image/...",
@@ -2021,7 +2034,7 @@ async function requestSecretGift(meta = {}){
 };
 
 
-    const res = await fetch("/api/imagechat", {
+    const res = await fetch("/api/imagechat2", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -2074,6 +2087,7 @@ await saveHistoryAsync(history);
 
 </body>
 </html>
+
 
 
 
