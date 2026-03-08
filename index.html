@@ -1021,6 +1021,14 @@ body.modalOpen{
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+
+.chatMsg .text .action{
+  display:block;
+  font-style:italic;
+  font-size:13px;
+  opacity:0.75;
+  margin-bottom:8px;
+}
     
     
   </style>
@@ -2630,6 +2638,22 @@ function appendLockedInnerThought(){
   return typeWriter(textEl, inner, 14);
 }
 
+
+function formatMessage(text){
+  if (!text) return "";
+
+  // HTML escape
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // *action* → italic
+  const italic = escaped.replace(/\*([^*]+)\*/g, '<em class="action">$1</em>');
+
+  // 줄바꿈 유지
+  return italic.replace(/\n/g, "<br>");
+}
     
     function appendMsg(role, content){
       const currentSession = loadSession();
@@ -2662,7 +2686,7 @@ who.innerHTML = (role === "assistant")
                             <div style="color: rgba(255,255,255,.86); white-space:pre-wrap;"></div>`;
       }
 
-      bubble.querySelector("div:last-child").textContent = content;
+      bubble.querySelector("div:last-child").innerHTML = formatMessage(content);
 
       msg.appendChild(who);
       msg.appendChild(bubble);
@@ -2672,9 +2696,11 @@ who.innerHTML = (role === "assistant")
     }
 
     async function typeWriter(targetEl, text, speed = 18){
-  targetEl.textContent = "";
+  targetEl.innerHTML = "";
+
   for (let i = 0; i < text.length; i++){
-    targetEl.textContent += text[i];
+    const partial = text.slice(0, i + 1);
+    targetEl.innerHTML = formatMessage(partial);
     $("#chatBox").scrollTop = $("#chatBox").scrollHeight;
     await new Promise(r => setTimeout(r, speed));
   }
@@ -3454,6 +3480,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
