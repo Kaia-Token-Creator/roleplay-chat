@@ -215,11 +215,22 @@
       line-height: 1.25;
     }
 
+    /* ===== action description ===== */
+.bubble .action{
+  display:block;
+  font-style:italic;
+  font-size:11px;
+  line-height:1.35;
+  opacity:.72;
+  margin-bottom:8px;
+}
+
     .bubble .userText{
       color:#fff;
       font-size:12px;
       line-height: 1.25;
     }
+
 
     .bubble img{
       width:100%;
@@ -1488,6 +1499,19 @@ function escapeText(s){
   return (s ?? "").toString();
 }
 
+function formatMessageHtml(s){
+  const text = (s ?? "").toString();
+
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  const withActions = escaped.replace(/\*([^*]+)\*/g, '<em class="action">$1</em>');
+
+  return withActions.replace(/\n/g, "<br>");
+}  
+
 async function compressDataUrlFixedSquare(dataUrl, {
   size = 300,
   quality = 0.72,
@@ -1533,11 +1557,11 @@ async function compressDataUrlFixedSquare(dataUrl, {
 
   
 async function typewriter(el, text, speed=14){
-  el.textContent = "";
+  el.innerHTML = "";
+
   const cursor = document.createElement("span");
   cursor.className = "typeCursor";
   cursor.textContent = "▍";
-  el.appendChild(cursor);
 
   const shouldAutoScroll = () => {
     const threshold = 80;
@@ -1546,8 +1570,8 @@ async function typewriter(el, text, speed=14){
   };
 
   for (let i = 0; i < text.length; i++){
-    cursor.remove();
-    el.append(text[i]);
+    const partial = text.slice(0, i + 1);
+    el.innerHTML = formatMessageHtml(partial);
     el.appendChild(cursor);
 
     if (shouldAutoScroll()){
@@ -1556,10 +1580,13 @@ async function typewriter(el, text, speed=14){
 
     await new Promise(r => setTimeout(r, speed));
   }
+
   cursor.remove();
+  el.innerHTML = formatMessageHtml(text);
+
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
 }
-
+  
 /* =========================
    ✅ Video Payment Modal logic
    ========================= */
@@ -1987,11 +2014,11 @@ function appendMsg(role, text, imageUrl, videoUrl, opts = {}){
 
     const safe = escapeText(text);
 
-    if (animate){
-      typewriter(body, safe, 14);
-    } else {
-      body.textContent = safe;
-    }
+if (animate){
+  typewriter(body, safe, 14);
+} else {
+  body.innerHTML = formatMessageHtml(safe);
+}
   } else {
     const name = document.createElement("div");
     name.innerHTML = "<b>You</b>";
@@ -2161,7 +2188,7 @@ async function bootstrapFirstMessage(){
 
   try{
     setBusy(true); 
-    const res = await fetch("/api/imagechat", {
+    const res = await fetch("/api/imagechat2", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -2289,7 +2316,7 @@ await pruneHistoryAndUI();
       chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "auto" });
     });
 
-    const res = await fetch("/api/imagechat", {
+    const res = await fetch("/api/imagechat2", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -2473,7 +2500,7 @@ async function requestSecretGift(){
       tabID: TAB_ID
     };
 
-    const res = await fetch("/api/imagechat", {
+    const res = await fetch("/api/imagechat2", {
       method: "POST",
       headers: { "Content-Type":"application/json" },
       body: JSON.stringify(payload)
@@ -2648,6 +2675,8 @@ donateModal?.addEventListener("click", e => {
 
 </body>
 </html>
+
+
 
 
 
