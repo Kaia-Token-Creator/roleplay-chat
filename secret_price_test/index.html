@@ -2237,7 +2237,7 @@ setUnlockUIVisibility();
   if (!chatHistory || chatHistory.length === 0){
     (async () => {
       try{
-        const res = await fetch("/api/chat", {
+        const res = await fetch("/api/chat2", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -2708,7 +2708,7 @@ who.innerHTML = (role === "assistant")
 
       const tier = session.tier === "uncensored" ? "uncensored" : "general";
 
-      const res = await fetch("/api/chat", {
+      const res = await fetch("/api/chat2", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -3476,6 +3476,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
