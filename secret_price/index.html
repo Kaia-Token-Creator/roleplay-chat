@@ -1543,7 +1543,124 @@ Deleting browser data will erase your character, chat history, and access permis
   </div>
 </div>
 
+<!-- Live Video Info Modal -->
+<div id="liveVideoModal" class="modalOverlay" role="dialog" aria-modal="true">
+  <div class="modal" style="display:flex; flex-direction:column; max-height:86dvh;">
+    
+    <div class="modalHeader" style="flex:0 0 auto;">
+      <h3 style="font-size:12px; line-height:1.35; margin:0;">
+  <span style="color:#ff7ad9;">sweetdream.ai</span> VS 
+  <span style="color:#FFD600;">roleplay-chat.com</span><br>
+  Which experience do you want?
+</h3>
+      <button class="xBtn" id="closeLiveVideoModal" type="button">Close</button>
+    </div>
 
+    <div class="modalBody" style="flex:1 1 auto; min-height:0; overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;">
+
+      <p class="warn" style="line-height:1.55; font-size:13px; margin:0;">
+
+        Alright, quick heads up before you jump in 👀
+
+        <br><br>
+
+        The service we’d like to introduce is
+        <b style="color:#ff7ad9;">sweetdream.ai</b>.
+        It’s a different platform from
+        <b style="color:#FFD600;">roleplay-chat.com</b>.
+
+        <br><br>
+
+        <b style="color:#ff7ad9;">sweetdream.ai</b> focuses on a
+        <b>live video call style experience</b> —
+        more like chatting with someone face-to-face.
+
+        <br><br>
+
+        Meanwhile here at
+        <b style="color:#FFD600;">roleplay-chat.com</b>,
+        we lean heavily into <b>roleplay</b>.
+
+        Our <b>Image & Video Chat</b> generates visuals based on
+        the conversation and scenario, so the images and videos
+        evolve naturally with the story.
+
+        <br><br>
+
+        Different vibe.
+        Different experience.
+
+        <br><br>
+
+        Personally… I kinda prefer the roleplay immersion here 😂
+        but plenty of people love the live-video concept at
+        <b style="color:#ff7ad9;">sweetdream.ai</b>.
+
+        <br><br>
+
+        Some users stick with
+        <b style="color:#FFD600;">roleplay-chat.com</b>.
+
+        Some prefer
+        <b style="color:#ff7ad9;">sweetdream.ai</b>.
+
+        And honestly… a lot of people use both.
+
+        <br><br>
+
+        So if you're curious —
+        we’re happy to introduce it.
+
+        Give it a try.
+        <b style="color:#ff7ad9;">sweetdream.ai</b> is actually pretty fun.
+
+        <br><br>
+
+        💡 Tip: Many users open <b style="color:#ff7ad9;">sweetdream.ai</b> in a new tab
+        while continuing <b style="color:#FFD600;">roleplay-chat.com</b> here.
+
+      </p>
+    </div>
+
+    <div style="flex:0 0 auto; display:flex; flex-direction:column; gap:10px; margin-top:0; padding:14px 16px 16px; border-top:1px solid rgba(255,255,255,.10); background:rgba(10,10,10,.96);">
+      
+      <a href="https://sweetdream.ai?via=roleplay-chat70"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="btn"
+         style="
+         background:#ff7ad9;
+         border:1px solid #ff62d1;
+         color:#000;
+         font-weight:900;
+         font-size:13px;
+         text-align:center;
+         text-decoration:none;
+         display:flex;
+         align-items:center;
+         justify-content:center;
+         ">
+         Try sweetdream.ai (new tab)
+      </a>
+
+      <button class="btn"
+              id="stayHereBtn"
+              type="button"
+              style="
+              background:#e0b400;
+              border:1px solid #c9a200;
+              color:#000;
+              font-weight:900;
+              font-size:13px;
+              text-align:center;
+              ">
+         Stay on roleplay-chat.com 😎
+      </button>
+
+    </div>
+  </div>
+</div>
+  
 
   <script>
 
@@ -2998,14 +3115,35 @@ resetBtn.addEventListener("click", () => {
 
 
 const liveVideoBtn = document.getElementById("liveVideoBtn");
+const liveVideoModal = document.getElementById("liveVideoModal");
+const closeLiveVideoModal = document.getElementById("closeLiveVideoModal");
+const stayHereBtn = document.getElementById("stayHereBtn");
+
+function openLiveVideoModal(){
+  if (liveVideoModal) liveVideoModal.classList.add("active");
+  document.body.classList.add("modalOpen");
+}
+
+function closeLiveVideoModalFn(){
+  if (liveVideoModal) liveVideoModal.classList.remove("active");
+  document.body.classList.remove("modalOpen");
+}
 
 if (liveVideoBtn){
-  liveVideoBtn.addEventListener("click", () => {
-    window.open(
-      "https://sweetdream.ai?via=roleplay-chat70",
-      "_blank",
-      "noopener,noreferrer"
-    );
+  liveVideoBtn.addEventListener("click", openLiveVideoModal);
+}
+
+if (closeLiveVideoModal){
+  closeLiveVideoModal.addEventListener("click", closeLiveVideoModalFn);
+}
+
+if (stayHereBtn){
+  stayHereBtn.addEventListener("click", closeLiveVideoModalFn);
+}
+
+if (liveVideoModal){
+  liveVideoModal.addEventListener("click", (e)=>{
+    if (e.target === liveVideoModal) closeLiveVideoModalFn();
   });
 }
 
@@ -3476,6 +3614,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
