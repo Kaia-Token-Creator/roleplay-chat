@@ -1663,6 +1663,62 @@ Deleting browser data will erase your character, chat history, and access permis
   </div>
 </div>  
 
+<!-- Image & Video Suggestion Modal -->
+<div id="mediaSuggestModal" class="modalOverlay" role="dialog" aria-modal="true">
+  <div class="modal" style="display:flex; flex-direction:column; max-height:86dvh;">
+
+    <!-- 제목 -->
+    <div class="modalHeader" style="flex:0 0 auto;">
+      <h3 id="mediaSuggestTitle" style="font-size:11px; margin:0; color:#FFD600;"></h3>
+      <button class="xBtn" id="closeMediaSuggestModal" type="button">X</button>
+    </div>
+
+    <!-- 스크롤 영역 -->
+    <div class="modalBody" style="flex:1 1 auto; min-height:0; overflow:auto;">
+
+      <p class="warn" style="font-size:13px; line-height:1.55;">
+
+        Wanna make the roleplay feel even more alive? 😏<br><br>
+
+        With <b class="highlightCTA">Image & Video Chat</b>, your character can
+        send you generated pictures and videos during the conversation,
+        making the whole experience way more immersive.<br><br>
+
+        To try it, simply press <b class="highlightCTA">"New Character"</b>
+        and start a new setup using the <b class="highlightCTA">Image & Video Chat</b> option.
+
+      </p>
+
+      <img src="/videoexample.jpg"
+           style="width:100%; height:auto; border-radius:12px; margin-top:10px;">
+
+    </div>
+
+    <!-- 하단 버튼 -->
+    <div style="flex:0 0 auto; display:flex; flex-direction:column; gap:10px; padding:14px 16px 16px; border-top:1px solid rgba(255,255,255,.10);">
+
+      <a href="https://roleplay-chat.com"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="btn"
+         style="background:#e0b400; border:1px solid #ff62d1; color:#000; font-weight:900; font-size:10px;
+text-decoration:none; text-align:center;">
+         Start Image & Video Chat [new tab]
+      </a>
+
+      <button class="btn"
+              id="closeMediaSuggestBtn"
+              type="button"
+              style="background:#000; border:1px solid #c9a200; color:#FFFFFF; font-weight:900; font-size:10px;
+text-decoration:none;">
+        Thanks, maybe later
+      </button>
+
+    </div>
+
+  </div>
+</div>  
+
 
   <script>
 
@@ -2337,6 +2393,11 @@ async function enterChat(session){
 
   // ✅ 화면 전환
   show(viewChat);
+
+  // ⭐ 채팅 최초 진입 팝업
+setTimeout(()=>{
+  openMediaSuggestModal(session.name);
+},600);
 
 setUnlockUIVisibility();
 
@@ -3119,6 +3180,39 @@ const liveVideoBtn = document.getElementById("liveVideoBtn");
 const liveVideoModal = document.getElementById("liveVideoModal");
 const closeLiveVideoModal = document.getElementById("closeLiveVideoModal");
 const stayHereBtn = document.getElementById("stayHereBtn");
+// Image & Video suggestion modal
+const mediaSuggestModal = document.getElementById("mediaSuggestModal");
+const closeMediaSuggestModal = document.getElementById("closeMediaSuggestModal");
+const closeMediaSuggestBtn = document.getElementById("closeMediaSuggestBtn");
+
+function openMediaSuggestModal(characterName){
+  const title = document.getElementById("mediaSuggestTitle");
+  if (title){
+    title.textContent = `${characterName} wants to send you pictures and videos`;
+  }
+
+  mediaSuggestModal.classList.add("active");
+  document.body.classList.add("modalOpen");
+}
+
+function closeMediaSuggestModalFn(){
+  mediaSuggestModal.classList.remove("active");
+  document.body.classList.remove("modalOpen");
+}
+
+if (closeMediaSuggestModal){
+  closeMediaSuggestModal.addEventListener("click", closeMediaSuggestModalFn);
+}
+
+if (closeMediaSuggestBtn){
+  closeMediaSuggestBtn.addEventListener("click", closeMediaSuggestModalFn);
+}
+
+if (mediaSuggestModal){
+  mediaSuggestModal.addEventListener("click",(e)=>{
+    if(e.target===mediaSuggestModal) closeMediaSuggestModalFn();
+  });
+}    
 
 function openLiveVideoModal(){
   if (liveVideoModal) liveVideoModal.classList.add("active");
@@ -3616,6 +3710,7 @@ function setupKeyboardBar(){
   </script>
 </body>
 </html>
+
 
 
 
