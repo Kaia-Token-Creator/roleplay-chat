@@ -1,3 +1,11 @@
+<!-- 
+이 페이지는 비디오생성에 결제 검증이 필요하지 않은 video.ts로 연결돼 있으며
+실제 페이지로 코드를 백업할 때는 결제 검증이 필요한 video2.ts로 바꿔야함.
+그리고 현재 페이지는 sandbox용 paypal key가 적용돼있음.
+-->
+
+
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -1919,7 +1927,7 @@ function b64ToBlob(b64, mime){
 
   // 1) queue
   // 1) queue
-const qRes = await fetch("/api/video2", {
+const qRes = await fetch("/api/video", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -1955,7 +1963,7 @@ if (!qRes.ok){
   while (Date.now() - startedAt < maxMs){
     await new Promise(r => setTimeout(r, pollEveryMs));
 
-    const rRes = await fetch("/api/video2", {
+    const rRes = await fetch("/api/video", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -2861,6 +2869,7 @@ donateModal?.addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
 
