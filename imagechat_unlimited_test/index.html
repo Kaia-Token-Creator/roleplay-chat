@@ -1360,7 +1360,6 @@ let history = [];
 
   // 1) load session/paid/history (LF → LS → session)
   session = await readSession();
-  if (session?.name) await writeBackupAny({ session });
   
   paid = await isUnlimitedPaid();
   history = await loadHistory();
@@ -1487,16 +1486,7 @@ async function hardenStorage(){
 
 
 async function readSession(){
-  // 1) ✅ sessionStorage first (latest for this tab)
-  try{
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (raw){
-      const s = JSON.parse(raw);
-      if (s && s.name) return s;
-    }
-  }catch(e){}
-
-  // 2) ✅ backup (LF → LS)
+  // ✅ 이미지챗은 현재 URL의 TAB_ID 백업만 신뢰
   const b = await readBackupAny();
   if (b && b.session && b.session.name){
     try{ sessionStorage.setItem(STORAGE_KEY, JSON.stringify(b.session)); }catch(e){}
@@ -2869,6 +2859,7 @@ donateModal?.addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
 
