@@ -1005,6 +1005,7 @@ padding: 5px 8px;
     const PAYMENT_KEY = "roleplay-chat_paid_v1";
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
     const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
+    const STORAGE_TABID_KEY = STORAGE_KEY + "_tabid";
 
     // Share button
 const shareBtn = document.querySelector("#shareBtn");
@@ -1749,10 +1750,53 @@ if (infoBtn && infoMenu){
     const imgUnlimitedPayOk = $("#imgUnlimitedPayOk");
     const imgUnlimitedPayErr = $("#imgUnlimitedPayErr");
 
-    // ===== Pending/session helpers (same behavior) =====
-    function saveSession(data){ sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-    function savePending(session){ sessionStorage.setItem(PENDING_KEY, JSON.stringify(session)); }
-    function clearPending(){ sessionStorage.removeItem(PENDING_KEY); }
+    function k(type, tabID){
+  return `rpc_${type}_${tabID}`;
+}
+
+function saveSession(data, tabID){
+  // 메인페이지 호환용
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  sessionStorage.setItem(STORAGE_TABID_KEY, tabID);
+
+  // 메인페이지 우선 탐색용 tab 전용 키
+  sessionStorage.setItem(`rpc_session_${tabID}`, JSON.stringify(data));
+
+  // localStorage 백업
+  try{
+    localStorage.setItem(k("session", tabID), JSON.stringify(data));
+  }catch(e){}
+}
+
+function savePending(session, tabID){
+  sessionStorage.setItem(PENDING_KEY, JSON.stringify(session));
+
+  try{
+    localStorage.setItem(k("pending", tabID), JSON.stringify(session));
+  }catch(e){}
+}
+
+function clearPending(tabID){
+  sessionStorage.removeItem(PENDING_KEY);
+
+  try{
+    localStorage.removeItem(k("pending", tabID));
+  }catch(e){}
+}
+
+function setPaid(keyName, value, tabID){
+  const tabKey = k(keyName, tabID);
+
+  // 메인페이지가 읽는 tabID 전용 키
+  sessionStorage.setItem(tabKey, value);
+
+  try{
+    localStorage.setItem(tabKey, JSON.stringify(value));
+  }catch(e){}
+
+  // 호환용 전역 키
+  sessionStorage.setItem(keyName, value);
+}
 
     // ===== Modal open/close (same as original) =====
     function openPayModal(){
@@ -2266,63 +2310,79 @@ fields.appendChild(note);
 session.tabID = tabID;
 
     if (tier === "general"){
-      try{ saveSession(session); }catch(e){ console.error(e); }
-      window.location.replace(`https://roleplay-chat.com/?tabID=${tabID}`);
-      return;
+  try{
+    saveSession(session, tabID);
+  }catch(e){
+    console.error(e);
+  }
+  window.location.replace(`https://roleplay-chat.com/?tabID=${tabID}`);
+  return;
+}
+
+   if (tier === "uncensored"){
+  savePending(session, tabID);
+
+  const payTitle = document.getElementById("payTitle");
+  const payCharName = document.getElementById("payCharName");
+  if (payTitle) payTitle.textContent = `Unlock +18 Uncensored ($2)`;
+  if (payCharName) payCharName.textContent = session.name;
+
+  openPayModal();
+  mountPayPalButtons(() => {
+    setPaid(PAYMENT_KEY, "paid", tabID);
+    session.tier = "uncensored";
+
+    try{
+      saveSession(session, tabID);
+    }catch(e){
+      console.error(e);
     }
 
-    if (tier === "uncensored"){
-      savePending(session);
-
-      const payTitle = document.getElementById("payTitle");
-      const payCharName = document.getElementById("payCharName");
-      if (payTitle) payTitle.textContent = `Unlock +18 Uncensored ($2)`;
-      if (payCharName) payCharName.textContent = session.name;
-
-      openPayModal();
-      mountPayPalButtons(() => {
-        sessionStorage.setItem(PAYMENT_KEY, "paid");
-        session.tier = "uncensored";
-
-        try{ saveSession(session); }catch(e){ console.error(e); }
-
-        clearPending();
-        window.location.replace(`https://roleplay-chat.com/?tabID=${tabID}`);
-      }, "2.00", "Playing game");
-      return;
-    }
+    clearPending(tabID);
+    window.location.replace(`https://roleplay-chat.com/?tabID=${tabID}`);
+  }, "2.00", "Playing game");
+  return;
+}
 
     if (tier === "imagechat"){
-      savePending(session);
+  savePending(session, tabID);
 
-      openImgPayModal();
-      mountPayPalButtonsImageChat(() => {
-        sessionStorage.setItem(IMAGECHAT_PAID_KEY, "paid");
-        session.tier = "imagechat";
+  openImgPayModal();
+  mountPayPalButtonsImageChat(() => {
+    setPaid(IMAGECHAT_PAID_KEY, "paid", tabID);
+    session.tier = "imagechat";
 
-        try{ saveSession(session); }catch(e){ console.error(e); }
-
-        clearPending();
-        window.location.href = `https://roleplay-chat.com/imagechat/?tabID=${session.tabID}`;
-      }, "6.90", "playing image game");
-      return;
+    try{
+      saveSession(session, tabID);
+    }catch(e){
+      console.error(e);
     }
+
+    clearPending(tabID);
+    window.location.href = `https://roleplay-chat.com/imagechat/?tabID=${session.tabID}`;
+  }, "6.90", "playing image game");
+  return;
+}
 
     if (tier === "imagechat_unlimited"){
-      savePending(session);
+  savePending(session, tabID);
 
-      openImgUnlimitedPayModal();
-      mountPayPalButtonsImageChatUnlimited(() => {
-        sessionStorage.setItem(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
-        session.tier = "imagechat_unlimited";
+  openImgUnlimitedPayModal();
+  mountPayPalButtonsImageChatUnlimited(() => {
+    setPaid(IMAGECHAT_UNLIMITED_PAID_KEY, "paid", tabID);
+    session.tier = "imagechat_unlimited";
 
-        try{ saveSession(session); }catch(e){ console.error(e); }
-
-        clearPending();
-        window.location.href = `https://roleplay-chat.com/imagechat_unlimited/?tabID=${session.tabID}`;
-      }, "25.00", "Upgrade game");
-      return;
+    try{
+      saveSession(session, tabID);
+    }catch(e){
+      console.error(e);
     }
+
+    clearPending(tabID);
+    window.location.href = `https://roleplay-chat.com/imagechat_unlimited/?tabID=${session.tabID}`;
+  }, "25.00", "Upgrade game");
+  return;
+}
   });
 
   return card;
@@ -2391,6 +2451,7 @@ applySearchFilter();
   </script>
 </body>
 </html>
+
 
 
 
