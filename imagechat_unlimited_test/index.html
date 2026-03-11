@@ -354,19 +354,28 @@
     }
     .secretModal.active{ display:flex; }
     .secretCard{
-      width: min(520px, calc(100vw - 28px));
-      background: rgba(10,10,10,.92);
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 14px 14px 12px;
-    }
+  width: min(520px, calc(100vw - 28px));
+  max-height: calc(100dvh - 28px);
+  background: rgba(10,10,10,.92);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
     .secretTop{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
-    }
+  flex: 0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  background: rgba(10,10,10,.96);
+}
+
     .secretTitle{
       display:flex;
       align-items:center;
@@ -406,11 +415,17 @@
     }
     .secretX:hover{ background: rgba(255,255,255,.10); }
     .secretBody{
-      margin-top: 10px;
-      font-size: 12px;
-      line-height: 1.35;
-      color: rgba(255,255,255,.88);
-    }
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 10px 14px 12px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: rgba(255,255,255,.88);
+}
+
     .secretLine{ margin: 8px 0 10px; color: rgba(255,255,255,.78); }
     .secretLinkRow{
       display:flex;
@@ -465,10 +480,14 @@
       font-weight: 900;
     }
     .secretActions{
-      margin-top: 12px;
-      display:flex;
-      justify-content: flex-end;
-    }
+  flex: 0 0 auto;
+  display:flex;
+  justify-content: flex-end;
+  padding: 12px 14px 14px;
+  border-top: 1px solid rgba(255,255,255,.10);
+  background: rgba(10,10,10,.96);
+}
+
     .thankBtn{
       border: none;
       background: #e0b400;
@@ -486,6 +505,28 @@
       color: rgba(255,255,255,.7);
       user-select:none;
     }
+
+    .secretGuide{
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+}
+
+.secretGuideTitle{
+  color: #ffcc00;
+  font-weight: 900;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.secretGuideText{
+  color: rgba(255,255,255,.88);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 
     /* =========================
        ✅ Generate video link (under image)
@@ -842,47 +883,57 @@
       <button class="secretX" id="secretCloseX" type="button" aria-label="Close">✕</button>
     </div>
 
-    <div class="secretBody">
-      <div class="secretLine">Here is secret price link.</div>
+   <div class="secretBody">
+  <div class="secretLine">Here is secret price link.</div>
 
-      <div class="secretLinkRow">
-        <div class="secretLinkText" id="secretLinkText">https://roleplay-chat.com/secret_price</div>
+  <div class="secretLinkRow">
+    <div class="secretLinkText" id="secretLinkText">https://roleplay-chat.com/secret_price</div>
 
-        <button class="iconBtn" id="secretCopyBtn" type="button" aria-label="Copy link" title="Copy">
-          <svg viewBox="0 0 24 24">
-            <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-        </button>
+    <button class="iconBtn" id="secretCopyBtn" type="button" aria-label="Copy link" title="Copy">
+      <svg viewBox="0 0 24 24">
+        <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+    </button>
 
-        <button class="iconBtn" id="secretShareBtn" type="button" aria-label="Share link" title="Share">
-          <svg viewBox="0 0 24 24">
-            <circle cx="18" cy="5" r="3"></circle>
-            <circle cx="6" cy="12" r="3"></circle>
-            <circle cx="18" cy="19" r="3"></circle>
-            <path d="M8.6 13.5l6.8 3.9"></path>
-            <path d="M15.4 6.6L8.6 10.5"></path>
-          </svg>
-        </button>
+    <button class="iconBtn" id="secretShareBtn" type="button" aria-label="Share link" title="Share">
+      <svg viewBox="0 0 24 24">
+        <circle cx="18" cy="5" r="3"></circle>
+        <circle cx="6" cy="12" r="3"></circle>
+        <circle cx="18" cy="19" r="3"></circle>
+        <path d="M8.6 13.5l6.8 3.9"></path>
+        <path d="M15.4 6.6L8.6 10.5"></path>
+      </svg>
+    </button>
 
-        <span class="toastMini" id="secretToast" style="display:none;">Copied!</span>
-      </div>
+    <span class="toastMini" id="secretToast" style="display:none;">Copied!</span>
+  </div>
 
-      <div class="secretNote">
-        <b style="font-size:13px;">Copy it now and keep it for later.</b><br><br>
-        You can use this secret price link <span class="offHighlight">50% off</span> forever to create a new character.<br><br>
-        This link must be opened in a new, clean tab.<br><br>
-        All prices are <span class="offHighlight">50% off</span> and you can use it unlimited times.<br><br>
-        Copy the link or bookmark it, and use it when you create a new character.<br><br>
-        You may share this link with friends or on social media.<br>
-        Yeah, secretly.<br><br>
-        Enjoy your time
-      </div>
+  <div class="secretNote">
+    <b style="font-size:13px;">Copy it now and keep it for later.</b><br><br>
+    You can use this secret price link <span class="offHighlight">50% off</span> forever to create a new character.<br><br>
+    This link must be opened in a new, clean tab.<br><br>
+    All prices are <span class="offHighlight">50% off</span> and you can use it unlimited times.<br><br>
+    Copy the link or bookmark it, and use it when you create a new character.<br><br>
+    You may share this link with friends or on social media.<br>
+    Yeah, secretly.<br><br>
+    Enjoy your time
+  </div>
 
-      <div class="secretActions">
-        <button class="thankBtn" id="secretThankBtn" type="button">Thank you (Go to chat)</button>
-      </div>
+  <div class="secretGuide">
+    <div class="secretGuideTitle">Image chat guide</div>
+    <div class="secretGuideText">
+      Unlimited access by unique URL.<br>
+      Always open a character using its unique URL in a <b>'new tab'</b>.<br>
+      Please request images naturally, as if you are talking to the character.
     </div>
+  </div>
+</div>
+
+<div class="secretActions">
+  <button class="thankBtn" id="secretThankBtn" type="button">Thank you (Go to chat)</button>
+</div>
+
   </div>
 </div>
 
@@ -2868,5 +2919,6 @@ donateModal?.addEventListener("click", e => {
 
 </body>
 </html>
+
 
 
