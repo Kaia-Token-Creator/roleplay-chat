@@ -365,6 +365,17 @@
 .sectionTitle.important{
   color: #ff4d4d;
 }
+
+.oldPrice{
+  text-decoration: line-through;
+  color: rgba(255,255,255,.45);
+  font-size: 0.65em;
+  margin-right: 10px;
+}
+
+.price{
+  color:#ffcc00;
+}    
     
   </style>
 </head>
@@ -459,7 +470,19 @@
 
       <div class="header">
         <div class="title">🎟 All-access Pass</div>
-        <div class="price">$99 <span>Lifetime</span></div>
+        <div class="price">
+  <span class="oldPrice">$200</span>
+  $99 <span>Lifetime</span><span style="
+  background:#ff4d4d;
+  color:#fff;
+  font-size:11px;
+  padding:3px 6px;
+  border-radius:6px;
+  margin-left:6px;
+">
+50% OFF
+</span>
+</div>
       </div>
 
       <div class="tagline">
@@ -557,7 +580,20 @@
     
     <div class="modalTitle">All-access Pass</div>
 
-    <div class="modalPrice">$99 <small>one-time · lifetime on this browser</small></div>
+    <div class="modalPrice">
+  <span class="oldPrice">$200</span>
+  $99<span style="
+  background:#ff4d4d;
+  color:#fff;
+  font-size:11px;
+  padding:3px 6px;
+  border-radius:6px;
+  margin-left:6px;
+">
+50% OFF
+</span>
+  <small>one-time · lifetime on this browser</small>
+</div>
 
     <div class="modalText">
       - <strong><span class="highlight">Just pay once.</span></strong><br>
