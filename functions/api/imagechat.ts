@@ -35,14 +35,14 @@ export const onRequestPost: PagesFunction<{
     };
 
     // ---------------- LIMITS ----------------
-    const MAX_MESSAGE_CHARS = 700;
-    const MAX_REPLY_CHARS = 600;
+    const MAX_MESSAGE_CHARS = 900;
+    const MAX_REPLY_CHARS = 700;
 
     const MAX_HISTORY_MSGS = 50;
     const MAX_PROMPT_CHARS = 15000;
 
     // text reply tokens
-    const MAX_TOKENS_TEXT = 500;
+    const MAX_TOKENS_TEXT = 600;
 
     // image plan tokens (same text model, separate call)
     const MAX_TOKENS_IMAGE_PLAN = 500;
