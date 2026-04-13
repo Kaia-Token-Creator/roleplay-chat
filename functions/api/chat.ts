@@ -568,7 +568,7 @@ const SEX_KEYWORDS = [
   "orgasm","moan","horny","aroused","wet","hard","thrust","ride","missionary",
   "doggy","anal","oral","deepthroat","penetrate","penetration","breed",
   "nsfw","erotic","kink","fetish","bdsm","spank","ejaculate","masturbate","jerk","stroke","lick","licking","rim",
-  "69","one night","fuck me","make love","take off","nude"
+  "69","one night","fuck me","make love","take off","nude","cunt"
 ];
 
 
