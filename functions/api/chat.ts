@@ -202,7 +202,7 @@ const history = isSexTrigger
     } else {
       const replyRaw = await callVeniceChat(env.VENICE_API_KEY, messages, MAX_TOKENS_VENICE);
       const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
-      return json({ reply, tier, model: "e2ee-venice-uncensored-24b-p" }, 200, CORS);
+      return json({ reply, tier, model: "venice-uncensored-role-play" }, 200, CORS);
     }
   } catch (err: any) {
     return json(
@@ -541,7 +541,7 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "e2ee-venice-uncensored-24b-p",
+      model: "venice-uncensored-role-play",
       messages,
       stream: false,
       temperature: 0.95,
