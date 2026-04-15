@@ -219,7 +219,7 @@ export const onRequestPost: PagesFunction = async (ctx) => {
       // 1) 서버에서 고정
       // 2) 프론트에서 model 넘기면 그걸 사용
       // (원하는 모델을 “찾아 붙여넣기” 했으면, 아래 default를 네 모델로 바꾸면 됨)
-      const model = (typeof b.model === "string" && b.model.trim()) || "wan-2.5-preview-image-to-video";
+      const model = (typeof b.model === "string" && b.model.trim()) || "wan-2-7-image-to-video";
 
       const userPrompt = typeof b.prompt === "string" ? b.prompt.trim() : "";
       const prompt =
