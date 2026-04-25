@@ -75,7 +75,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <!-- PayPal SDK (for in-page popup/overlay checkout). Note: The "buttons" flow opens PayPal in an overlay/mini-window. -->
-  <script src="https://www.paypal.com/sdk/js?client-id=ASts4hxcd4-DkLEL8b-PbbawSaCD4G5pQiuJM9aZYawixhxWbQ2upSru10WQNZa4HzCqHUcGC8Z1RIrW&currency=USD&intent=capture"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AWMNyvXpo7AJVokhdranzsBYseGheJFuEg4vH73rU8PcXOd6Tr7zjRDoCtk5PLz1aqUUNRTjPSe-NUHR&currency=USD&intent=capture"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 
@@ -1792,6 +1792,11 @@ function TAB_HISTORY_KEY(){
     const MAX_HISTORY = 120;
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
     const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
+    let pendingPaymentSession = null;
+
+let paypalTextMounted = false;
+let paypalImageMounted = false;
+let paypalUnlimitedMounted = false;
 
 
 // ✅ 외부에서 ?tabID= 로 들어온 경우: 그 값을 window.name에 고정해서 이후 저장키가 절대 안 꼬이게 함
@@ -3089,15 +3094,21 @@ if (!nicknameVal){
 
 
   if (tier === "uncensored"){
-    // ✅ 유료(uncensored)는 결제 전까지 저장 금지 (pending)
-    savePending(session);
+  savePending(session);
+  pendingPaymentSession = session;
 
-    openPayModal();
+  openPayModal();
+
+  if (!paypalTextMounted){
+    paypalTextMounted = true;
+
     mountPayPalButtons(() => {
+      const session = pendingPaymentSession;
+      if (!session) return;
+
       paymentStatus = "paid";
       setPaid(PAYMENT_KEY, "paid");
 
-      // ✅ 결제 성공 시점에만 저장
       session.tier = "uncensored";
       try{
         saveSession(session);
@@ -3108,17 +3119,27 @@ if (!nicknameVal){
       }
 
       clearPending();
-      const tabID = getCurrentTabID();   // ✅ 기존 tabID 유지
-window.location.href = "/?tabID=" + tabID;
+      const tabID = getCurrentTabID();
+      window.location.href = "/?tabID=" + tabID;
     }, "1.00", "Playing secret game");
-    return;
   }
 
-  if (tier === "imagechat"){
-    savePending(session);
+  return;
+}
 
-    openImgPayModal();
+  if (tier === "imagechat"){
+  savePending(session);
+  pendingPaymentSession = session;
+
+  openImgPayModal();
+
+  if (!paypalImageMounted){
+    paypalImageMounted = true;
+
     mountPayPalButtonsImageChat(() => {
+      const session = pendingPaymentSession;
+      if (!session) return;
+
       setPaid(IMAGECHAT_PAID_KEY, "paid");
 
       session.tier = "imagechat";
@@ -3132,16 +3153,26 @@ window.location.href = "/?tabID=" + tabID;
 
       clearPending();
       const tabID = generateTabID();
-window.location.href = "/imagechat/?tabID=" + tabID;
+      window.location.href = "/imagechat/?tabID=" + tabID;
     }, "3.45", "playing secret image game");
-    return;
   }
 
-  if (tier === "imagechat_unlimited"){
-    savePending(session);
+  return;
+}
 
-    openImgUnlimitedPayModal();
+  if (tier === "imagechat_unlimited"){
+  savePending(session);
+  pendingPaymentSession = session;
+
+  openImgUnlimitedPayModal();
+
+  if (!paypalUnlimitedMounted){
+    paypalUnlimitedMounted = true;
+
     mountPayPalButtonsImageChatUnlimited(() => {
+      const session = pendingPaymentSession;
+      if (!session) return;
+
       setPaid(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
 
       session.tier = "imagechat_unlimited";
@@ -3154,12 +3185,13 @@ window.location.href = "/imagechat/?tabID=" + tabID;
       }
 
       clearPending();
-clearPending();
-const tabID = generateTabID();
-window.location.href = "/imagechat_unlimited/?tabID=" + tabID;
+      const tabID = generateTabID();
+      window.location.href = "/imagechat_unlimited/?tabID=" + tabID;
     }, "12.50", "Upgrade secret game");
-    return;
   }
+
+  return;
+}
 });
 
 // ✅ submit 밖으로 빼야 정상 동작하는 버튼들
