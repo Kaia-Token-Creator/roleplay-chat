@@ -198,7 +198,7 @@ const history = isSexTrigger
     if (tier === "general") {
       const replyRaw = await callDeepSeekChat(env.DEEPSEEK_API_KEY, messages, MAX_TOKENS_DEEPSEEK);
       const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
-      return json({ reply, tier, model: "deepseek-chat" }, 200, CORS);
+      return json({ reply, tier, model: "deepseek-v4-flash" }, 200, CORS);
     } else {
       const replyRaw = await callVeniceChat(env.VENICE_API_KEY, messages, MAX_TOKENS_VENICE);
       const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
@@ -509,7 +509,7 @@ async function callDeepSeekChat(apiKey: string, messages: any[], maxTokens: numb
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "deepseek-chat",
+      model: "deepseek-v4-flash",
       messages,
       stream: false,
       temperature: 0.8,
