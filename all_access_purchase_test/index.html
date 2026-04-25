@@ -24,7 +24,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <!-- PayPal SDK -->
-  <script src="https://www.paypal.com/sdk/js?client-id=ASts4hxcd4-DkLEL8b-PbbawSaCD4G5pQiuJM9aZYawixhxWbQ2upSru10WQNZa4HzCqHUcGC8Z1RIrW&currency=USD"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AWMNyvXpo7AJVokhdranzsBYseGheJFuEg4vH73rU8PcXOd6Tr7zjRDoCtk5PLz1aqUUNRTjPSe-NUHR&currency=USD"></script>
 
   <style>
     /* =========================
@@ -808,25 +808,27 @@ if(modalCloseBtn){
         });
       },
       onApprove: async (data, actions) => {
+  try {
+    const details = await actions.order.capture();
 
-  const details = await actions.order.capture(); // 결제 확정
+    gtag('event', 'conversion', {
+      send_to: 'AW-17946940858/F-qqCILj2_cbELqr4u1C',
+      transaction_id: details.id || data.orderID
+    });
 
-  // ⭐⭐⭐ 전환 코드 여기 ⭐⭐⭐
-  gtag('event', 'conversion', {
-    send_to: 'AW-17946940858/F-qqCILj2_cbELqr4u1C',
-    transaction_id: details.id || data.orderID
-  });
+    const paidKey = "paid";
+    localStorage.setItem(STORAGE_KEY, paidKey);
 
-  const paidKey = "paid";
-  localStorage.setItem(STORAGE_KEY, paidKey);
+    const url = "https://roleplay-chat.com/all_access?key=" + encodeURIComponent(paidKey);
 
-  const url = "https://roleplay-chat.com/all_access?key=" + encodeURIComponent(paidKey);
+    setTimeout(() => {
+      window.location.href = url;
+    }, 1000);
 
-  // ⭐ 너무 빨리 이동하면 전환이 씹힐 수 있음
-  setTimeout(() => {
-    window.location.href = url;
-  }, 1000);
-
+  } catch (err) {
+    console.error("PayPal all-access capture error:", err);
+    alert("Payment capture failed. Please refresh the page and try again.");
+  }
 }
 
     }).render("#paypal-button-container");
