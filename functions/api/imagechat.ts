@@ -333,7 +333,7 @@ const history: Msg[] = isSexTrigger
       {
         reply,
         image,
-        tier: "venice-uncensored",
+        tier: "venice-uncensored-1-2",
         imageModel: "lustify-sdxl",
       },
       200,
@@ -909,7 +909,7 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "venice-uncensored",
+      model: "venice-uncensored-1-2",
       messages,
       stream: false,
       temperature: 0.92,
