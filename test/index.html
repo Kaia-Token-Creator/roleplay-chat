@@ -1798,6 +1798,11 @@ function TAB_HISTORY_KEY(){
     const MAX_HISTORY = 120;
     const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
     const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
+    let pendingPaymentSession = null;
+
+let paypalTextMounted = false;
+let paypalImageMounted = false;
+let paypalUnlimitedMounted = false;
 
 
 // ✅ 외부에서 ?tabID= 로 들어온 경우: 그 값을 window.name에 고정해서 이후 저장키가 절대 안 꼬이게 함
@@ -3131,36 +3136,42 @@ if (!nicknameVal){
 
 
   if (tier === "uncensored"){
-    // ✅ 유료(uncensored)는 결제 전까지 저장 금지 (pending)
-    savePending(session);
+  savePending(session);
 
-    openPayModal();
-    mountPayPalButtons(() => {
-      paymentStatus = "paid";
-      setPaid(PAYMENT_KEY, "paid");
+  openPayModal();
+  mountPayPalButtons(() => {
+    paymentStatus = "paid";
+    setPaid(PAYMENT_KEY, "paid");
 
-      // ✅ 결제 성공 시점에만 저장
-      session.tier = "uncensored";
-      try{
-        saveSession(session);
-      }catch(e){
-        console.error(e);
-        session.avatarDataUrl = "";
-        try{ saveSession(session); }catch(_){}
-      }
+    session.tier = "uncensored";
+    try{
+      saveSession(session);
+    }catch(e){
+      console.error(e);
+      session.avatarDataUrl = "";
+      try{ saveSession(session); }catch(_){}
+    }
 
-      clearPending();
-      const tabID = getCurrentTabID();   // ✅ 기존 tabID 유지
-window.location.href = "/test/?tabID=" + tabID;
-    }, "2.00", "Playing game");
-    return;
-  }
+    clearPending();
+    const tabID = getCurrentTabID();
+    window.location.href = "/test/?tabID=" + tabID;
+  }, "2.00", "Playing game");
+  return;
+}
 
   if (tier === "imagechat"){
-    savePending(session);
+  savePending(session);
+  pendingPaymentSession = session;
 
-    openImgPayModal();
+  openImgPayModal();
+
+  if (!paypalImageMounted){
+    paypalImageMounted = true;
+
     mountPayPalButtonsImageChat(() => {
+      const session = pendingPaymentSession;
+      if (!session) return;
+
       setPaid(IMAGECHAT_PAID_KEY, "paid");
 
       session.tier = "imagechat";
@@ -3174,16 +3185,26 @@ window.location.href = "/test/?tabID=" + tabID;
 
       clearPending();
       const tabID = generateTabID();
-window.location.href = "/imagechat_test/?tabID=" + tabID;
+      window.location.href = "/imagechat_test/?tabID=" + tabID;
     }, "6.90", "playing image game");
-    return;
   }
 
-  if (tier === "imagechat_unlimited"){
-    savePending(session);
+  return;
+}
 
-    openImgUnlimitedPayModal();
+  if (tier === "imagechat_unlimited"){
+  savePending(session);
+  pendingPaymentSession = session;
+
+  openImgUnlimitedPayModal();
+
+  if (!paypalUnlimitedMounted){
+    paypalUnlimitedMounted = true;
+
     mountPayPalButtonsImageChatUnlimited(() => {
+      const session = pendingPaymentSession;
+      if (!session) return;
+
       setPaid(IMAGECHAT_UNLIMITED_PAID_KEY, "paid");
 
       session.tier = "imagechat_unlimited";
@@ -3196,12 +3217,13 @@ window.location.href = "/imagechat_test/?tabID=" + tabID;
       }
 
       clearPending();
-clearPending();
-const tabID = generateTabID();
-window.location.href = "/imagechat_unlimited_test/?tabID=" + tabID;
+      const tabID = generateTabID();
+      window.location.href = "/imagechat_unlimited_test/?tabID=" + tabID;
     }, "25.00", "Upgrade game");
-    return;
   }
+
+  return;
+}
 });
 
 // ✅ submit 밖으로 빼야 정상 동작하는 버튼들
