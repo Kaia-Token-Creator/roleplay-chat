@@ -2563,12 +2563,24 @@ function mountPayPalButtonsImageChat(onSuccess, priceUsd = "6.90", description =
           onSuccess();
         }, 600);
       }catch(err){
-        if (imgPayErr){
-          imgPayErr.textContent = "Payment capture failed. Please try again.";
-          imgPayErr.style.display = "block";
-        }
-        if (imgPayOk) imgPayOk.style.display = "none";
-      }
+
+  console.error("PayPal IMAGE capture error:", err);
+
+  let msg =
+    err?.details?.[0]?.issue ||
+    err?.name ||
+    err?.message ||
+    "Unknown error";
+
+  if (imgPayErr){
+    imgPayErr.textContent =
+      "Payment capture failed: " + msg;
+
+    imgPayErr.style.display = "block";
+  }
+
+  if (imgPayOk) imgPayOk.style.display = "none";
+}
     },
     onCancel: () => {
       if (imgPayErr){
@@ -2621,12 +2633,25 @@ function mountPayPalButtonsImageChatUnlimited(onSuccess, priceUsd = "25.00", des
           onSuccess();
         }, 600);
       }catch(err){
-        if (imgUnlimitedPayErr){
-          imgUnlimitedPayErr.textContent = "Payment capture failed. Please try again.";
-          imgUnlimitedPayErr.style.display = "block";
-        }
-        if (imgUnlimitedPayOk) imgUnlimitedPayOk.style.display = "none";
-      }
+
+  console.error("PayPal UNLIMITED capture error:", err);
+
+  let msg =
+    err?.details?.[0]?.issue ||
+    err?.name ||
+    err?.message ||
+    "Unknown error";
+
+  if (imgUnlimitedPayErr){
+    imgUnlimitedPayErr.textContent =
+      "Payment capture failed: " + msg;
+
+    imgUnlimitedPayErr.style.display = "block";
+  }
+
+  if (imgUnlimitedPayOk)
+    imgUnlimitedPayOk.style.display = "none";
+}
     },
     onCancel: () => {
       if (imgUnlimitedPayErr){
@@ -2676,11 +2701,22 @@ function mountPayPalButtons(onSuccess, priceUsd = "2.00", description = "Playing
           closePayModal();
           onSuccess();
         }, 600);
-      }catch(err){
-        payErr.textContent = "Payment capture failed. Please try again.";
-        payErr.style.display = "block";
-        payOk.style.display = "none";
-      }
+     }catch(err){
+
+  console.error("PayPal capture error:", err);
+
+  let msg =
+    err?.details?.[0]?.issue ||
+    err?.name ||
+    err?.message ||
+    "Unknown error";
+
+  payErr.textContent =
+    "Payment capture failed: " + msg;
+
+  payErr.style.display = "block";
+  payOk.style.display = "none";
+}
     },
     onCancel: () => {
       payErr.textContent = "Payment cancelled.";
