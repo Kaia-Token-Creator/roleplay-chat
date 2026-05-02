@@ -1970,7 +1970,7 @@ function loadPayPalSdkOnce(){
 
     paypalSdkLoading = true;
     const s = document.createElement("script");
-    s.src = "https://www.paypal.com/sdk/js?client-id=ASts4hxcd4-DkLEL8b-PbbawSaCD4G5pQiuJM9aZYawixhxWbQ2upSru10WQNZa4HzCqHUcGC8Z1RIrW&currency=USD&intent=capture";
+    s.src = "https://www.paypal.com/sdk/js?client-id=AWMNyvXpo7AJVokhdranzsBYseGheJFuEg4vH73rU8PcXOd6Tr7zjRDoCtk5PLz1aqUUNRTjPSe-NUHR&currency=USD&intent=capture";
     s.async = true;
     s.onload = () => resolve();
     s.onerror = () => reject(new Error("Failed to load PayPal SDK"));
