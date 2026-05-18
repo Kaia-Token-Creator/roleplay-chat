@@ -222,6 +222,27 @@
   background: rgba(255,255,255,.08);
 }
 
+.liveBox{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap: 3px;
+}
+
+.telegramHint{
+  font-size: 10px;
+  line-height: 1.15;
+  color: rgba(255,255,255,.72);
+  text-align: right;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.telegramHint:hover{
+  color: #ffcc00;
+  text-decoration: underline;
+}    
+
   </style>
 </head>
 
@@ -277,10 +298,22 @@
 
       <section class="card" aria-label="Real-human chat">
     
-        <div class="cardHead">
-          <h2>Real Human Chat</h2>
-          <div class="badge"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ffcc00;box-shadow:0 0 6px #ffcc00;margin-right:6px;"></span>Live</div>
-        </div>
+       <div class="cardHead">
+  <h2>Real Human Chat</h2>
+
+  <div class="liveBox">
+    <div class="badge">
+      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ffcc00;box-shadow:0 0 6px #ffcc00;margin-right:6px;"></span>Live
+    </div>
+
+    <a class="telegramHint"
+       href="https://t.me/lookingforglobalfriends"
+       target="_blank"
+       rel="noopener noreferrer">
+      Find more roleplay partners on Telegram.
+    </a>
+  </div>
+</div>
 
         <div class="cardBody">
           <div class="embedShell">
