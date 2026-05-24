@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17946940858"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-17946940858');
+</script>
+  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Earn | roleplay-chat.com</title>
+  <meta name="description" content="Earn PayPal rewards by sharing roleplay-chat.com on social media. Get paid $1 per 1,000 verified views." />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Fonts (same as main) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --yellow:#ffcc00;
+      --pink:#ff5fb8;
+      --blue:#2AABEE;
+      --green:#42d392;
+      --muted:rgba(255,255,255,.75);
+      --muted2:rgba(255,255,255,.55);
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.09);
+      --border:rgba(255,255,255,.14);
+      --border2:rgba(255,204,0,.35);
+      --shadow: 0 14px 36px rgba(0,0,0,.55);
+      --glow: 0 0 30px rgba(255,204,0,.18);
+      --radius2: 22px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ min-height:100%; margin:0; }
+
+    body{
+      background:
+        radial-gradient(900px 600px at 10% 0%, rgba(255,204,0,.09), transparent 56%),
+        radial-gradient(850px 540px at 90% 8%, rgba(255,95,184,.10), transparent 58%),
+        radial-gradient(700px 500px at 50% 110%, rgba(42,171,238,.08), transparent 60%),
+        var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+    }
+
+    a{ color:inherit; }
+
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding: 18px 14px 34px;
+    }
+
+    .shell{
+      width: min(860px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 4px 6px 0;
+      gap: 12px;
+    }
+
+    .logo{
+      text-decoration: none;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: clamp(16px, 3.6vw, 24px);
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      user-select:none;
+      white-space: nowrap;
+    }
+
+    .logoRole{ color: #ffcc00; }
+    .logoDot{
+      color: rgba(255,255,255,.95);
+      font-size: 0.5em;
+      vertical-align: baseline;
+    }
+
+    .shareWrap{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .bookmarkHint{
+      font-size: 10px;
+      line-height: 1.1;
+      text-align: right;
+      color: rgba(255,255,255,.55);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .shareBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:.15s ease;
+      flex: 0 0 auto;
+      padding: 0;
+    }
+    .shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+    .shareBtn:active{ transform: translateY(0px); }
+
+    .shareBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #infoBtn{
+      border-color: rgba(255, 204, 0, .55);
+      box-shadow:
+        0 0 0 1px rgba(255, 204, 0, .25),
+        0 0 18px rgba(255, 204, 0, .35),
+        0 0 34px rgba(255, 204, 0, .22),
+        var(--shadow);
+    }
+    #infoBtn:hover{
+      border-color: rgba(255, 204, 0, .75);
+      box-shadow:
+        0 0 0 1px rgba(255, 204, 0, .35),
+        0 0 22px rgba(255, 204, 0, .45),
+        0 0 44px rgba(255, 204, 0, .28),
+        var(--shadow);
+    }
+
+    .infoMenu{
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display: none;
+      z-index: 99999;
+      backdrop-filter: blur(14px);
+    }
+    .infoMenu.active{ display: block; }
+
+    .infoMenu a{
+      display: block;
+      padding: 10px 10px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+    }
+    .infoMenu a:hover{ background: rgba(255,255,255,.08); }
+
+    .sub{
+      text-align:center;
+      margin-top: 0px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(255,204,0,.14), rgba(255,255,255,.04) 42%, rgba(255,95,184,.11)),
+        rgba(255,255,255,.045);
+      box-shadow: var(--shadow), var(--glow);
+      padding: clamp(22px, 5vw, 44px);
+      margin-top: 2px;
+    }
+
+    .hero:before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:999px;
+      background: rgba(255,204,0,.16);
+      filter: blur(30px);
+      right:-95px;
+      top:-105px;
+      pointer-events:none;
+    }
+
+    .hero:after{
+      content:"";
+      position:absolute;
+      width:190px;
+      height:190px;
+      border-radius:999px;
+      background: rgba(42,171,238,.12);
+      filter: blur(26px);
+      left:-80px;
+      bottom:-95px;
+      pointer-events:none;
+    }
+
+    .heroInner{ position:relative; z-index:1; }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color: var(--yellow);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      background: rgba(0,0,0,.35);
+      border:1px solid rgba(255,204,0,.25);
+      padding: 7px 10px;
+      border-radius: 999px;
+      box-shadow: 0 0 22px rgba(255,204,0,.12);
+    }
+
+    .pulseDot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background: var(--yellow);
+      box-shadow:0 0 0 0 rgba(255,204,0,.65);
+      animation:pulse 1.7s infinite;
+    }
+    @keyframes pulse{
+      0%{ box-shadow:0 0 0 0 rgba(255,204,0,.65); }
+      70%{ box-shadow:0 0 0 9px rgba(255,204,0,0); }
+      100%{ box-shadow:0 0 0 0 rgba(255,204,0,0); }
+    }
+
+    h1{
+      font-family:"Baloo 2", Inter, sans-serif;
+      font-size: clamp(38px, 9vw, 72px);
+      line-height:.92;
+      letter-spacing:-.04em;
+      margin: 18px 0 10px;
+    }
+
+    .highlight{
+      color: var(--yellow);
+      text-shadow: 0 0 24px rgba(255,204,0,.25);
+    }
+
+    .lead{
+      color: rgba(255,255,255,.82);
+      font-size: clamp(15px, 2.4vw, 18px);
+      max-width: 690px;
+      margin: 0;
+    }
+
+    .rateRow{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .rateCard{
+      border:1px solid rgba(255,255,255,.13);
+      background: rgba(0,0,0,.34);
+      border-radius: 20px;
+      padding: 14px;
+      min-height: 92px;
+    }
+
+    .rateBig{
+      display:block;
+      font-size: clamp(22px, 5vw, 34px);
+      font-weight: 900;
+      letter-spacing:-.04em;
+      color:#fff;
+    }
+    .rateLabel{ color: var(--muted2); font-size: 12px; font-weight:700; }
+
+    .ctaRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 22px;
+    }
+
+    .cta{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height: 46px;
+      padding: 0 16px;
+      border-radius: 999px;
+      text-decoration:none;
+      font-weight:900;
+      font-size: 14px;
+      border:1px solid rgba(255,255,255,.16);
+      transition:.15s ease;
+    }
+    .cta.primary{
+      background: linear-gradient(135deg, var(--yellow), #fff0a6);
+      color:#000;
+      border-color: rgba(255,204,0,.55);
+      box-shadow: 0 12px 30px rgba(255,204,0,.20);
+    }
+    .cta.secondary{
+      background: rgba(255,255,255,.08);
+      color:#fff;
+    }
+    .cta:hover{ transform:translateY(-1px); filter:brightness(1.04); }
+
+    .sectionGrid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:14px;
+      margin-top: 0;
+    }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      background: rgba(255,255,255,.055);
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3.2vw, 24px);
+      overflow:hidden;
+    }
+
+    .card.soft{
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035)),
+        rgba(255,255,255,.04);
+    }
+
+    h2{
+      margin:0 0 12px;
+      font-family:"Baloo 2", Inter, sans-serif;
+      font-size: 26px;
+      line-height:1;
+      letter-spacing:-.02em;
+    }
+
+    .smallText{ color: var(--muted); font-size: 14px; margin:0; }
+
+    .steps{
+      display:grid;
+      gap:10px;
+      margin-top: 14px;
+    }
+
+    .step{
+      display:grid;
+      grid-template-columns: 34px 1fr;
+      gap:10px;
+      align-items:start;
+      padding: 12px;
+      border-radius: 17px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    .num{
+      width:34px;
+      height:34px;
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,204,0,.13);
+      color: var(--yellow);
+      font-weight: 900;
+      border:1px solid rgba(255,204,0,.25);
+    }
+
+    .step b{ display:block; font-size:14px; margin-bottom:3px; }
+    .step span{ display:block; color:var(--muted2); font-size:13px; }
+
+    .platforms{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:14px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height: 34px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.88);
+      font-size: 13px;
+      font-weight:800;
+    }
+
+    .pill.good{ color:#111; background:linear-gradient(135deg, var(--yellow), #fff1a8); border-color: rgba(255,204,0,.55); }
+
+    .rules{
+      list-style:none;
+      padding:0;
+      margin:14px 0 0;
+      display:grid;
+      gap:8px;
+    }
+
+    .rules li{
+      position:relative;
+      padding: 11px 12px 11px 35px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.23);
+      border:1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.76);
+      font-size: 13px;
+    }
+    .rules li:before{
+      content:"✓";
+      position:absolute;
+      left:12px;
+      top:10px;
+      color: var(--yellow);
+      font-weight:900;
+    }
+
+    .warning{
+      margin-top:12px;
+      padding: 13px 14px;
+      border-radius: 18px;
+      border:1px solid rgba(255,95,184,.25);
+      background: rgba(255,95,184,.08);
+      color: rgba(255,255,255,.80);
+      font-size:13px;
+    }
+
+    .submitBox{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .fieldLike{
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.11);
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+    }
+    .fieldLike b{ color:#fff; }
+
+    .captionBox{
+      margin-top:14px;
+      padding:14px;
+      border-radius: 18px;
+      background: rgba(255,204,0,.08);
+      border:1px dashed rgba(255,204,0,.32);
+      color: rgba(255,255,255,.82);
+      font-size:13px;
+    }
+
+    .captionBox b{ color:var(--yellow); }
+
+    footer{
+      text-align:center;
+      color: rgba(255,255,255,.45);
+      font-size: 11px;
+      padding: 6px 0 0;
+    }
+
+    @media (max-width: 760px){
+      .sectionGrid{ grid-template-columns:1fr; }
+      .rateRow{ grid-template-columns:1fr; }
+      .hero{ padding:24px 18px; border-radius:24px; }
+      .cta{ width:100%; }
+      .bookmarkHint{ display:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="shell">
+
+      <header>
+        <!-- ✅ 2줄 스택 컨테이너 -->
+        <div style="display:block; width:100%;">
+
+          <!-- ✅ 1줄: 기존 헤더 내용 -->
+          <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+            <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer" class="logo">
+              <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+            </a>
+
+            <!-- ✅ 공유 영역 묶기 -->
+            <div class="shareWrap">
+              <div class="bookmarkHint">
+                Bookmark<br>&amp; Share
+              </div>
+
+              <button class="shareBtn" id="shareBtn" type="button" aria-label="Share" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="18" cy="5" r="3"></circle>
+                  <circle cx="6" cy="12" r="3"></circle>
+                  <circle cx="18" cy="19" r="3"></circle>
+                  <path d="M8.6 13.5l6.8 3.9"></path>
+                  <path d="M15.4 6.6L8.6 10.5"></path>
+                </svg>
+              </button>
+
+              <!-- ✅ Info 버튼(최우측) -->
+              <button class="shareBtn" id="infoBtn" type="button" aria-label="Menu" title="Menu">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 8h12"></path>
+                  <path d="M6 12h12"></path>
+                  <path d="M6 16h12"></path>
+                </svg>
+              </button>
+
+              <!-- ✅ Info 메뉴 -->
+              <div class="infoMenu" id="infoMenu" role="menu" aria-label="Info menu">
+                <a href="https://sweetdream.ai?via=roleplay-chat70" target="_blank" rel="noopener noreferrer" style="color: #FF69B4; font-weight: bold; text-decoration: none;">Live Video Chat with girls</a>
+                <a href="https://roleplay-chat.com/human" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Chat with real human</a>
+                <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer">Home</a>
+                <a href="https://roleplay-chat.com/characters" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Featured Characters</a>
+                <a href="https://roleplay-chat.com/how" target="_blank" rel="noopener noreferrer">How to use</a>
+                <a href="https://roleplay-chat.com/about" target="_blank" rel="noopener noreferrer">About</a>
+                <a href="https://roleplay-chat.com/event" target="_blank" rel="noopener noreferrer">Event</a>
+                <a href="https://roleplay-chat.com/pricing" target="_blank" rel="noopener noreferrer">Pricing</a>
+                <a href="https://roleplay-chat.com/all_access_purchase" target="_blank" rel="noopener noreferrer">All-access pass</a>
+                <a href="https://roleplay-chat.com/policy" target="_blank" rel="noopener noreferrer">Policy</a>
+                <a href="https://roleplay-chat.com/faq" target="_blank" rel="noopener noreferrer">FAQ</a>
+                <a href="mailto:showmetheaitools@gmail.com">Contact</a>
+                <a href="https://roleplay-chat.com/image2video" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Image to Video generator</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✅ 2줄: Chatango 라인(오른쪽) -->
+          <div align="right">
+            <sup>
+              <a href="https://roleplay-chat.com/human" target="_blank" style="text-decoration:none">
+                <font size="1" color="#ffcc00"><b>Live user chat</b></font>
+              </a>
+            </sup>
+
+            <script
+              id="cid0020000430144912743"
+              data-cfasync="false"
+              async
+              src="https://st.chatango.com/js/gz/emb.js"
+              style="width:200px;height:300px;"
+            >
+              {"handle":"roleplay-chat-com","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"cv":1,"cvfntsz":"10px","cvbg":"000000","cvfg":"ffcc00","cvw":49,"cvh":18}}
+            </script>
+          </div>
+
+        </div>
+      </header>
+
+      <div class="sub">Create the most human-like character, Enjoy roleplay.<br>no-login. Private & Safe.</div>
+
+      <main>
+        <section class="hero">
+          <div class="heroInner">
+            <div class="eyebrow"><span class="pulseDot"></span> Creator Reward Program</div>
+            <h1>Post. Share. <span class="highlight">Earn.</span></h1>
+            <p class="lead">
+              Introduce <b>roleplay-chat.com</b> on TikTok, YouTube, X, Reddit, Instagram, Threads, or any public social platform.
+              Submit a screenshot of your post and verified views, and earn <b>$1 per 1,000 verified views</b>.
+            </p>
+
+            <div class="rateRow" aria-label="Reward summary">
+              <div class="rateCard">
+                <span class="rateBig">$1</span>
+                <span class="rateLabel">per 1,000 verified views</span>
+              </div>
+              <div class="rateCard">
+                <span class="rateBig">24h</span>
+                <span class="rateLabel">payment after review</span>
+              </div>
+              <div class="rateCard">
+                <span class="rateBig">PayPal</span>
+                <span class="rateLabel">payout method</span>
+              </div>
+            </div>
+
+            <div class="ctaRow">
+              <a class="cta primary" href="mailto:showmetheaitools@gmail.com?subject=Creator%20Reward%20Submission%20-%20roleplay-chat.com&body=Hello%2C%0A%0AI%20would%20like%20to%20submit%20my%20creator%20reward%20post.%0A%0APost%20URL%3A%0APlatform%3A%0AView%20count%20at%20submission%3A%0APayPal%20email%3A%0AAttached%20screenshot%3A%20Yes%0A%0AThank%20you.">
+                Submit by Email
+              </a>
+              <a class="cta secondary" href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer">
+                Visit roleplay-chat.com
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <div class="sectionGrid" style="margin-top:14px;">
+          <section class="card soft">
+            <h2>How it works</h2>
+            <p class="smallText">Create your own content freely. Reviews, reactions, tutorials, screenshots, short posts, or honest recommendations are all welcome.</p>
+
+            <div class="steps">
+              <div class="step">
+                <div class="num">1</div>
+                <div>
+                  <b>Create a public post</b>
+                  <span>Post about roleplay-chat.com on TikTok, YouTube, X, Reddit, Instagram, Threads, or another social platform.</span>
+                </div>
+              </div>
+              <div class="step">
+                <div class="num">2</div>
+                <div>
+                  <b>Get views</b>
+                  <span>The view count must be visible and verifiable. Public posts are easier to approve.</span>
+                </div>
+              </div>
+              <div class="step">
+                <div class="num">3</div>
+                <div>
+                  <b>Send your proof</b>
+                  <span>Email the post link, screenshot showing views, and your PayPal email to showmetheaitools@gmail.com.</span>
+                </div>
+              </div>
+              <div class="step">
+                <div class="num">4</div>
+                <div>
+                  <b>Get paid</b>
+                  <span>After review, eligible submissions are paid within 24 hours via PayPal.</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Accepted platforms</h2>
+            <p class="smallText">Use the platform where your audience naturally responds best.</p>
+            <div class="platforms">
+              <span class="pill good">TikTok</span>
+              <span class="pill">YouTube</span>
+              <span class="pill">X</span>
+              <span class="pill">Reddit</span>
+              <span class="pill">Instagram</span>
+              <span class="pill">Threads</span>
+              <span class="pill">Facebook</span>
+              <span class="pill">Discord</span>
+              <span class="pill">Telegram</span>
+              <span class="pill">Other public platforms</span>
+            </div>
+
+            <div class="captionBox">
+              <b>Content style is up to you.</b><br>
+              You can write your own post, make a short video, share your experience, explain the privacy/no-login concept, or introduce the AI roleplay features naturally.
+            </div>
+          </section>
+        </div>
+
+        <div class="sectionGrid" style="margin-top:14px;">
+          <section class="card">
+            <h2>Submission requirements</h2>
+            <ul class="rules">
+              <li>The post must mention or introduce <b>roleplay-chat.com</b>.</li>
+              <li>You must submit a screenshot that clearly shows the post and its view count.</li>
+              <li>The payout is calculated based on the view count at the time of submission.</li>
+              <li>Each post can be submitted and rewarded only once.</li>
+              <li>Payment is made through PayPal only.</li>
+            </ul>
+          </section>
+
+          <section class="card soft">
+            <h2>Email checklist</h2>
+            <div class="submitBox">
+              <div class="fieldLike"><b>Send to:</b> showmetheaitools@gmail.com</div>
+              <div class="fieldLike"><b>Include:</b> post URL, platform name, view count, screenshot, and PayPal email.</div>
+              <div class="fieldLike"><b>Review time:</b> eligible submissions are paid within 24 hours after review.</div>
+            </div>
+          </section>
+        </div>
+
+        <section class="card" style="margin-top:14px;">
+          <h2>Fair use & anti-abuse policy</h2>
+          <p class="smallText">
+            Fake views, bot traffic, spam, misleading submissions, repeated submissions for the same post, or unnatural/meaningless view generation are not allowed.
+            Suspicious activity may be rejected during review. We reward real exposure from genuine content.
+          </p>
+          <div class="warning">
+            Please submit only honest, verifiable posts. If the view count cannot be confirmed, the submission may not be approved.
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        Creator rewards are reviewed manually. roleplay-chat.com reserves the right to reject invalid or abusive submissions.
+      </footer>
+
+    </div>
+  </div>
+
+  <script>
+    // Share button
+    const shareBtn = document.querySelector("#shareBtn");
+    if (shareBtn){
+      shareBtn.addEventListener("click", async () => {
+        const url = window.location.href;
+        try{
+          if (navigator.share){
+            await navigator.share({ title: document.title, url });
+          }else{
+            await navigator.clipboard.writeText(url);
+            shareBtn.title = "Copied!";
+            setTimeout(() => (shareBtn.title = "Share"), 900);
+          }
+        }catch(e){
+          // user cancelled / blocked
+        }
+      });
+    }
+
+    // Info button dropdown
+    const infoBtn = document.querySelector("#infoBtn");
+    const infoMenu = document.querySelector("#infoMenu");
+
+    function closeInfoMenu(){
+      if (infoMenu) infoMenu.classList.remove("active");
+    }
+
+    if (infoBtn && infoMenu){
+      infoBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        infoMenu.classList.toggle("active");
+      });
+
+      infoMenu.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      document.addEventListener("click", closeInfoMenu);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeInfoMenu();
+      });
+    }
+  </script>
+</body>
+</html>
