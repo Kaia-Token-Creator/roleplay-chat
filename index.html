@@ -1456,6 +1456,7 @@ Deleting browser data will erase your character, chat history, and access permis
   <div class="row" style="gap:10px;">
     <button class="xBtn" id="resetBtn" type="button">New character</button>
     <button class="xBtn" id="liveVideoBtn" type="button">Live Video</button>
+    <button class="xBtn" id="earnBtn" type="button">Earn</button>
     <button class="xBtn" id="unlockBtn" type="button" style="display:none;">Unlock</button>
   </div>
 </div>
@@ -3801,6 +3802,13 @@ function setupKeyboardBar(){
   window.addEventListener("resize", updateKeyboardOffset);
 }
 
+const earnBtn = document.querySelector("#earnBtn");
+if (earnBtn){
+  earnBtn.addEventListener("click", () => {
+    window.open("https://roleplay-chat.com/earn", "_blank", "noopener,noreferrer");
+  });
+}
+    
     
   </script>
 </body>
