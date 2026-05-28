@@ -369,7 +369,7 @@ const history: Msg[] = isSexTrigger
     );
   }
 
-  return json(
+   return json(
     {
       error: "Server error.",
       detail: serialized,
@@ -378,6 +378,7 @@ const history: Msg[] = isSexTrigger
     CORS
   );
 }
+};
 
 // ---------------- response helper ----------------
 function json(data: unknown, status = 200, headers: Record<string, string> = {}) {
