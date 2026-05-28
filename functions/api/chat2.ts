@@ -204,9 +204,39 @@ const history = isSexTrigger
       const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
       return json({ reply, tier, model: "e2ee-venice-uncensored-24b-p" }, 200, CORS);
     }
-  } catch (err: any) {
+    } catch (err: any) {
+    const serialized = serializeErr(err);
+    const status = Number(serialized?.status);
+
+    if (status === 429) {
+      return json(
+        {
+          error: "Rate limited.",
+          detail: serialized,
+          message: "The AI server is temporarily rate-limited. Please wait a moment and try again.",
+        },
+        429,
+        CORS
+      );
+    }
+
+    if (status === 502 || status === 503 || status === 504) {
+      return json(
+        {
+          error: "Upstream server error.",
+          detail: serialized,
+          message: "The AI server is temporarily busy. Please try again shortly.",
+        },
+        502,
+        CORS
+      );
+    }
+
     return json(
-      { error: "Server error.", detail: String(err?.message || err) },
+      {
+        error: "Server error.",
+        detail: serialized,
+      },
       500,
       CORS
     );
@@ -220,6 +250,31 @@ function json(data: unknown, status = 200, headers: Record<string, string> = {})
     status,
     headers: { "Content-Type": "application/json; charset=utf-8", ...headers },
   });
+}
+
+function serializeErr(e: any) {
+  if (!e) return { message: "unknown error" };
+
+  if (typeof e === "object") {
+    const out: any = {};
+
+    for (const k of Object.keys(e)) {
+      out[k] = e[k];
+    }
+
+    if (e instanceof Error) {
+      out.name = e.name;
+      out.message = e.message;
+      out.stack = e.stack;
+    } else {
+      if (out.message == null) out.message = String(e?.message || "error");
+      if (out.stack == null && e?.stack) out.stack = e.stack;
+    }
+
+    return out;
+  }
+
+  return { message: String(e) };
 }
 
 type HeightUnit = "cm" | "ft";
@@ -546,18 +601,41 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
       temperature: 0.95,
       presence_penalty: 0.6,
       frequency_penalty: 0.2,
-      max_tokens: maxTokens, // ✅ 출력 토큰 제한
+      max_tokens: maxTokens,
     }),
   });
 
+  const raw = await res.text().catch(() => "");
+
+  console.log("VENICE CHAT2 STATUS:", res.status);
+  console.log("VENICE CHAT2 BODY:", raw.slice(0, 2000));
+
+  let data: any = null;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {}
+
   if (!res.ok) {
-    const t = await res.text();
-    throw new Error(`Venice error (${res.status}): ${t.slice(0, 800)}`);
+    throw {
+      where: "venice_chat2",
+      status: res.status,
+      statusText: res.statusText,
+      body_json: data,
+      body_raw: raw.slice(0, 4000),
+    };
   }
 
-  const data: any = await res.json();
   const content = data?.choices?.[0]?.message?.content;
-  if (!content) throw new Error("Venice: empty response");
+
+  if (!content) {
+    throw {
+      where: "venice_chat2_empty_response",
+      status: res.status,
+      body_json: data,
+      body_raw: raw.slice(0, 4000),
+    };
+  }
+
   return String(content);
 }
 
