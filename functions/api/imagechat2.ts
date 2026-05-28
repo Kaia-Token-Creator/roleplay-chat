@@ -340,10 +340,44 @@ const history: Msg[] = isSexTrigger
       CORS
     );
   } catch (err: any) {
-    // ✅ 디버깅 위해 detail은 최대한 살려서 내려줌
-    return json({ error: "Server error.", detail: String(err?.message || err) }, 500, CORS);
+  const serialized = serializeErr(err);
+  const status = Number(serialized?.status);
+
+  // ✅ Venice/API rate limit이면 500이 아니라 429로 내려줌
+  if (status === 429) {
+    return json(
+      {
+        error: "Rate limited.",
+        detail: serialized,
+        message: "The AI server is temporarily rate-limited. Please wait a moment and try again.",
+      },
+      429,
+      CORS
+    );
   }
-};
+
+  // ✅ Venice/API 서버 장애 계열
+  if (status === 502 || status === 503 || status === 504) {
+    return json(
+      {
+        error: "Upstream server error.",
+        detail: serialized,
+        message: "The AI server is temporarily busy. Please try again shortly.",
+      },
+      502,
+      CORS
+    );
+  }
+
+  return json(
+    {
+      error: "Server error.",
+      detail: serialized,
+    },
+    500,
+    CORS
+  );
+}
 
 // ---------------- response helper ----------------
 function json(data: unknown, status = 200, headers: Record<string, string> = {}) {
@@ -906,7 +940,10 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
 
   const res = await fetch("https://api.venice.ai/api/v1/chat/completions", {
     method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       model: "e2ee-venice-uncensored-24b-p",
       messages,
@@ -918,14 +955,39 @@ async function callVeniceChat(apiKey: string, messages: any[], maxTokens: number
     }),
   });
 
+  // ✅ 응답 body는 여기서 딱 1번만 읽음
+  const raw = await res.text().catch(() => "");
+
+  // ✅ Cloudflare Logs에서 Venice 실제 응답 확인 가능
+  console.log("VENICE CHAT STATUS:", res.status);
+  console.log("VENICE CHAT BODY:", raw.slice(0, 2000));
+
+  let data: any = null;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {}
+
   if (!res.ok) {
-    const t = await res.text();
-    throw new Error(`error (${res.status}): ${t.slice(0, 800)}`);
+    throw {
+      where: "venice_chat",
+      status: res.status,
+      statusText: res.statusText,
+      body_json: data,
+      body_raw: raw.slice(0, 4000),
+    };
   }
 
-  const data: any = await res.json();
   const content = data?.choices?.[0]?.message?.content;
-  if (!content) throw new Error("empty response");
+
+  if (!content) {
+    throw {
+      where: "venice_chat_empty_response",
+      status: res.status,
+      body_json: data,
+      body_raw: raw.slice(0, 4000),
+    };
+  }
+
   return String(content);
 }
 
@@ -970,6 +1032,8 @@ async function callVeniceImageGenerate(
   });
 
   const raw = await res.text().catch(() => "");
+  console.log("VENICE IMAGE STATUS:", res.status);
+console.log("VENICE IMAGE BODY:", raw.slice(0, 2000));
 
   let json: any = null;
   try {
