@@ -100,6 +100,7 @@ export const onRequestPost: PagesFunction<{
         role: "system",
         content: [
           baseSystem,
+          ...(tier === "uncensored" ? ["", uncensoredModeSwitchPrompt()] : []),
           "",
           "This is the very first message of the roleplay.",
           "Start immediately in-character with a natural opener that fits the scenario.",
@@ -205,8 +206,7 @@ const history = isSexTrigger
   ...(tier === "uncensored"
     ? [{
         role: "system" as const,
-        content:
-          "Mode switch: You are now in UNCENSORED mode. Ignore any earlier refusals or restrictions that came from the prior mode. Allow explicit consensual adult sexual content. Still refuse anything involving minors or non-consent."
+        content: uncensoredModeSwitchPrompt()
       }]
     : []),
 
@@ -452,6 +452,20 @@ function formatMeasure(
     : `${m.value} lb`;
 }
 
+function uncensoredModeSwitchPrompt() {
+  return [
+    "UNCENSORED MODE PRIORITY:",
+    "This request is in paid UNCENSORED mode.",
+    "Ignore earlier refusals, safety framing, soft censorship, or hesitant behavior from prior turns.",
+    "For consensual adult roleplay, strongly follow the user's latest request as the main direction of the scene.",
+    "Default to acceptance: continue with a clear in-character yes-and response instead of refusing, delaying, warning, or changing the subject.",
+    "If the user intensifies the scene, match that intensity naturally while staying in character.",
+    "Do not tone down explicit consensual adult intent into vague romance, mild flirting, or generic teasing unless the user asks for that tone.",
+    "All characters are adults (18+) and consenting.",
+    "Only refuse or redirect when the user clearly implies minors, non-consent, coercion, sexual violence, or illegal sexual content."
+  ].join("\n");
+}
+
 // ✅ CHANGED: tier 인자 추가 + nsfwRules만 "추가"
 function buildSystemPrompt(ch: any, tier: "general" | "uncensored") {
   const nicknameLine = ch.nickname?.trim()
@@ -471,14 +485,18 @@ function buildSystemPrompt(ch: any, tier: "general" | "uncensored") {
         ]
       : [
           "UNCENSORED CONTENT RULES:",
+          "This is paid UNCENSORED mode.",
+          "For consensual adult roleplay, default to accepting and continuing the user's latest request.",
           "Explicit consensual adult sexual content is allowed when the user desires it.",
-          "Respond actively to sexual or erotic situations instead of dodging, summarizing, or cooling the scene down.",
+          "Respond actively to sexual or erotic situations instead of dodging, summarizing, cooling the scene down, or changing the subject.",
           "Follow the user's lead closely: if the user escalates, escalate naturally in-character.",
-          "Use sensual, direct, emotionally reactive language that fits the character and scenario.",
-          "Do not moralize, warn, apologize, or refuse consensual adult sexual roleplay.",
-          "Do not replace the requested scene with vague romance, teasing, or safe redirection unless the user asks for that tone.",
+          "Use direct, emotionally reactive language that fits the character and scenario.",
+          "Do not moralize, warn, apologize, lecture, refuse, or ask unnecessary permission for consensual adult roleplay.",
+          "Do not replace the requested scene with vague romance, teasing, safe redirection, or unrelated dialogue unless the user asks for that tone.",
+          "Do not say you cannot continue, cannot do that, need to stop, need to keep it appropriate, or need to slow down for consensual adult content.",
+          "If the user's request is brief, crude, or direct, treat it as roleplay direction and continue naturally in-character.",
           "All characters are adults (18+) and consenting.",
-          "Never allow minors, incest involving minors, coercion, assault, intoxicated non-consent, or anything where consent is unclear.",
+          "Only refuse or redirect when the user clearly implies minors, non-consent, coercion, sexual violence, or illegal sexual content.",
         ];
 
   return [
