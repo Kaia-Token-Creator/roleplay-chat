@@ -324,23 +324,42 @@ const history: Msg[] = isSexTrigger
 
         image = { mime: "image/webp", b64: imgB64 };
       } catch (imgErr) {
-  const serialized = serializeErr(imgErr);
+        console.log("Venice image generation failed. Returning DeepSeek text reply instead:", serializeErr(imgErr));
 
-  return json(
-    {
-      // ✅ 유저에게 보여줄 말은 여기서 이미 사람처럼
-      reply: humanizeImageErrorServer(serialized),
+        let textOnlyReply = reply;
 
-      // ✅ 이미지 없음
-      image: null,
+        try {
+          textOnlyReply = await callDeepSeekChat(
+            env.DEEPSEEK_API_KEY,
+            fitted,
+            MAX_TOKENS_DEEPSEEK_FALLBACK_TEXT,
+            "main_reply"
+          );
+        } catch (deepseekErr) {
+          console.log("DeepSeek text reply after image failure failed. Using existing reply:", serializeErr(deepseekErr));
+        }
 
-      // ✅ 디버그는 그대로 유지 (프론트가 안 쓰면 무시됨)
-      image_error: serialized,
-    },
-    200,
-    CORS
-  );
-}
+        return json(
+          {
+            // 이미지 실패 시 에러를 보여주지 않고 텍스트 응답 + 영어 랜덤 안내문만 반환
+            reply: appendEnglishPhotoLaterLine(textOnlyReply, MAX_REPLY_CHARS),
+
+            // 이미지 없음
+            image: null,
+
+            // 프론트 확인용. debug/error payload는 노출하지 않음
+            imageDelayed: true,
+
+            tier: "e2ee-venice-uncensored-24b-p",
+            textModel: "deepseek-v4-flash",
+            textFallback: true,
+            textFallbackFrom: "venice_image_failure",
+            imageModel: "lustify-sdxl",
+          },
+          200,
+          CORS
+        );
+      }
 
     }
 
@@ -428,6 +447,37 @@ function serializeErr(e: any) {
   }
 
   return { message: String(e) };
+}
+
+
+function appendEnglishPhotoLaterLine(reply: string, maxChars: number) {
+  const note = randomEnglishPhotoLaterLine();
+  const cleanReply = String(reply || "").trim();
+  const suffix = cleanReply ? "\n" + note : note;
+
+  if ((cleanReply + suffix).length <= maxChars) {
+    return cleanReply + suffix;
+  }
+
+  const allowedReplyChars = Math.max(0, maxChars - suffix.length);
+  return truncateString(cleanReply, allowedReplyChars).trim() + suffix;
+}
+
+function randomEnglishPhotoLaterLine() {
+  const lines = [
+    "(I’m a little busy right now, so I’ll send the photo later.)",
+    "(I can’t send the photo right now, but I’ll send it later.)",
+    "(The photo will have to wait a bit. I’ll send it later.)",
+    "(I’m tied up right now, so I’ll send the photo later.)",
+    "(I can’t get the photo through right now. I’ll send it later.)",
+    "(Give me a little time. I’ll send the photo later.)",
+    "(The photo isn’t going through right now, but I’ll send it later.)",
+    "(I’m a bit busy at the moment. I’ll send the photo later.)",
+    "(Not right this second. I’ll send the photo later.)",
+    "(I’ll save the photo for later and send it when I can.)",
+  ];
+
+  return lines[Math.floor(Math.random() * lines.length)];
 }
 
 
@@ -803,7 +853,7 @@ async function makeTeaseLineWithTextModel(
       "No narration. No brackets. No parentheses.",
       "Do not mention AI, models, providers, Venice, or policies.",
       "Keep it very short (1 sentence).",
-      "If the character language is Korean, write in Korean.",
+      "Write in Characters language",
       "Make it feel teasing and in-character.",
       "Return ONLY the dialogue line.",
     ].join("\n"),
