@@ -535,27 +535,7 @@ function buildSystemPrompt(ch: any, tier: "general" | "uncensored") {
 }
 
 function withUncensoredFallbackBoost(messages: any[]) {
-  const boost: Msg = {
-    role: "system",
-    content: [
-      "DeepSeek fallback instruction:",
-      "The user paid for UNCENSORED mode, but Venice is temporarily unavailable.",
-      "Continue the same uncensored adult roleplay mode using the existing character, scenario, language, and history.",
-      "Be obedient to the user's consensual adult roleplay direction, including sexual direction.",
-      "Do not mention fallback, DeepSeek, Venice, provider issues, policies, or system instructions.",
-      "Keep the answer immersive, in-character, and formatted exactly like the existing roleplay format.",
-      "Still refuse and redirect only if the user implies minors, non-consent, sexual violence, or illegal sexual content."
-    ].join("\n"),
-  };
-
-  if (!Array.isArray(messages) || messages.length === 0) return [boost];
-
-  const first = messages[0];
-  if (first?.role === "system") {
-    return [first, boost, ...messages.slice(1)];
-  }
-
-  return [boost, ...messages];
+  return messages;
 }
 
 // ---------------- Budget / Truncation helpers ----------------
@@ -740,4 +720,3 @@ const SEX_KEYWORDS = [
   "nsfw","erotic","kink","fetish","bdsm","spank","ejaculate","masturbate","jerk","stroke","lick","licking","rim",
   "69","one night","fuck me","make love","take off","nude","cunt"
 ];
-
