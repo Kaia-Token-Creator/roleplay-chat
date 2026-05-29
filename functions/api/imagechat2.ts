@@ -2,6 +2,7 @@
 
 export const onRequestPost: PagesFunction<{
   VENICE_API_KEY: string;
+  DEEPSEEK_API_KEY: string;
 }> = async (ctx) => {
   const { request, env } = ctx;
 
@@ -76,7 +77,7 @@ if (bodyAny.type === "donation_gift") {
   try {
 
     // 💝 텍스트 모델이 Gift용 이미지 프롬프트 생성
-    const forcedPrompt = await makeForcedPromptWithTextModel(env.VENICE_API_KEY, {
+    const forcedPrompt = await makeForcedPromptWithTextModel(env.VENICE_API_KEY, env.DEEPSEEK_API_KEY, {
       character: ch,
       userMessage: "Secret intimate photo taken for the user.",
       lastAssistant: "",
@@ -216,14 +217,20 @@ const history: Msg[] = isSexTrigger
 
     const fitted = fitMessagesToBudget(messagesBeforeFit, MAX_PROMPT_CHARS);
 
-    const replyRaw = await callVeniceChat(env.VENICE_API_KEY, fitted, MAX_TOKENS_TEXT);
-    let reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
+    const textResult = await callTextChatWithFallback(
+      env.VENICE_API_KEY,
+      env.DEEPSEEK_API_KEY,
+      fitted,
+      MAX_TOKENS_TEXT,
+      "main_reply"
+    );
+    let reply = truncateReply(textResult.content, MAX_REPLY_CHARS);
 
     // 2) 사진 판단 + 프롬프트 생성: 텍스트 모델이 JSON으로 내리도록 (강건 파서 적용)
     let plan: { generate: boolean; prompt: string; negativePrompt?: string } = { generate: false, prompt: "" };
 
     if (!isInit) {
-      plan = await makeImagePlanWithTextModel(env.VENICE_API_KEY, {
+      plan = await makeImagePlanWithTextModel(env.VENICE_API_KEY, env.DEEPSEEK_API_KEY, {
         character: ch,
         userMessage: userMsg,
         lastAssistant: reply,
@@ -234,7 +241,7 @@ const history: Msg[] = isSexTrigger
       // ✅ 유저가 명시적으로 사진을 요구하면, planner가 삐끗해도 generate=true로 "안전핀"
       if (userExplicitlyAsksImage(userMsg)) {
         if (!plan.prompt) {
-          const forcedPrompt = await makeForcedPromptWithTextModel(env.VENICE_API_KEY, {
+          const forcedPrompt = await makeForcedPromptWithTextModel(env.VENICE_API_KEY, env.DEEPSEEK_API_KEY, {
             character: ch,
             userMessage: userMsg,
             lastAssistant: reply,
@@ -258,7 +265,7 @@ const history: Msg[] = isSexTrigger
         plan = { generate: false, prompt: "", negativePrompt: "" };
 
         // ✅ 옵션 B: 생성형 튕김 멘트 1줄 생성
-        const teaseLine = await makeTeaseLineWithTextModel(env.VENICE_API_KEY, {
+        const teaseLine = await makeTeaseLineWithTextModel(env.VENICE_API_KEY, env.DEEPSEEK_API_KEY, {
           character: ch,
           userMessage: userMsg,
           lastAssistant: reply,
@@ -334,6 +341,9 @@ const history: Msg[] = isSexTrigger
         reply,
         image,
         tier: "e2ee-venice-uncensored-24b-p",
+        textModel: textResult.model,
+        textFallback: textResult.fallback,
+        textFallbackFrom: textResult.fallbackFrom,
         imageModel: "lustify-sdxl",
       },
       200,
@@ -628,6 +638,7 @@ function safeParseJsonObject(raw: string) {
 // ✅ 사진 필요 여부 + 프롬프트를 텍스트 모델이 JSON으로 결정
 async function makeImagePlanWithTextModel(
   apiKey: string,
+  deepseekApiKey: string,
   args: {
     character: any;
     userMessage: string;
@@ -690,7 +701,14 @@ async function makeImagePlanWithTextModel(
     ].join("\n"),
   };
 
-  const raw = await callVeniceChat(apiKey, [plannerSystem, plannerUser], maxTokens);
+  const textResult = await callTextChatWithFallback(
+    apiKey,
+    deepseekApiKey,
+    [plannerSystem, plannerUser],
+    maxTokens,
+    "image_plan"
+  );
+  const raw = textResult.content;
 
   const parsed = safeParseJsonObject(raw);
   if (!parsed) return { generate: false, prompt: "" };
@@ -758,6 +776,7 @@ function userExplicitlyAsksImage(userMsg: string) {
 // ✅ 게이트로 이미지가 막혔을 때 "생성형 튕김 멘트" 1줄 만들기
 async function makeTeaseLineWithTextModel(
   apiKey: string,
+  deepseekApiKey: string,
   args: {
     character: any;
     userMessage: string;
@@ -796,14 +815,21 @@ async function makeTeaseLineWithTextModel(
     ].join("\n"),
   };
 
-  const raw = await callVeniceChat(apiKey, [sys, user], maxTokens);
-  const line = String(raw || "").trim().split("\n").filter(Boolean)[0] || "";
+  const textResult = await callTextChatWithFallback(
+    apiKey,
+    deepseekApiKey,
+    [sys, user],
+    maxTokens,
+    "tease_line"
+  );
+  const line = String(textResult.content || "").trim().split("\n").filter(Boolean)[0] || "";
   return line.slice(0, 140);
 }
 
 // ✅ 유저가 명시 요구했는데 planner가 prompt를 비워버리면: 텍스트 모델로 prompt만 생성
 async function makeForcedPromptWithTextModel(
   apiKey: string,
+  deepseekApiKey: string,
   args: {
     character: any;
     userMessage: string;
@@ -840,8 +866,14 @@ async function makeForcedPromptWithTextModel(
     ].join("\n"),
   };
 
-  const raw = await callVeniceChat(apiKey, [sys, user], maxTokens);
-  return String(raw || "").trim();
+  const textResult = await callTextChatWithFallback(
+    apiKey,
+    deepseekApiKey,
+    [sys, user],
+    maxTokens,
+    "forced_image_prompt"
+  );
+  return String(textResult.content || "").trim();
 }
 
 // ✅ 확률 게이트: 명시적 요구가 아니면 가끔 튕김
@@ -933,6 +965,89 @@ function defaultNegativePrompt() {
 
 function buildImagePromptWithAvatarHint(basePrompt: string, _ch: any) {
   return basePrompt;
+}
+
+// ---------------- Text chat: Venice first, DeepSeek fallback ----------------
+async function callTextChatWithFallback(
+  veniceApiKey: string,
+  deepseekApiKey: string,
+  messages: any[],
+  maxTokens: number,
+  where: string
+): Promise<{ content: string; model: string; fallback: boolean; fallbackFrom?: string }> {
+  try {
+    const content = await callVeniceChat(veniceApiKey, messages, maxTokens);
+    return {
+      content,
+      model: "e2ee-venice-uncensored-24b-p",
+      fallback: false,
+    };
+  } catch (veniceErr) {
+    console.log(`Venice text failed at ${where}. Falling back to DeepSeek:`, serializeErr(veniceErr));
+
+    const content = await callDeepSeekChat(deepseekApiKey, messages, maxTokens);
+    return {
+      content,
+      model: "deepseek-v4-flash",
+      fallback: true,
+      fallbackFrom: "venice",
+    };
+  }
+}
+
+// ---------------- DeepSeek: chat (text fallback) ----------------
+async function callDeepSeekChat(apiKey: string, messages: any[], maxTokens: number) {
+  if (!apiKey) throw new Error("Missing DEEPSEEK_API_KEY");
+
+  const res = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "deepseek-v4-flash",
+      messages,
+      stream: false,
+      temperature: 0.92,
+      presence_penalty: 0.6,
+      frequency_penalty: 0.2,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  const raw = await res.text().catch(() => "");
+
+  console.log("DEEPSEEK FALLBACK STATUS:", res.status);
+  console.log("DEEPSEEK FALLBACK BODY:", raw.slice(0, 2000));
+
+  let data: any = null;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {}
+
+  if (!res.ok) {
+    throw {
+      where: "deepseek_chat_fallback",
+      status: res.status,
+      statusText: res.statusText,
+      body_json: data,
+      body_raw: raw.slice(0, 4000),
+    };
+  }
+
+  const content = data?.choices?.[0]?.message?.content;
+
+  if (!content) {
+    throw {
+      where: "deepseek_chat_fallback_empty_response",
+      status: res.status,
+      body_json: data,
+      body_raw: raw.slice(0, 4000),
+    };
+  }
+
+  return String(content);
 }
 
 // ---------------- Venice: chat (text) ----------------
@@ -1063,5 +1178,4 @@ console.log("VENICE IMAGE BODY:", raw.slice(0, 2000));
 
   return images[0];
 }
-
 
