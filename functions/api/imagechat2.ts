@@ -1,5 +1,12 @@
 // functions/api/imagechat.ts
 
+// DeepSeek fallback tokens
+// Venice는 기존 토큰수를 그대로 쓰고, DeepSeek fallback일 때만 더 크게 사용
+const MAX_TOKENS_DEEPSEEK_FALLBACK_TEXT = 900;
+const MAX_TOKENS_DEEPSEEK_FALLBACK_IMAGE_PLAN = 1000;
+const MAX_TOKENS_DEEPSEEK_FALLBACK_IMAGE_FORCED_PROMPT = 900;
+const MAX_TOKENS_DEEPSEEK_FALLBACK_TEASE_LINE = 200;
+
 export const onRequestPost: PagesFunction<{
   VENICE_API_KEY: string;
   DEEPSEEK_API_KEY: string;
@@ -50,6 +57,7 @@ export const onRequestPost: PagesFunction<{
 
     // if user explicitly asks for an image and plan prompt is empty, generate forced prompt via text model
     const MAX_TOKENS_IMAGE_FORCED_PROMPT = 500;
+
     // ---------------------------------------
 
     // ✅ body는 딱 1번만 읽어야 함
@@ -985,18 +993,55 @@ async function callTextChatWithFallback(
   } catch (veniceErr) {
     console.log(`Venice text failed at ${where}. Falling back to DeepSeek:`, serializeErr(veniceErr));
 
-    const content = await callDeepSeekChat(deepseekApiKey, messages, maxTokens);
-    return {
-      content,
-      model: "deepseek-v4-flash",
-      fallback: true,
-      fallbackFrom: "venice",
-    };
+    const deepseekMaxTokens = getDeepSeekFallbackMaxTokens(where, maxTokens);
+
+    try {
+      const content = await callDeepSeekChat(deepseekApiKey, messages, deepseekMaxTokens, where);
+      return {
+        content,
+        model: "deepseek-v4-flash",
+        fallback: true,
+        fallbackFrom: "venice",
+      };
+    } catch (deepseekErr) {
+      console.log(`DeepSeek fallback failed at ${where}. Returning safe empty fallback:`, serializeErr(deepseekErr));
+
+      return {
+        content: fallbackTextContentForFailedCall(where),
+        model: "deepseek-v4-flash",
+        fallback: true,
+        fallbackFrom: "venice",
+      };
+    }
   }
 }
 
+function getDeepSeekFallbackMaxTokens(where: string, baseMaxTokens: number) {
+  if (where === "main_reply") return Math.max(baseMaxTokens, MAX_TOKENS_DEEPSEEK_FALLBACK_TEXT);
+  if (where === "image_plan") return Math.max(baseMaxTokens, MAX_TOKENS_DEEPSEEK_FALLBACK_IMAGE_PLAN);
+  if (where === "forced_image_prompt") return Math.max(baseMaxTokens, MAX_TOKENS_DEEPSEEK_FALLBACK_IMAGE_FORCED_PROMPT);
+  if (where === "tease_line") return Math.max(baseMaxTokens, MAX_TOKENS_DEEPSEEK_FALLBACK_TEASE_LINE);
+  return Math.max(baseMaxTokens, 900);
+}
+
+function fallbackTextContentForFailedCall(where: string) {
+  if (where === "image_plan") {
+    return JSON.stringify({ generate: false, prompt: "", negativePrompt: "" });
+  }
+
+  if (where === "forced_image_prompt") {
+    return "adult character, realistic photo, consistent with the current roleplay scene, cinematic lighting, intimate atmosphere, high detail, no text, no watermark";
+  }
+
+  if (where === "tease_line") {
+    return "";
+  }
+
+  return "*I glance at you for a second, trying to catch the thread again.* \"Say that one more time.\"";
+}
+
 // ---------------- DeepSeek: chat (text fallback) ----------------
-async function callDeepSeekChat(apiKey: string, messages: any[], maxTokens: number) {
+async function callDeepSeekChat(apiKey: string, messages: any[], maxTokens: number, where = "deepseek_chat_fallback") {
   if (!apiKey) throw new Error("Missing DEEPSEEK_API_KEY");
 
   const res = await fetch("https://api.deepseek.com/chat/completions", {
@@ -1037,14 +1082,17 @@ async function callDeepSeekChat(apiKey: string, messages: any[], maxTokens: numb
   }
 
   const content = data?.choices?.[0]?.message?.content;
+  const reasoningContent = data?.choices?.[0]?.message?.reasoning_content;
 
   if (!content) {
-    throw {
-      where: "deepseek_chat_fallback_empty_response",
-      status: res.status,
-      body_json: data,
-      body_raw: raw.slice(0, 4000),
-    };
+    // DeepSeek가 content 없이 reasoning_content만 반환하는 경우가 있음.
+    // 이때 서버 전체를 죽이지 않고, 호출 목적별 안전 fallback을 반환한다.
+    console.log(
+      "DEEPSEEK FALLBACK EMPTY CONTENT:",
+      JSON.stringify({ where, finish_reason: data?.choices?.[0]?.finish_reason, reasoning_preview: String(reasoningContent || "").slice(0, 500) })
+    );
+
+    return fallbackTextContentForFailedCall(where);
   }
 
   return String(content);
