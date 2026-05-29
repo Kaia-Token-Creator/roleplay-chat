@@ -108,14 +108,37 @@ export const onRequestPost: PagesFunction<{
 
       const messages: Msg[] = fitMessagesToBudget([initSystem], MAX_PROMPT_CHARS);
 
-      const replyRaw =
-        tier === "uncensored"
-          ? await callVeniceChat(env.VENICE_API_KEY, messages, MAX_TOKENS_VENICE)
-          : await callDeepSeekChat(env.DEEPSEEK_API_KEY, messages, MAX_TOKENS_DEEPSEEK);
+      let replyRaw: string;
+      let model = "deepseek-v4-flash";
+      let fallback = false;
+
+      if (tier === "uncensored") {
+        try {
+          replyRaw = await callVeniceChat(env.VENICE_API_KEY, messages, MAX_TOKENS_VENICE);
+          model = "e2ee-venice-uncensored-24b-p";
+        } catch (veniceErr) {
+          console.log("Venice init failed. Falling back to DeepSeek:", serializeErr(veniceErr));
+
+          replyRaw = await callDeepSeekChat(
+            env.DEEPSEEK_API_KEY,
+            messages,
+            MAX_TOKENS_DEEPSEEK
+          );
+
+          model = "deepseek-v4-flash";
+          fallback = true;
+        }
+      } else {
+        replyRaw = await callDeepSeekChat(
+          env.DEEPSEEK_API_KEY,
+          messages,
+          MAX_TOKENS_DEEPSEEK
+        );
+      }
 
       const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
 
-      return json({ reply, tier }, 200, CORS);
+      return json({ reply, tier, model, fallback }, 200, CORS);
     }
 
     // ---------- 기존 로직 (기능 유지 + 제한 가드만 추가) ----------
@@ -200,9 +223,43 @@ const history = isSexTrigger
       const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
       return json({ reply, tier, model: "deepseek-v4-flash" }, 200, CORS);
     } else {
-      const replyRaw = await callVeniceChat(env.VENICE_API_KEY, messages, MAX_TOKENS_VENICE);
-      const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
-      return json({ reply, tier, model: "e2ee-venice-uncensored-24b-p" }, 200, CORS);
+      try {
+        const replyRaw = await callVeniceChat(env.VENICE_API_KEY, messages, MAX_TOKENS_VENICE);
+        const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
+
+        return json(
+          {
+            reply,
+            tier,
+            model: "e2ee-venice-uncensored-24b-p",
+            fallback: false,
+          },
+          200,
+          CORS
+        );
+      } catch (veniceErr) {
+        console.log("Venice failed. Falling back to DeepSeek:", serializeErr(veniceErr));
+
+        const replyRaw = await callDeepSeekChat(
+          env.DEEPSEEK_API_KEY,
+          messages,
+          MAX_TOKENS_DEEPSEEK
+        );
+
+        const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
+
+        return json(
+          {
+            reply,
+            tier,
+            model: "deepseek-v4-flash",
+            fallback: true,
+            fallbackFrom: "venice",
+          },
+          200,
+          CORS
+        );
+      }
     }
     } catch (err: any) {
     const serialized = serializeErr(err);
