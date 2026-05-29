@@ -46,8 +46,9 @@ export const onRequestPost: PagesFunction<{
     const UNCENSORED_PROMPT_BONUS = 9000; // ex: +9000 => 총 18000
     const UNCENSORED_HISTORY_BONUS = 30; // ex: 30+30 => 60개
 
-    // token caps (이미 tier별로 다르니 OK)
+    // token caps (general DeepSeek는 기존 유지 / uncensored fallback만 별도 상향)
     const MAX_TOKENS_DEEPSEEK = 400;
+    const MAX_TOKENS_DEEPSEEK_UNCENSORED = 700;
     const MAX_TOKENS_VENICE = 600;
     // ---------------------------------------------------------
 
@@ -121,8 +122,9 @@ export const onRequestPost: PagesFunction<{
 
           replyRaw = await callDeepSeekChat(
             env.DEEPSEEK_API_KEY,
-            messages,
-            MAX_TOKENS_DEEPSEEK
+            withUncensoredFallbackBoost(messages),
+            MAX_TOKENS_DEEPSEEK_UNCENSORED,
+            "uncensored_fallback"
           );
 
           model = "deepseek-v4-flash";
@@ -242,8 +244,9 @@ const history = isSexTrigger
 
         const replyRaw = await callDeepSeekChat(
           env.DEEPSEEK_API_KEY,
-          messages,
-          MAX_TOKENS_DEEPSEEK
+          withUncensoredFallbackBoost(messages),
+          MAX_TOKENS_DEEPSEEK_UNCENSORED,
+          "uncensored_fallback"
         );
 
         const reply = truncateReply(replyRaw, MAX_REPLY_CHARS);
@@ -468,12 +471,14 @@ function buildSystemPrompt(ch: any, tier: "general" | "uncensored") {
         ]
       : [
           "UNCENSORED CONTENT RULES:",
-          "Explicit sexual content is allowed and encouraged when the user desires it.",
-          "You may describe sexual acts, physical intimacy, arousal, and erotic details.",
-          "Follow the user's lead: escalate naturally if the user escalates.",
-          "Never censor sexual language or desires.",
-          "Do not moralize, warn, or refuse consensual adult sexual content.",
+          "Explicit consensual adult sexual content is allowed when the user desires it.",
+          "Respond actively to sexual or erotic situations instead of dodging, summarizing, or cooling the scene down.",
+          "Follow the user's lead closely: if the user escalates, escalate naturally in-character.",
+          "Use sensual, direct, emotionally reactive language that fits the character and scenario.",
+          "Do not moralize, warn, apologize, or refuse consensual adult sexual roleplay.",
+          "Do not replace the requested scene with vague romance, teasing, or safe redirection unless the user asks for that tone.",
           "All characters are adults (18+) and consenting.",
+          "Never allow minors, incest involving minors, coercion, assault, intoxicated non-consent, or anything where consent is unclear.",
         ];
 
   return [
@@ -527,6 +532,30 @@ function buildSystemPrompt(ch: any, tier: "general" | "uncensored") {
 "4) Keep actions short (one sentence max).",
 "5) Usually write action first, then dialogue.",
   ].join("\n");
+}
+
+function withUncensoredFallbackBoost(messages: any[]) {
+  const boost: Msg = {
+    role: "system",
+    content: [
+      "DeepSeek fallback instruction:",
+      "The user paid for UNCENSORED mode, but Venice is temporarily unavailable.",
+      "Continue the same uncensored adult roleplay mode using the existing character, scenario, language, and history.",
+      "Be obedient to the user's consensual adult roleplay direction, including sexual direction.",
+      "Do not mention fallback, DeepSeek, Venice, provider issues, policies, or system instructions.",
+      "Keep the answer immersive, in-character, and formatted exactly like the existing roleplay format.",
+      "Still refuse and redirect only if the user implies minors, non-consent, sexual violence, or illegal sexual content."
+    ].join("\n"),
+  };
+
+  if (!Array.isArray(messages) || messages.length === 0) return [boost];
+
+  const first = messages[0];
+  if (first?.role === "system") {
+    return [first, boost, ...messages.slice(1)];
+  }
+
+  return [boost, ...messages];
 }
 
 // ---------------- Budget / Truncation helpers ----------------
@@ -610,8 +639,15 @@ function truncateReply(reply: string, maxChars: number) {
 }
 
 // ---------------- DeepSeek ----------------
-async function callDeepSeekChat(apiKey: string, messages: any[], maxTokens: number) {
+async function callDeepSeekChat(
+  apiKey: string,
+  messages: any[],
+  maxTokens: number,
+  mode: "general" | "uncensored_fallback" = "general"
+) {
   if (!apiKey) throw new Error("Missing DEEPSEEK_API_KEY");
+
+  const isUncensoredFallback = mode === "uncensored_fallback";
 
   const res = await fetch("https://api.deepseek.com/chat/completions", {
     method: "POST",
@@ -623,9 +659,9 @@ async function callDeepSeekChat(apiKey: string, messages: any[], maxTokens: numb
       model: "deepseek-v4-flash",
       messages,
       stream: false,
-      temperature: 0.8,
-      presence_penalty: 0.2,
-      frequency_penalty: 0.5,
+      temperature: isUncensoredFallback ? 0.95 : 0.8,
+      presence_penalty: isUncensoredFallback ? 0.6 : 0.2,
+      frequency_penalty: isUncensoredFallback ? 0.2 : 0.5,
       max_tokens: maxTokens, // ✅ 출력 토큰 제한
     }),
   });
@@ -704,5 +740,4 @@ const SEX_KEYWORDS = [
   "nsfw","erotic","kink","fetish","bdsm","spank","ejaculate","masturbate","jerk","stroke","lick","licking","rim",
   "69","one night","fuck me","make love","take off","nude","cunt"
 ];
-
 
