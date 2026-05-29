@@ -48,7 +48,7 @@ export const onRequestPost: PagesFunction<{
 
     // token caps (general DeepSeek는 기존 유지 / uncensored fallback만 별도 상향)
     const MAX_TOKENS_DEEPSEEK = 400;
-    const MAX_TOKENS_DEEPSEEK_UNCENSORED = 700;
+    const MAX_TOKENS_DEEPSEEK_UNCENSORED = 800;
     const MAX_TOKENS_VENICE = 600;
     // ---------------------------------------------------------
 
