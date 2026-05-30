@@ -615,7 +615,7 @@ async function queueModelsLabVideo(args: {
     width: dims.width,
     height: dims.height,
     num_frames: frames,
-    num_inference_steps: 30,
+    num_inference_steps: 25,
 
     // Conservative motion settings to keep the result close to Venice's smooth short clip feel.
     min_guidance_scale: 1,
