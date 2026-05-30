@@ -1042,8 +1042,8 @@ function buildImagePromptWithAvatarHint(basePrompt: string, _ch: any) {
 // 나중에 ModelsLab catalog에서 NSFW에 더 맞는 모델을 고르면 Cloudflare env에 MODELSLAB_MODEL_ID만 추가해서 교체 가능.
 const DEFAULT_MODELSLAB_MODEL_ID = "realistic-vision-v51";
 
-const MODELSLAB_DREAMBOOTH_URL = "https://stablediffusionapi.com/api/v4/dreambooth";
-const MODELSLAB_FETCH_URL_BASE = "https://stablediffusionapi.com/api/v3/fetch";
+const MODELSLAB_DREAMBOOTH_URL = "https://modelslab.com/api/v6/images/text2img";
+const MODELSLAB_FETCH_URL = "https://modelslab.com/api/v6/images/fetch";
 
 type ImageGenerateArgs = {
   veniceModel: string;
