@@ -624,7 +624,7 @@ async function queueModelsLabVideo(args: {
     noise_aug_strength: 0.02,
 
     // Keep this short/video-chat style.
-    fps: 15,
+    fps: 16,
 
     // Current ModelsLab video docs do not expose safety_checker:"no".
     // NSFW/adult intent is handled through adult prompt anchors while hard-blocking minors/non-consent in negative prompt.
