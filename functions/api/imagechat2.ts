@@ -82,8 +82,7 @@ if (bodyAny.type === "donation_gift") {
   const ch = sanitizeCharacter(characterRaw);
 
   // 🔥 기존 히스토리도 사용 (몰입 유지)
-  const rawHistory = Array.isArray(bodyAny.history) ? bodyAny.history : [];
-  const history: Msg[] = rawHistory.filter(isValidMsg).slice(-10);
+  const history: Msg[] = sanitizeHistoryMessages(bodyAny.history, 10);
 
   try {
 
@@ -121,7 +120,7 @@ if (bodyAny.type === "donation_gift") {
     return json(
       {
         reply: "Thanks for donation. I sent you a secret gift… check it.",
-        image: { mime: imgResult.mime, b64: imgResult.b64 },
+        image: { ...(imgResult.mime ? { mime: imgResult.mime } : {}), ...(imgResult.b64 ? { b64: imgResult.b64 } : {}), ...(imgResult.url ? { url: imgResult.url } : {}) },
         type: "donation_gift",
         imageProvider: imgResult.provider,
         imageModel: imgResult.model,
@@ -168,14 +167,12 @@ if (bodyAny.type === "donation_gift") {
     const userMsg = isInit ? "" : truncateString(message, MAX_MESSAGE_CHARS);
 
     // history
-   const rawHistory = Array.isArray(bodyAny.history) ? bodyAny.history : [];
-
 const isSexTrigger =
   !isInit && containsSexKeyword(userMsg);
 
 const history: Msg[] = isSexTrigger
   ? [] // 🔥 과거 censored 거절/완화 맥락 완전 차단
-  : rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
+  : sanitizeHistoryMessages(bodyAny.history, MAX_HISTORY_MSGS);
 
 
     // paymentStatus
@@ -299,7 +296,7 @@ const history: Msg[] = isSexTrigger
     }
 
     // 3) 이미지 생성
-    let image: null | { mime: string; b64: string } = null;
+    let image: null | { mime?: string; b64?: string; url?: string } = null;
 
     if (plan.generate === true) {
       if (looksExplicitOrIllegal(plan.prompt)) {
@@ -331,7 +328,7 @@ const history: Msg[] = isSexTrigger
           variants: 1,
         });
 
-        image = { mime: imgResult.mime, b64: imgResult.b64 };
+        image = { ...(imgResult.mime ? { mime: imgResult.mime } : {}), ...(imgResult.b64 ? { b64: imgResult.b64 } : {}), ...(imgResult.url ? { url: imgResult.url } : {}) };
       } catch (imgErr) {
         console.log("Venice + ModelsLab image generation failed. Returning DeepSeek text reply instead:", serializeErr(imgErr));
 
@@ -537,6 +534,29 @@ function isValidMsg(m: any): m is { role: "system" | "user" | "assistant"; conte
     (m.role === "system" || m.role === "user" || m.role === "assistant") &&
     typeof m.content === "string"
   );
+}
+
+
+function sanitizeHistoryMessages(rawHistory: any, limit: number): { role: "system" | "user" | "assistant"; content: string }[] {
+  const arr = Array.isArray(rawHistory) ? rawHistory : [];
+  return arr
+    .filter(isValidMsg)
+    .map((m) => ({ role: m.role, content: stripBase64FromHistoryContent(m.content) }))
+    .filter((m) => m.content.trim().length > 0)
+    .slice(-limit);
+}
+
+function stripBase64FromHistoryContent(content: string) {
+  let s = String(content || "");
+
+  // data URL base64 제거
+  s = s.replace(/data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+/g, "[image omitted]");
+  s = s.replace(/data:video\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+/g, "[video omitted]");
+
+  // 아주 긴 base64 덩어리 제거
+  s = s.replace(/[A-Za-z0-9+/]{800,}={0,2}/g, "[base64 omitted]");
+
+  return truncateString(s, 4000);
 }
 
 function normalizeMBTI(s: string) {
@@ -1062,8 +1082,9 @@ type ImageGenerateArgs = {
 };
 
 type ImageGenerateResult = {
-  mime: string;
-  b64: string;
+  mime?: string;
+  b64?: string;
+  url?: string;
   provider: "venice" | "modelslab";
   model: string;
   fallback: boolean;
@@ -1112,6 +1133,7 @@ async function callImageGenerateWithModelsLabFallback(
       return {
         mime: modelslab.mime,
         b64: modelslab.b64,
+        url: modelslab.url,
         provider: "modelslab",
         model: args.modelslabModelId || DEFAULT_MODELSLAB_MODEL_ID,
         fallback: true,
@@ -1138,7 +1160,7 @@ async function callModelsLabImageGenerate(
     height?: number;
     guidance_scale?: number;
   }
-): Promise<{ mime: string; b64: string }> {
+): Promise<{ mime?: string; b64?: string; url?: string }> {
   if (!apiKey) throw new Error("Missing MODELSLAB_API_KEY");
 
   const dims = normalizeModelsLabSize(args.width ?? 1024, args.height ?? 1024);
@@ -1162,8 +1184,9 @@ async function callModelsLabImageGenerate(
   };
 
   const first = await postModelsLabJson(MODELSLAB_DREAMBOOTH_URL, payload, "modelslab_dreambooth");
-  const firstImage = extractModelsLabImageOutput(first);
-  if (firstImage) return await modelslabImageOutputToBase64(firstImage);
+  let lastCandidates = extractModelsLabImageCandidates(first);
+  const firstResolved = await tryResolveModelsLabImageCandidates(lastCandidates);
+  if (firstResolved) return firstResolved;
 
   const status = String(first?.status || "").toLowerCase();
   const id = first?.id || first?.generation_id || first?.fetch_result || first?.queue_id;
@@ -1177,8 +1200,9 @@ async function callModelsLabImageGenerate(
         { key: apiKey, request_id: String(id) },
         "modelslab_fetch"
       );
-      const fetchedImage = extractModelsLabImageOutput(fetched);
-      if (fetchedImage) return await modelslabImageOutputToBase64(fetchedImage);
+      lastCandidates = extractModelsLabImageCandidates(fetched);
+      const fetchedResolved = await tryResolveModelsLabImageCandidates(lastCandidates);
+      if (fetchedResolved) return fetchedResolved;
 
       const fetchedStatus = String(fetched?.status || "").toLowerCase();
       if (fetchedStatus === "failed" || fetchedStatus === "error") {
@@ -1189,6 +1213,14 @@ async function callModelsLabImageGenerate(
         };
       }
     }
+  }
+
+  const urlFallback = firstHttpUrl(lastCandidates);
+  if (urlFallback) {
+    return {
+      mime: guessImageMimeFromUrl(urlFallback),
+      url: urlFallback,
+    };
   }
 
   throw {
@@ -1237,8 +1269,8 @@ async function postModelsLabJson(url: string, payload: any, where: string) {
   return data;
 }
 
-function extractModelsLabImageOutput(data: any): string | null {
-  const candidates = [
+function extractModelsLabImageCandidates(data: any): string[] {
+  const rawCandidates = [
     // output의 R2 URL은 생성 직후 404가 나는 경우가 있어 CDN proxy 링크를 우선 사용
     data?.proxy_links?.[0],
     data?.output?.[0],
@@ -1247,13 +1279,39 @@ function extractModelsLabImageOutput(data: any): string | null {
     data?.url,
   ];
 
-  for (const v of candidates) {
-    if (typeof v === "string" && v.trim()) return v.trim();
+  const out: string[] = [];
+  for (const v of rawCandidates) {
+    if (typeof v === "string" && v.trim()) {
+      const t = v.trim();
+      if (!out.includes(t)) out.push(t);
+    }
+  }
+  return out;
+}
+
+function firstHttpUrl(candidates: string[]): string | null {
+  for (const c of candidates) {
+    if (/^https?:\/\//i.test(c)) return c;
   }
   return null;
 }
 
-async function modelslabImageOutputToBase64(output: string): Promise<{ mime: string; b64: string }> {
+async function tryResolveModelsLabImageCandidates(candidates: string[]): Promise<{ mime?: string; b64?: string; url?: string } | null> {
+  let lastErr: any = null;
+
+  for (const c of candidates) {
+    try {
+      return await modelslabImageOutputToBase64(c);
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+
+  if (lastErr) console.log("MODELSLAB IMAGE CANDIDATES DOWNLOAD FAILED:", serializeErr(lastErr));
+  return null;
+}
+
+async function modelslabImageOutputToBase64(output: string): Promise<{ mime?: string; b64?: string; url?: string }> {
   const s = String(output || "").trim();
 
   // data URL이면 그대로 분리
@@ -1271,7 +1329,7 @@ async function modelslabImageOutputToBase64(output: string): Promise<{ mime: str
   return { mime: "image/png", b64: stripBase64Prefix(s) };
 }
 
-async function fetchImageUrlAsBase64(url: string): Promise<{ mime: string; b64: string }> {
+async function fetchImageUrlAsBase64(url: string): Promise<{ mime?: string; b64?: string; url?: string }> {
   let lastErr: any = null;
 
   // ModelsLab이 status=success와 URL을 먼저 주고 실제 CDN/R2 파일은 1~몇 초 늦게 열리는 경우가 있어 재시도
