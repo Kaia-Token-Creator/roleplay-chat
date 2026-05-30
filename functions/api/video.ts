@@ -492,7 +492,7 @@ async function queueModelsLabVideo(args: {
     width: dims.width,
     height: dims.height,
     num_frames: frames,
-    num_inference_steps: 30,
+    num_inference_steps: 25,
 
     // Wan/SVD-style motion settings. Conservative defaults to avoid wild motion.
     min_guidance_scale: 1,
