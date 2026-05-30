@@ -74,6 +74,10 @@ function isHttpUrl(s: any): s is string {
   return typeof s === "string" && /^https?:\/\//i.test(s);
 }
 
+function stripDataUrlPrefix(dataUrl: string) {
+  return String(dataUrl || "").replace(/^data:[^;]+;base64,/i, "").trim();
+}
+
 function bestErrMsg(data: any, fallback: string) {
   return (
     (typeof data?.message === "string" && data.message) ||
@@ -438,15 +442,9 @@ export const onRequestPost: PagesFunction<{
       }
 
       const parsed = parseProviderQueueId(b.model, b.queue_id);
+      console.log("VIDEO RETRIEVE REQUEST:", { model: b.model, queue_id: b.queue_id, provider: parsed.provider, rawId: parsed.rawId });
 
-console.log("VIDEO RETRIEVE REQUEST:", {
-  model: b.model,
-  queue_id: b.queue_id,
-  provider: parsed.provider,
-  rawId: parsed.rawId
-});
-
-if (parsed.provider === "modelslab") {
+      if (parsed.provider === "modelslab") {
         if (!modelslabApiKey) {
           return json({ error: "Missing MODELSLAB_API_KEY" }, { status: 500, headers: cors(origin) });
         }
@@ -474,9 +472,9 @@ if (parsed.provider === "modelslab") {
 
     return json({ error: "Unknown action. Use 'queue' or 'retrieve'." }, { status: 400, headers: cors(origin) });
   } catch (e: any) {
-  console.log("VIDEO API SERVER ERROR:", serializeErr(e));
-  return json({ error: "Server error", detail: serializeErr(e) }, { status: 500, headers: cors(origin) });
-}
+    console.log("VIDEO API SERVER ERROR:", serializeErr(e));
+    return json({ error: "Server error", detail: serializeErr(e) }, { status: 500, headers: cors(origin) });
+  }
 };
 
 async function queueVeniceVideo(args: {
@@ -600,6 +598,9 @@ async function queueModelsLabVideo(args: {
   const initImage = await ensureModelsLabInitImageUrl(args.apiKey, args.imageDataUrl);
 
   const dims = pickModelsLabVideoDims(args.imageDataUrl);
+  // ModelsLab video API currently requires num_frames >= 25.
+  // Keep 25 for both 5s and 10s so fallback does not fail with:
+  // "The num frames field must be at least 25."
   const frames = 25;
 
   const payload = {
@@ -757,26 +758,58 @@ async function ensureModelsLabInitImageUrl(apiKey: string, imageDataUrlOrUrl: st
     throw { where: "modelslab_init_image", message: "init image must be data URL or URL" };
   }
 
-  const data = await postModelsLabJson(
-    MODELSLAB_BASE64_TO_URL,
-    {
-      key: apiKey,
-      // Docs accept full data:image/...;base64,... string.
-      base64_string: stripDataUrlPrefix(imageDataUrlOrUrl),
-    },
-    "modelslab_base64_to_url"
-  );
+  const fullDataUrl = String(imageDataUrlOrUrl || "").trim();
+  const rawBase64 = stripDataUrlPrefix(fullDataUrl);
 
-  const url = extractUrlCandidates(data)[0];
-  if (!url) {
-    throw {
-      where: "modelslab_base64_to_url_parse",
-      body_json: data,
-      message: "Missing uploaded image URL",
-    };
+  // ModelsLab docs show the general endpoint with "base64_string".
+  // In practice, accounts/endpoints may accept either:
+  // - full data URL: data:image/png;base64,...
+  // - raw base64 only
+  // So try both, then fallback to the image_editing endpoint which uses "init_image".
+  const attempts = [
+    {
+      where: "modelslab_base64_to_url_full_dataurl",
+      url: MODELSLAB_BASE64_TO_URL,
+      payload: { key: apiKey, base64_string: fullDataUrl },
+    },
+    {
+      where: "modelslab_base64_to_url_raw_base64",
+      url: MODELSLAB_BASE64_TO_URL,
+      payload: { key: apiKey, base64_string: rawBase64 },
+    },
+    {
+      where: "modelslab_image_editing_base64_to_url",
+      url: "https://modelslab.com/api/v6/image_editing/base64_to_url",
+      payload: { key: apiKey, init_image: fullDataUrl },
+    },
+  ];
+
+  const errors: any[] = [];
+
+  for (const a of attempts) {
+    try {
+      const data = await postModelsLabJson(a.url, a.payload, a.where);
+      const url = extractUrlCandidates(data)[0];
+
+      if (url) return url;
+
+      errors.push({
+        where: a.where,
+        message: "Missing uploaded image URL",
+        body_json: data,
+      });
+    } catch (e) {
+      errors.push(serializeErr(e));
+    }
   }
 
-  return url;
+  throw {
+    where: "modelslab_base64_upload_all_failed",
+    message: "Could not convert image dataURL to URL for ModelsLab video.",
+    imagePrefix: fullDataUrl.slice(0, 80),
+    imageLength: fullDataUrl.length,
+    errors,
+  };
 }
 
 function extractUrlCandidates(data: any): string[] {
@@ -795,12 +828,10 @@ function extractUrlCandidates(data: any): string[] {
 
   function add(v: any) {
     if (!v) return;
-
     if (Array.isArray(v)) {
       for (const x of v) add(x);
       return;
     }
-
     if (typeof v === "object") {
       add(v.url);
       add(v.video);
@@ -810,7 +841,6 @@ function extractUrlCandidates(data: any): string[] {
       add(v.future_links);
       return;
     }
-
     if (typeof v === "string" && v.trim()) {
       const s = v.trim();
       if (/^https?:\/\//i.test(s) && !out.includes(s)) out.push(s);
