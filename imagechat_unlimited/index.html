@@ -1334,6 +1334,30 @@ async function lfSet(key, val){
   }
 }
 
+
+function stripBase64FromApiContent(content) {
+  let s = String(content || "");
+
+  // data URL 형태 제거
+  s = s.replace(/data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+/g, "[image omitted]");
+  s = s.replace(/data:video\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+/g, "[video omitted]");
+
+  // 긴 base64 덩어리 제거
+  s = s.replace(/[A-Za-z0-9+/]{800,}={0,2}/g, "[base64 omitted]");
+
+  return s.slice(0, 4000);
+}
+
+function makeApiHistory(list, limit = 50) {
+  return (Array.isArray(list) ? list : [])
+    .slice(-limit)
+    .map(m => ({
+      role: m && m.role === "assistant" ? "assistant" : "user",
+      content: stripBase64FromApiContent(m && m.content)
+    }))
+    .filter(m => m.content && m.content.trim());
+}
+
 /* =========================
    Load character from main
    ========================= */
@@ -1970,11 +1994,83 @@ function b64ToBlob(b64, mime){
   const byteArray = new Uint8Array(byteNums);
   return new Blob([byteArray], { type: mime });
 }
+
+function blobToDataUrl(blob){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Image blob conversion failed."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function imageUrlToDataUrlViaCanvas(url){
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.decoding = "async";
+
+  const loaded = new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = () => reject(new Error("Image URL load failed."));
+  });
+
+  img.src = url;
+  await loaded;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = img.naturalWidth || img.width;
+  canvas.height = img.naturalHeight || img.height;
+
+  const ctx = canvas.getContext("2d", { alpha: false });
+  ctx.drawImage(img, 0, 0);
+
+  try {
+    return canvas.toDataURL("image/jpeg", 0.92);
+  } catch (e) {
+    throw new Error("Image URL could not be converted for video. The image server may block browser conversion.");
+  }
+}
+
+async function ensureImageDataUrlForVideo(src){
+  const s = String(src || "").trim();
+  if (!s) throw new Error("No image selected.");
+
+  // Venice/base64 이미지 또는 저장된 dataURL은 그대로 사용
+  if (s.startsWith("data:image/")) return s;
+
+  // blob URL이면 fetch 가능
+  if (s.startsWith("blob:")) {
+    const res = await fetch(s);
+    if (!res.ok) throw new Error("Selected image blob could not be read.");
+    return await blobToDataUrl(await res.blob());
+  }
+
+  // ModelsLab fallback 이미지 URL은 video2에 보내기 전에 dataURL로 변환
+  if (/^https?:\/\//i.test(s)) {
+    try {
+      const res = await fetch(s, {
+        method: "GET",
+        cache: "no-store",
+        mode: "cors",
+        credentials: "omit"
+      });
+      if (res.ok) {
+        return await blobToDataUrl(await res.blob());
+      }
+    } catch (e) {}
+
+    return await imageUrlToDataUrlViaCanvas(s);
+  }
+
+  throw new Error("Unsupported image format for video.");
+}
   
   async function generateVideoFromSelectedImage({ duration, extraPrompt }){
   if (!selectedImageDataUrl){
     throw new Error("No image selected.");
   }
+
+  const imageDataUrlForVideo = await ensureImageDataUrlForVideo(selectedImageDataUrl);
 
   // 1) queue
   // 1) queue
@@ -1985,7 +2081,7 @@ const qRes = await fetch("/api/video2", {
     action: "queue",
     orderID: lastVideoOrderID,
     duration,
-    imageDataUrl: selectedImageDataUrl,
+    imageDataUrl: imageDataUrlForVideo,
     prompt: extraPrompt || ""
   })
 });
@@ -2280,6 +2376,9 @@ if (animate){
   let imgEl = null;
   if (imageUrl){
     const img = document.createElement("img");
+    if (/^https?:\/\//i.test(String(imageUrl))) {
+      img.crossOrigin = "anonymous";
+    }
     img.src = imageUrl;
     img.dataset.imageDataUrl = imageUrl; // ✅ capture for modal
     imgEl = img;
@@ -2461,8 +2560,12 @@ if (!res.ok) {
     const reply = (data && typeof data.reply === "string") ? data.reply : "(no text)";
 let imageUrl = "";
 
-if (data && data.image && typeof data.image.b64 === "string" && typeof data.image.mime === "string"){
-  imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
+if (data && data.image) {
+  if (typeof data.image.b64 === "string" && data.image.b64) {
+    imageUrl = `data:${data.image.mime || "image/jpeg"};base64,${data.image.b64}`;
+  } else if (typeof data.image.url === "string" && data.image.url) {
+    imageUrl = data.image.url;
+  }
 }
 
 appendMsg("assistant", reply, imageUrl || undefined, undefined, { animate: true });
@@ -2526,7 +2629,7 @@ await pruneHistoryAndUI();
     return;
   }
 
-  const slimHistory = Array.isArray(history) ? history.slice(-50) : [];
+  const slimHistory = makeApiHistory(history, 50);
 
   const payload = {
     paymentStatus: paid ? "paid" : "unpaid",
@@ -2590,8 +2693,12 @@ if (!res.ok) {
     const reply = (data && typeof data.reply === "string") ? data.reply : "(no text)";
 let imageUrl = "";
 
-if (data && data.image && typeof data.image.b64 === "string" && typeof data.image.mime === "string"){
-  imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
+if (data && data.image) {
+  if (typeof data.image.b64 === "string" && data.image.b64) {
+    imageUrl = `data:${data.image.mime || "image/jpeg"};base64,${data.image.b64}`;
+  } else if (typeof data.image.url === "string" && data.image.url) {
+    imageUrl = data.image.url;
+  }
 }
 
 appendMsg("assistant", reply, imageUrl || undefined, undefined, { animate: true });
@@ -2767,8 +2874,12 @@ if (!res.ok){
 
     let imageUrl = "";
 
-    if (data.image && data.image.b64){
-      imageUrl = `data:${data.image.mime};base64,${data.image.b64}`;
+    if (data && data.image) {
+      if (typeof data.image.b64 === "string" && data.image.b64) {
+        imageUrl = `data:${data.image.mime || "image/jpeg"};base64,${data.image.b64}`;
+      } else if (typeof data.image.url === "string" && data.image.url) {
+        imageUrl = data.image.url;
+      }
     }
 
     appendMsg(
@@ -2920,5 +3031,3 @@ donateModal?.addEventListener("click", e => {
 
 </body>
 </html>
-
-
