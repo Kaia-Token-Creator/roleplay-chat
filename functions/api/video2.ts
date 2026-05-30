@@ -754,7 +754,7 @@ async function ensureModelsLabInitImageUrl(apiKey: string, imageDataUrlOrUrl: st
     {
       key: apiKey,
       // Docs accept full data:image/...;base64,... string.
-      base64_string: imageDataUrlOrUrl,
+      base64_string: stripDataUrlPrefix(imageDataUrlOrUrl),
     },
     "modelslab_base64_to_url"
   );
