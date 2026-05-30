@@ -501,7 +501,7 @@ async function queueModelsLabVideo(args: {
     noise_aug_strength: 0.02,
 
     // Docs show fps in top cURL. Keep 15 for Venice-like short clip feel.
-    fps: 15,
+    fps: 16,
 
     // NSFW/adult: no safety_checker field exists in current ModelsLab video docs.
     // Do not add child/minor/non-consent terms. Keep prompt adult and consenting.
