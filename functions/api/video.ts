@@ -320,7 +320,14 @@ export const onRequestPost: PagesFunction<{
 
       const parsed = parseProviderQueueId(b.model, b.queue_id);
 
-      if (parsed.provider === "modelslab") {
+console.log("VIDEO RETRIEVE REQUEST:", {
+  model: b.model,
+  queue_id: b.queue_id,
+  provider: parsed.provider,
+  rawId: parsed.rawId
+});
+
+if (parsed.provider === "modelslab") {
         if (!modelslabApiKey) {
           return json({ error: "Missing MODELSLAB_API_KEY" }, { status: 500, headers: cors(origin) });
         }
@@ -347,9 +354,10 @@ export const onRequestPost: PagesFunction<{
     }
 
     return json({ error: "Unknown action. Use 'queue' or 'retrieve'." }, { status: 400, headers: cors(origin) });
-  } catch (e: any) {
-    return json({ error: "Server error", detail: serializeErr(e) }, { status: 500, headers: cors(origin) });
-  }
+ } catch (e: any) {
+  console.log("VIDEO API SERVER ERROR:", serializeErr(e));
+  return json({ error: "Server error", detail: serializeErr(e) }, { status: 500, headers: cors(origin) });
+}
 };
 
 async function queueVeniceVideo(args: {
@@ -656,21 +664,43 @@ async function ensureModelsLabInitImageUrl(apiKey: string, imageDataUrlOrUrl: st
 
 function extractUrlCandidates(data: any): string[] {
   const raw = [
-    data?.proxy_links?.[0],
-    data?.output?.[0],
-    data?.future_links?.[0],
+    data?.proxy_links,
+    data?.output,
+    data?.future_links,
     data?.video,
     data?.url,
     data?.fetch_result,
+    data?.file,
+    data?.result,
   ];
 
   const out: string[] = [];
-  for (const v of raw) {
+
+  function add(v: any) {
+    if (!v) return;
+
+    if (Array.isArray(v)) {
+      for (const x of v) add(x);
+      return;
+    }
+
+    if (typeof v === "object") {
+      add(v.url);
+      add(v.video);
+      add(v.file);
+      add(v.output);
+      add(v.proxy_links);
+      add(v.future_links);
+      return;
+    }
+
     if (typeof v === "string" && v.trim()) {
       const s = v.trim();
       if (/^https?:\/\//i.test(s) && !out.includes(s)) out.push(s);
     }
   }
+
+  for (const v of raw) add(v);
   return out;
 }
 
