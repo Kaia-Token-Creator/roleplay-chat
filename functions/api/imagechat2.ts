@@ -10,6 +10,9 @@ const MAX_TOKENS_DEEPSEEK_FALLBACK_TEASE_LINE = 200;
 export const onRequestPost: PagesFunction<{
   VENICE_API_KEY: string;
   DEEPSEEK_API_KEY: string;
+  MODELSLAB_API_KEY: string;
+  // 선택사항: 나중에 ModelsLab에서 더 마음에 드는 모델을 찾으면 secret/env로 바꿔 끼울 수 있음
+  MODELSLAB_MODEL_ID?: string;
 }> = async (ctx) => {
   const { request, env } = ctx;
 
@@ -98,9 +101,10 @@ if (bodyAny.type === "donation_gift") {
   `${ch.scenario ? `in ${ch.scenario}, ` : ""}` +
   "completely nude, fully naked, bare body, bare skin, uncensored nude, dancing";
 
-    // 🎨 이미지 생성
-    const imgB64 = await callVeniceImageGenerate(env.VENICE_API_KEY, {
-      model: "lustify-sdxl",
+    // 🎨 이미지 생성: Venice 실패 시 ModelsLab으로 fallback
+    const imgResult = await callImageGenerateWithModelsLabFallback(env, {
+      veniceModel: "lustify-sdxl",
+      modelslabModelId: env.MODELSLAB_MODEL_ID || DEFAULT_MODELSLAB_MODEL_ID,
       prompt: finalPrompt,
       negative_prompt:
   defaultNegativePrompt() +
@@ -117,8 +121,12 @@ if (bodyAny.type === "donation_gift") {
     return json(
       {
         reply: "Thanks for donation. I sent you a secret gift… check it.",
-        image: { mime: "image/webp", b64: imgB64 },
-        type: "donation_gift"
+        image: { mime: imgResult.mime, b64: imgResult.b64 },
+        type: "donation_gift",
+        imageProvider: imgResult.provider,
+        imageModel: imgResult.model,
+        imageFallback: imgResult.fallback,
+        imageFallbackFrom: imgResult.fallbackFrom,
       },
       200,
       CORS
@@ -291,7 +299,7 @@ const history: Msg[] = isSexTrigger
     }
 
     // 3) 이미지 생성
-    let image: null | { mime: "image/webp"; b64: string } = null;
+    let image: null | { mime: string; b64: string } = null;
 
     if (plan.generate === true) {
       if (looksExplicitOrIllegal(plan.prompt)) {
@@ -309,8 +317,9 @@ const history: Msg[] = isSexTrigger
       const promptWithRef = buildImagePromptWithAvatarHint(plan.prompt, ch);
 
       try {
-        const imgB64 = await callVeniceImageGenerate(env.VENICE_API_KEY, {
-          model: "lustify-sdxl",
+        const imgResult = await callImageGenerateWithModelsLabFallback(env, {
+          veniceModel: "lustify-sdxl",
+          modelslabModelId: env.MODELSLAB_MODEL_ID || DEFAULT_MODELSLAB_MODEL_ID,
           prompt: promptWithRef,
           negative_prompt: plan.negativePrompt || defaultNegativePrompt(),
           format: "webp",
@@ -322,9 +331,9 @@ const history: Msg[] = isSexTrigger
           variants: 1,
         });
 
-        image = { mime: "image/webp", b64: imgB64 };
+        image = { mime: imgResult.mime, b64: imgResult.b64 };
       } catch (imgErr) {
-        console.log("Venice image generation failed. Returning DeepSeek text reply instead:", serializeErr(imgErr));
+        console.log("Venice + ModelsLab image generation failed. Returning DeepSeek text reply instead:", serializeErr(imgErr));
 
         let textOnlyReply = reply;
 
@@ -341,7 +350,7 @@ const history: Msg[] = isSexTrigger
 
         return json(
           {
-            // 이미지 실패 시 에러를 보여주지 않고 텍스트 응답 + 영어 랜덤 안내문만 반환
+            // Venice + ModelsLab 이미지가 둘 다 실패한 경우에만 텍스트 응답 + 영어 랜덤 안내문 반환
             reply: appendEnglishPhotoLaterLine(textOnlyReply, MAX_REPLY_CHARS),
 
             // 이미지 없음
@@ -353,8 +362,9 @@ const history: Msg[] = isSexTrigger
             tier: "e2ee-venice-uncensored-24b-p",
             textModel: "deepseek-v4-flash",
             textFallback: true,
-            textFallbackFrom: "venice_image_failure",
+            textFallbackFrom: "venice_and_modelslab_image_failure",
             imageModel: "lustify-sdxl",
+            imageFallbackModel: env.MODELSLAB_MODEL_ID || DEFAULT_MODELSLAB_MODEL_ID,
           },
           200,
           CORS
@@ -1017,12 +1027,310 @@ function looksExplicitOrIllegal(prompt: string) {
   return false;
 }
 
+
 function defaultNegativePrompt() {
   return "low quality, blurry, bad anatomy, extra fingers, deformed, watermark, text, logo, jpeg artifacts";
 }
 
 function buildImagePromptWithAvatarHint(basePrompt: string, _ch: any) {
   return basePrompt;
+}
+
+// ---------------- Image generation fallback: Venice -> ModelsLab -> DeepSeek text ----------------
+// ModelsLab 기본 fallback 모델.
+// Realistic Vision V51은 photorealistic 계열이고 API 문서에 model_id가 명확히 공개되어 있어 바로 작동 안정성이 높음.
+// 나중에 ModelsLab catalog에서 NSFW에 더 맞는 모델을 고르면 Cloudflare env에 MODELSLAB_MODEL_ID만 추가해서 교체 가능.
+const DEFAULT_MODELSLAB_MODEL_ID = "realistic-vision-v51";
+
+const MODELSLAB_DREAMBOOTH_URL = "https://stablediffusionapi.com/api/v4/dreambooth";
+const MODELSLAB_FETCH_URL_BASE = "https://stablediffusionapi.com/api/v3/fetch";
+
+type ImageGenerateArgs = {
+  veniceModel: string;
+  modelslabModelId: string;
+  prompt: string;
+  negative_prompt?: string;
+  format?: "webp" | "png" | "jpeg";
+  width?: number;
+  height?: number;
+  cfg_scale?: number;
+  safe_mode?: boolean;
+  hide_watermark?: boolean;
+  variants?: number;
+};
+
+type ImageGenerateResult = {
+  mime: string;
+  b64: string;
+  provider: "venice" | "modelslab";
+  model: string;
+  fallback: boolean;
+  fallbackFrom?: string;
+};
+
+async function callImageGenerateWithModelsLabFallback(
+  env: { VENICE_API_KEY: string; MODELSLAB_API_KEY: string; MODELSLAB_MODEL_ID?: string },
+  args: ImageGenerateArgs
+): Promise<ImageGenerateResult> {
+  try {
+    const veniceB64 = await callVeniceImageGenerate(env.VENICE_API_KEY, {
+      model: args.veniceModel,
+      prompt: args.prompt,
+      negative_prompt: args.negative_prompt || defaultNegativePrompt(),
+      format: args.format || "webp",
+      width: args.width ?? 1024,
+      height: args.height ?? 1024,
+      cfg_scale: args.cfg_scale ?? 7.0,
+      safe_mode: args.safe_mode ?? false,
+      hide_watermark: args.hide_watermark ?? true,
+      variants: args.variants ?? 1,
+    });
+
+    return {
+      mime: "image/webp",
+      b64: veniceB64,
+      provider: "venice",
+      model: args.veniceModel,
+      fallback: false,
+    };
+  } catch (veniceErr) {
+    console.log("Venice image failed. Falling back to ModelsLab:", serializeErr(veniceErr));
+
+    try {
+      const modelslab = await callModelsLabImageGenerate(env.MODELSLAB_API_KEY, {
+        model_id: args.modelslabModelId || DEFAULT_MODELSLAB_MODEL_ID,
+        prompt: args.prompt,
+        negative_prompt: args.negative_prompt || defaultNegativePrompt(),
+        width: args.width ?? 1024,
+        height: args.height ?? 1024,
+        guidance_scale: args.cfg_scale ?? 7.0,
+      });
+
+      return {
+        mime: modelslab.mime,
+        b64: modelslab.b64,
+        provider: "modelslab",
+        model: args.modelslabModelId || DEFAULT_MODELSLAB_MODEL_ID,
+        fallback: true,
+        fallbackFrom: "venice_image_failure",
+      };
+    } catch (modelslabErr) {
+      console.log("ModelsLab image fallback failed:", serializeErr(modelslabErr));
+      throw {
+        where: "image_generate_all_failed",
+        venice: serializeErr(veniceErr),
+        modelslab: serializeErr(modelslabErr),
+      };
+    }
+  }
+}
+
+async function callModelsLabImageGenerate(
+  apiKey: string,
+  args: {
+    model_id: string;
+    prompt: string;
+    negative_prompt?: string;
+    width?: number;
+    height?: number;
+    guidance_scale?: number;
+  }
+): Promise<{ mime: string; b64: string }> {
+  if (!apiKey) throw new Error("Missing MODELSLAB_API_KEY");
+
+  const dims = normalizeModelsLabSize(args.width ?? 1024, args.height ?? 1024);
+
+  const payload = {
+    key: apiKey,
+    model_id: args.model_id || DEFAULT_MODELSLAB_MODEL_ID,
+    prompt: buildModelsLabPrompt(args.prompt),
+    negative_prompt: buildModelsLabNegativePrompt(args.negative_prompt || defaultNegativePrompt()),
+    width: String(dims.width),
+    height: String(dims.height),
+    samples: "1",
+    num_inference_steps: "30",
+    guidance_scale: args.guidance_scale ?? 7.0,
+    scheduler: "DPMSolverMultistepScheduler",
+    safety_checker: "no",
+    enhance_prompt: "no",
+    seed: null,
+    webhook: null,
+    track_id: null,
+  };
+
+  const first = await postModelsLabJson(MODELSLAB_DREAMBOOTH_URL, payload, "modelslab_dreambooth");
+  const firstImage = extractModelsLabImageOutput(first);
+  if (firstImage) return await modelslabImageOutputToBase64(firstImage);
+
+  const status = String(first?.status || "").toLowerCase();
+  const id = first?.id || first?.generation_id || first?.fetch_result || first?.queue_id;
+
+  // ModelsLab은 처리 중이면 id를 주고 fetch endpoint에서 결과를 가져오게 하는 경우가 있음.
+  if ((status === "processing" || status === "queued" || status === "pending") && id != null) {
+    for (let i = 0; i < 8; i++) {
+      await sleep(1500);
+      const fetched = await postModelsLabJson(`${MODELSLAB_FETCH_URL_BASE}/${encodeURIComponent(String(id))}`, { key: apiKey }, "modelslab_fetch");
+      const fetchedImage = extractModelsLabImageOutput(fetched);
+      if (fetchedImage) return await modelslabImageOutputToBase64(fetchedImage);
+
+      const fetchedStatus = String(fetched?.status || "").toLowerCase();
+      if (fetchedStatus === "failed" || fetchedStatus === "error") {
+        throw {
+          where: "modelslab_fetch_failed",
+          status: fetchedStatus,
+          body_json: fetched,
+        };
+      }
+    }
+  }
+
+  throw {
+    where: "modelslab_image_parse",
+    body_json: first,
+  };
+}
+
+async function postModelsLabJson(url: string, payload: any, where: string) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const raw = await res.text().catch(() => "");
+  console.log(`${where.toUpperCase()} STATUS:`, res.status);
+  console.log(`${where.toUpperCase()} BODY:`, raw.slice(0, 2000));
+
+  let data: any = null;
+  try {
+    data = raw ? JSON.parse(raw) : null;
+  } catch {}
+
+  if (!res.ok) {
+    throw {
+      where,
+      status: res.status,
+      statusText: res.statusText,
+      body_json: data,
+      body_raw: raw.slice(0, 4000),
+    };
+  }
+
+  const status = String(data?.status || "").toLowerCase();
+  if (status === "error" || status === "failed") {
+    throw {
+      where,
+      status: data?.status,
+      message: data?.message || data?.messege || data?.error,
+      body_json: data,
+      body_raw: raw.slice(0, 4000),
+    };
+  }
+
+  return data;
+}
+
+function extractModelsLabImageOutput(data: any): string | null {
+  const candidates = [
+    data?.output?.[0],
+    data?.proxy_links?.[0],
+    data?.future_links?.[0],
+    data?.image,
+    data?.url,
+  ];
+
+  for (const v of candidates) {
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return null;
+}
+
+async function modelslabImageOutputToBase64(output: string): Promise<{ mime: string; b64: string }> {
+  const s = String(output || "").trim();
+
+  // data URL이면 그대로 분리
+  const dataUrlMatch = s.match(/^data:([^;]+);base64,(.+)$/i);
+  if (dataUrlMatch) {
+    return { mime: dataUrlMatch[1] || "image/png", b64: dataUrlMatch[2] || "" };
+  }
+
+  // URL이면 서버에서 받아서 base64로 변환
+  if (/^https?:\/\//i.test(s)) {
+    return await fetchImageUrlAsBase64(s);
+  }
+
+  // 순수 base64로 오는 경우
+  return { mime: "image/png", b64: stripBase64Prefix(s) };
+}
+
+async function fetchImageUrlAsBase64(url: string): Promise<{ mime: string; b64: string }> {
+  const res = await fetch(url, { method: "GET" });
+  if (!res.ok) {
+    throw {
+      where: "modelslab_image_download",
+      status: res.status,
+      statusText: res.statusText,
+      url,
+    };
+  }
+
+  const mime = res.headers.get("content-type")?.split(";")[0]?.trim() || guessImageMimeFromUrl(url) || "image/png";
+  const buf = await res.arrayBuffer();
+  return { mime, b64: arrayBufferToBase64(buf) };
+}
+
+function arrayBufferToBase64(buf: ArrayBuffer) {
+  const bytes = new Uint8Array(buf);
+  const chunkSize = 0x8000;
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+}
+
+function stripBase64Prefix(s: string) {
+  return s.replace(/^data:[^;]+;base64,/i, "").trim();
+}
+
+function guessImageMimeFromUrl(url: string) {
+  const clean = url.split("?")[0].toLowerCase();
+  if (clean.endsWith(".webp")) return "image/webp";
+  if (clean.endsWith(".jpg") || clean.endsWith(".jpeg")) return "image/jpeg";
+  if (clean.endsWith(".png")) return "image/png";
+  return "image/png";
+}
+
+function normalizeModelsLabSize(width: number, height: number) {
+  // ModelsLab 문서 기준 V4 Dreambooth는 메모리 제한 때문에 1024x768 또는 768x1024가 안전함.
+  // 기존 Venice는 1024x1024였지만 fallback 안정성을 위해 세로 roleplay photo 비율로 낮춤.
+  const w = Number(width) || 1024;
+  const h = Number(height) || 1024;
+
+  if (w >= 1024 && h >= 1024) return { width: 768, height: 1024 };
+  if (w > h) return { width: 1024, height: 768 };
+  if (h > w) return { width: 768, height: 1024 };
+  return { width: 768, height: 768 };
+}
+
+function buildModelsLabPrompt(prompt: string) {
+  const p = String(prompt || "").trim();
+  return [
+    p,
+    "adult 18+ subject, photorealistic, realistic skin texture, natural face, high detail, cinematic lighting, sharp focus, professional camera, no text, no watermark",
+  ].filter(Boolean).join(", ");
+}
+
+function buildModelsLabNegativePrompt(negativePrompt: string) {
+  return [
+    negativePrompt || defaultNegativePrompt(),
+    "minor, child, kid, teen, underage, loli, shota, young-looking, baby face, school uniform, forced, non-consensual, rape, gore, dismemberment, celebrity, public figure, real person, deepfake, watermark, text, logo, signature, bad hands, bad fingers, extra limbs, deformed face, distorted eyes, lowres, blurry",
+  ].filter(Boolean).join(", ");
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // ---------------- Text chat: Venice first, DeepSeek fallback ----------------
@@ -1276,4 +1584,3 @@ console.log("VENICE IMAGE BODY:", raw.slice(0, 2000));
 
   return images[0];
 }
-
