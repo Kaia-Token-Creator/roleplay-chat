@@ -473,7 +473,7 @@ async function queueModelsLabVideo(args: {
   const initImage = await ensureModelsLabInitImageUrl(args.apiKey, args.imageDataUrl);
 
   const dims = pickModelsLabVideoDims(args.imageDataUrl);
-  const frames = args.duration === "10s" ? 25 : 16;
+  const frames = 25;
 
   const payload = {
     key: args.apiKey,
