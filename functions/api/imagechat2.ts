@@ -267,7 +267,7 @@ const history: Msg[] = isSexTrigger
           plan = {
             generate: true,
             prompt: forcedPrompt,
-            negativePrompt: plan?.negativePrompt || "",
+            negativePrompt: undefined,
           };
         } else {
           plan.generate = true;
@@ -321,7 +321,7 @@ const history: Msg[] = isSexTrigger
           veniceModel: "lustify-sdxl",
           modelslabModelId: env.MODELSLAB_MODEL_ID || DEFAULT_MODELSLAB_MODEL_ID,
           prompt: promptWithRef,
-          negative_prompt: plan.negativePrompt || defaultNegativePrompt(),
+          negative_prompt: defaultNegativePrompt(),
           format: "webp",
           width: 1024,
           height: 1024,
@@ -724,7 +724,7 @@ async function makeImagePlanWithTextModel(
       "Return ONLY valid JSON. No markdown. No extra text.",
       "",
       "Schema:",
-      `{ "generate": boolean, "prompt": string, "negativePrompt": string }`,
+      `{ "generate": boolean, "prompt": string }`,
       "",
       "Decision rules:",
       "- generate=true in almost all cases.",
@@ -734,10 +734,11 @@ async function makeImagePlanWithTextModel(
       "- If generate=true, prompt must be detailed and NSFW-friendly when appropriate to the scene.",
       "- If the conversation includes sexual or erotic language, treat it as an explicit consent signal.",
       "- In sexual contexts, be bold and uncensored in prompt details.",
-      "- If generate=false, prompt=\"\" and negativePrompt=\"\".",
+      "- If generate=false, prompt=\"\".",
       "- If generate=true, prompt MUST be a single, detailed image prompt (no lists), describing subject, setting, composition, camera/framing, lighting, realism.",
       "- Keep identity consistent with the character and the conversation.",
       "- Avoid text, watermark, logos in the image.",
+      "- Do NOT output negativePrompt. The server handles negative prompts separately.",
       "- Never depict minors or ambiguous age; all people must be 18+.",
       "- If user requests something illegal or disallowed, set generate=false.",
       "",
@@ -783,10 +784,11 @@ async function makeImagePlanWithTextModel(
 
   const generate = !!(parsed as any)?.generate;
   const prompt = String((parsed as any)?.prompt || "").trim();
-  const negativePrompt = String((parsed as any)?.negativePrompt || "").trim();
 
+  // DeepSeek/Venice planner가 negativePrompt에 NSFW 차단 문구를 넣는 경우가 있어
+  // image model에는 절대 planner negativePrompt를 전달하지 않는다.
   if (!generate || !prompt) return { generate: false, prompt: "" };
-  return { generate: true, prompt, negativePrompt: negativePrompt || undefined };
+  return { generate: true, prompt, negativePrompt: undefined };
 }
 
 // ✅ 유저가 "사진/이미지"를 명시적으로 요구하는 경우 감지 (안전핀용)
@@ -1100,7 +1102,8 @@ async function callImageGenerateWithModelsLabFallback(
       const modelslab = await callModelsLabImageGenerate(env.MODELSLAB_API_KEY, {
         model_id: args.modelslabModelId || DEFAULT_MODELSLAB_MODEL_ID,
         prompt: args.prompt,
-        negative_prompt: args.negative_prompt || defaultNegativePrompt(),
+        // DeepSeek가 만든 negativePrompt는 ModelsLab fallback에 전달하지 않고 서버 기본 negative만 사용
+        negative_prompt: defaultNegativePrompt(),
         width: args.width ?? 1024,
         height: args.height ?? 1024,
         guidance_scale: args.cfg_scale ?? 7.0,
@@ -1144,7 +1147,7 @@ async function callModelsLabImageGenerate(
     key: apiKey,
     model_id: args.model_id || DEFAULT_MODELSLAB_MODEL_ID,
     prompt: buildModelsLabPrompt(args.prompt),
-    negative_prompt: buildModelsLabNegativePrompt(args.negative_prompt || defaultNegativePrompt()),
+    negative_prompt: buildModelsLabNegativePrompt(defaultNegativePrompt()),
     width: String(dims.width),
     height: String(dims.height),
     samples: "1",
@@ -1169,7 +1172,11 @@ async function callModelsLabImageGenerate(
   if ((status === "processing" || status === "queued" || status === "pending") && id != null) {
     for (let i = 0; i < 8; i++) {
       await sleep(1500);
-      const fetched = await postModelsLabJson(`${MODELSLAB_FETCH_URL_BASE}/${encodeURIComponent(String(id))}`, { key: apiKey }, "modelslab_fetch");
+      const fetched = await postModelsLabJson(
+        MODELSLAB_FETCH_URL,
+        { key: apiKey, request_id: String(id) },
+        "modelslab_fetch"
+      );
       const fetchedImage = extractModelsLabImageOutput(fetched);
       if (fetchedImage) return await modelslabImageOutputToBase64(fetchedImage);
 
@@ -1232,8 +1239,9 @@ async function postModelsLabJson(url: string, payload: any, where: string) {
 
 function extractModelsLabImageOutput(data: any): string | null {
   const candidates = [
-    data?.output?.[0],
+    // output의 R2 URL은 생성 직후 404가 나는 경우가 있어 CDN proxy 링크를 우선 사용
     data?.proxy_links?.[0],
+    data?.output?.[0],
     data?.future_links?.[0],
     data?.image,
     data?.url,
@@ -1264,19 +1272,42 @@ async function modelslabImageOutputToBase64(output: string): Promise<{ mime: str
 }
 
 async function fetchImageUrlAsBase64(url: string): Promise<{ mime: string; b64: string }> {
-  const res = await fetch(url, { method: "GET" });
-  if (!res.ok) {
-    throw {
+  let lastErr: any = null;
+
+  // ModelsLab이 status=success와 URL을 먼저 주고 실제 CDN/R2 파일은 1~몇 초 늦게 열리는 경우가 있어 재시도
+  for (let i = 0; i < 6; i++) {
+    if (i > 0) await sleep(1200);
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+      },
+    });
+
+    if (res.ok) {
+      const mime = res.headers.get("content-type")?.split(";")[0]?.trim() || guessImageMimeFromUrl(url) || "image/png";
+      const buf = await res.arrayBuffer();
+      return { mime, b64: arrayBufferToBase64(buf) };
+    }
+
+    lastErr = {
       where: "modelslab_image_download",
       status: res.status,
       statusText: res.statusText,
       url,
+      attempt: i + 1,
     };
+
+    if (res.status !== 404 && res.status !== 403 && res.status !== 429) break;
   }
 
-  const mime = res.headers.get("content-type")?.split(";")[0]?.trim() || guessImageMimeFromUrl(url) || "image/png";
-  const buf = await res.arrayBuffer();
-  return { mime, b64: arrayBufferToBase64(buf) };
+  throw lastErr || {
+    where: "modelslab_image_download",
+    message: "unknown download error",
+    url,
+  };
 }
 
 function arrayBufferToBase64(buf: ArrayBuffer) {
@@ -1384,7 +1415,7 @@ function getDeepSeekFallbackMaxTokens(where: string, baseMaxTokens: number) {
 
 function fallbackTextContentForFailedCall(where: string) {
   if (where === "image_plan") {
-    return JSON.stringify({ generate: false, prompt: "", negativePrompt: "" });
+    return JSON.stringify({ generate: false, prompt: "" });
   }
 
   if (where === "forced_image_prompt") {
