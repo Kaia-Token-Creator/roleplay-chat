@@ -64,13 +64,13 @@ function pickDuration(v: any): "5s" | "10s" {
 
 function pickModelsLabVideoSettings(duration: "5s" | "10s") {
   if (duration === "10s") {
-    // ModelsLab Ultra currently rejects num_frames > 120.
-    // fps <= 16 is allowed, so use 12 fps for the long option.
-    // 120 frames / 12 fps = 10 seconds.
+    // ModelsLab Ultra rejects num_frames > 120.
+    // Actual API also requires fps >= 16.
+    // Therefore the longest stable ModelsLab output is 120 / 16 = 7.5 seconds.
     return {
       frames: 120,
-      fps: 12,
-      expectedSeconds: 10,
+      fps: 16,
+      expectedSeconds: 7.5,
     };
   }
 
