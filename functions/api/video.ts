@@ -2,7 +2,7 @@
 // Cloudflare Pages Functions
 //
 // Flow:
-// 1) Try ModelsLab video first.
+// 1) Try ModelsLab WAN 2.7 Image-to-Video first (480p, 5s or 10s).
 // 2) If ModelsLab queue fails, fallback to Venice video.
 // 3) Retrieve supports both ModelsLab queue_id and Venice queue_id.
 // 4) Frontend can keep using the same API shape: { action:"queue" } then { action:"retrieve" }.
@@ -27,17 +27,14 @@ type Provider = "modelslab" | "venice";
 const VENICE_BASE_URL = "https://api.venice.ai/api/v1";
 const VENICE_DEFAULT_VIDEO_MODEL = "wan-2-7-image-to-video";
 
-// ModelsLab docs:
-// Image-to-Video Ultra: POST https://modelslab.com/api/v6/video/img2video_ultra
-// Fetch Video:          POST https://modelslab.com/api/v6/video/fetch/{id}
-// Base64 to URL:        POST https://modelslab.com/api/v6/base64_to_url
-const MODELSLAB_IMG2VIDEO_ULTRA_URL = "https://modelslab.com/api/v6/video/img2video_ultra";
+// ModelsLab WAN 2.7 Image-to-Video (Video Fusion)
+const MODELSLAB_WAN27_I2V_URL = "https://modelslab.com/api/v7/video-fusion/image-to-video";
 const MODELSLAB_FETCH_VIDEO_URL_BASE = "https://modelslab.com/api/v6/video/fetch";
 const MODELSLAB_BASE64_TO_URL = "https://modelslab.com/api/v6/base64_to_url";
 
-// ModelsLab Ultra supports wan2.2 and ltx-2.3.
-// wan2.2 is the default here.
-const MODELSLAB_DEFAULT_VIDEO_MODEL = "wan2.2";
+// Optional Cloudflare env override: MODELSLAB_VIDEO_MODEL_ID
+const MODELSLAB_DEFAULT_VIDEO_MODEL = "wan2.7-i2v";
+const MODELSLAB_DEFAULT_RESOLUTION = "480p";
 
 function cors(origin?: string) {
   return {
@@ -63,22 +60,10 @@ function pickDuration(v: any): "5s" | "10s" {
 }
 
 function pickModelsLabVideoSettings(duration: "5s" | "10s") {
-  if (duration === "10s") {
-    // ModelsLab Ultra rejects num_frames > 120.
-    // Actual API also requires fps >= 16.
-    // Therefore the longest stable ModelsLab output is 120 / 16 = 7.5 seconds.
-    return {
-      frames: 120,
-      fps: 16,
-      expectedSeconds: 7.5,
-    };
-  }
-
-  // 80 frames / 16 fps = 5 seconds.
   return {
-    frames: 80,
-    fps: 16,
-    expectedSeconds: 5,
+    durationSeconds: duration === "10s" ? 10 : 5,
+    resolution: MODELSLAB_DEFAULT_RESOLUTION,
+    expectedSeconds: duration === "10s" ? 10 : 5,
   };
 }
 
@@ -311,14 +296,13 @@ export const onRequestPost: PagesFunction<{
               queue_id: providerQueueId("modelslab", String(modelslabQueued.id)),
               fallback: false,
               duration,
-              fps: modelslabQueued.fps,
-              num_frames: modelslabQueued.num_frames,
+              resolution: modelslabQueued.resolution,
               expected_seconds: modelslabQueued.expected_seconds,
             },
             { status: 200, headers: cors(origin) }
           );
         } catch (modelslabErr) {
-          console.log("ModelsLab video queue failed. Falling back to Venice:", serializeErr(modelslabErr));
+          console.log("ModelsLab WAN 2.7 video queue failed. Falling back to Venice:", serializeErr(modelslabErr));
 
           if (!veniceApiKey) {
             return json(
@@ -475,57 +459,36 @@ async function queueModelsLabVideo(args: {
 }): Promise<{
   id: string | number;
   model_id: string;
-  num_frames: number;
-  fps: number;
+  resolution: string;
   expected_seconds: number;
 }> {
   const initImage = await ensureModelsLabInitImageUrl(args.apiKey, args.imageDataUrl);
 
   const settings = pickModelsLabVideoSettings(args.duration);
-  const fps = settings.fps;
-  const frames = settings.frames;
 
-  console.log("MODELSLAB VIDEO QUEUE SETTINGS:", {
+  console.log("MODELSLAB WAN2.7 VIDEO QUEUE SETTINGS:", {
     duration: args.duration,
+    duration_seconds: settings.durationSeconds,
     model_id: args.model_id,
-    fps,
-    num_frames: frames,
+    resolution: settings.resolution,
     expected_seconds: settings.expectedSeconds,
+    endpoint: MODELSLAB_WAN27_I2V_URL,
   });
 
   const payload = {
     key: args.apiKey,
-    init_image: initImage,
     model_id: args.model_id || MODELSLAB_DEFAULT_VIDEO_MODEL,
-
+    image_url: initImage,
     prompt: buildModelsLabVideoPrompt(args.prompt),
     negative_prompt: buildModelsLabVideoNegativePrompt(),
-
-    // ModelsLab Ultra settings.
-    // Length is controlled by num_frames / fps.
-    // 5s  = 80 / 16 = 5s
-    // 10s = 120 / 12 = 10s
-    resolution: 480,
-    num_frames: frames,
-    num_inference_steps: 25,
-    guidance_scale: 4,
-    fps,
-
-    // Keep square-ish output like the current image chat.
-    // Set true only if your frontend expects 9:16 portrait video.
-    portrait: false,
-
-    sample_shift: 5,
-    base64: false,
-    temp: false,
-    webhook: null,
-    track_id: null,
+    duration: settings.durationSeconds,
+    resolution: settings.resolution,
   };
 
   const data = await postModelsLabJson(
-    MODELSLAB_IMG2VIDEO_ULTRA_URL,
+    MODELSLAB_WAN27_I2V_URL,
     payload,
-    "modelslab_video_img2video_ultra"
+    "modelslab_wan27_image_to_video"
   );
 
   const status = String(data?.status || "").toLowerCase();
@@ -534,7 +497,7 @@ async function queueModelsLabVideo(args: {
     throw {
       where: "modelslab_video_queue_failed",
       body_json: data,
-      message: bestErrMsg(data, "ModelsLab video queue failed"),
+      message: bestErrMsg(data, "ModelsLab WAN 2.7 video queue failed"),
     };
   }
 
@@ -551,8 +514,7 @@ async function queueModelsLabVideo(args: {
   return {
     id,
     model_id: payload.model_id,
-    num_frames: frames,
-    fps,
+    resolution: settings.resolution,
     expected_seconds: settings.expectedSeconds,
   };
 }
@@ -799,9 +761,6 @@ async function ensureModelsLabInitImageUrl(apiKey: string, imageDataUrlOrUrl: st
   const fullDataUrl = String(imageDataUrlOrUrl || "").trim();
   const rawBase64 = stripDataUrlPrefix(fullDataUrl);
 
-  // ModelsLab Ultra init_image is safest as a URL.
-  // So convert data URL to hosted URL first.
-  // Try multiple known ModelsLab base64-to-url variants for account compatibility.
   const attempts = [
     {
       where: "modelslab_base64_to_url_full_dataurl",
