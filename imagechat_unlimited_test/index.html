@@ -2108,7 +2108,7 @@ const startedAt = Date.now();
 // ModelsLab can take much longer than Venice.
 // 5s / 10s options may require several minutes, especially on the standard plan.
 const maxMs = 30 * 60 * 1000; // 30 minutes client-side
-const pollEveryMs = 7000;     // check every 5 seconds
+const pollEveryMs = 7000;     // check every 7 seconds
 let pollCount = 0;
 
 while (Date.now() - startedAt < maxMs){
