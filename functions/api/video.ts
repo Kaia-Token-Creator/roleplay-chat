@@ -476,14 +476,17 @@ async function queueModelsLabVideo(args: {
   });
 
   const payload = {
-    key: args.apiKey,
-    model_id: args.model_id || MODELSLAB_DEFAULT_VIDEO_MODEL,
-    image_url: initImage,
-    prompt: buildModelsLabVideoPrompt(args.prompt),
-    negative_prompt: buildModelsLabVideoNegativePrompt(),
-    duration: settings.durationSeconds,
-    resolution: settings.resolution,
-  };
+  key: args.apiKey,
+  model_id: args.model_id || MODELSLAB_DEFAULT_VIDEO_MODEL,
+
+  init_image: initImage,
+  image_url: initImage,
+
+  prompt: buildModelsLabVideoPrompt(args.prompt),
+  negative_prompt: buildModelsLabVideoNegativePrompt(),
+  duration: settings.durationSeconds,
+  resolution: settings.resolution,
+};
 
   const data = await postModelsLabJson(
     MODELSLAB_WAN27_I2V_URL,
