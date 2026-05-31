@@ -39,12 +39,6 @@ const MODELSLAB_BASE64_TO_URL = "https://modelslab.com/api/v6/base64_to_url";
 // wan2.2 is the default here.
 const MODELSLAB_DEFAULT_VIDEO_MODEL = "wan2.2";
 
-// ModelsLab Ultra supports fps <= 16.
-// Approx video length = num_frames / fps.
-// 5s option  = 80 / 16 = 5 seconds
-// 10s option = 120 / 16 = 7.5 seconds due to ModelsLab num_frames max 120
-const MODELSLAB_VIDEO_FPS = 16;
-
 function cors(origin?: string) {
   return {
     "Access-Control-Allow-Origin": origin || "*",
@@ -68,11 +62,24 @@ function pickDuration(v: any): "5s" | "10s" {
   return v === "10s" ? "10s" : "5s";
 }
 
-function pickModelsLabFrames(duration: "5s" | "10s") {
-  // ModelsLab Ultra currently rejects num_frames > 120.
-  // 5s  = 80 frames / 16 fps = 5s
-  // 10s option is capped at 120 frames / 16 fps = 7.5s
-  return duration === "10s" ? 120 : 80;
+function pickModelsLabVideoSettings(duration: "5s" | "10s") {
+  if (duration === "10s") {
+    // ModelsLab Ultra currently rejects num_frames > 120.
+    // fps <= 16 is allowed, so use 12 fps for the long option.
+    // 120 frames / 12 fps = 10 seconds.
+    return {
+      frames: 120,
+      fps: 12,
+      expectedSeconds: 10,
+    };
+  }
+
+  // 80 frames / 16 fps = 5 seconds.
+  return {
+    frames: 80,
+    fps: 16,
+    expectedSeconds: 5,
+  };
 }
 
 function isDataUrl(s: any): s is string {
@@ -127,24 +134,39 @@ function parseProviderQueueId(model: string, queue_id: string): { provider: Prov
   const m = String(model || "");
 
   if (q.startsWith("modelslab:")) {
-    return { provider: "modelslab", rawId: q.slice("modelslab:".length) };
+    return {
+      provider: "modelslab",
+      rawId: q.slice("modelslab:".length),
+    };
   }
 
   if (q.startsWith("venice:")) {
-    return { provider: "venice", rawId: q.slice("venice:".length) };
+    return {
+      provider: "venice",
+      rawId: q.slice("venice:".length),
+    };
   }
 
   if (m.startsWith("modelslab:")) {
-    return { provider: "modelslab", rawId: q };
+    return {
+      provider: "modelslab",
+      rawId: q,
+    };
   }
 
   if (m.startsWith("venice:")) {
-    return { provider: "venice", rawId: q };
+    return {
+      provider: "venice",
+      rawId: q,
+    };
   }
 
   // Backward compatibility:
   // Old unprefixed Venice queue IDs should still retrieve through Venice.
-  return { provider: "venice", rawId: q };
+  return {
+    provider: "venice",
+    rawId: q,
+  };
 }
 
 function guessVideoMimeFromUrl(url: string) {
@@ -221,6 +243,7 @@ function sleep(ms: number) {
 // OPTIONS preflight
 export const onRequestOptions: PagesFunction = async (ctx) => {
   const origin = ctx.request.headers.get("Origin") || undefined;
+
   return new Response(null, {
     status: 204,
     headers: cors(origin),
@@ -288,7 +311,7 @@ export const onRequestPost: PagesFunction<{
               queue_id: providerQueueId("modelslab", String(modelslabQueued.id)),
               fallback: false,
               duration,
-              fps: MODELSLAB_VIDEO_FPS,
+              fps: modelslabQueued.fps,
               num_frames: modelslabQueued.num_frames,
               expected_seconds: modelslabQueued.expected_seconds,
             },
@@ -458,8 +481,17 @@ async function queueModelsLabVideo(args: {
 }> {
   const initImage = await ensureModelsLabInitImageUrl(args.apiKey, args.imageDataUrl);
 
-  const fps = MODELSLAB_VIDEO_FPS;
-  const frames = pickModelsLabFrames(args.duration);
+  const settings = pickModelsLabVideoSettings(args.duration);
+  const fps = settings.fps;
+  const frames = settings.frames;
+
+  console.log("MODELSLAB VIDEO QUEUE SETTINGS:", {
+    duration: args.duration,
+    model_id: args.model_id,
+    fps,
+    num_frames: frames,
+    expected_seconds: settings.expectedSeconds,
+  });
 
   const payload = {
     key: args.apiKey,
@@ -471,8 +503,8 @@ async function queueModelsLabVideo(args: {
 
     // ModelsLab Ultra settings.
     // Length is controlled by num_frames / fps.
-    // 5s  = 80 / 16
-    // 10s = 160 / 16
+    // 5s  = 80 / 16 = 5s
+    // 10s = 120 / 12 = 10s
     resolution: 480,
     num_frames: frames,
     num_inference_steps: 25,
@@ -521,7 +553,7 @@ async function queueModelsLabVideo(args: {
     model_id: payload.model_id,
     num_frames: frames,
     fps,
-    expected_seconds: frames / fps,
+    expected_seconds: settings.expectedSeconds,
   };
 }
 
