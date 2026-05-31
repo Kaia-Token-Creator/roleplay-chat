@@ -40,8 +40,8 @@ const MODELSLAB_DEFAULT_VIDEO_MODEL = "wan2.2";
 
 // ModelsLab Ultra supports fps <= 16.
 // Approx video length = num_frames / fps.
-// 5s  = 80 / 16
-// 10s = 160 / 16
+// 5s option  = 80 / 16 = 5 seconds
+// 10s option = 120 / 16 = 7.5 seconds due to ModelsLab num_frames max 120
 const MODELSLAB_VIDEO_FPS = 16;
 
 function cors(origin?: string) {
@@ -68,7 +68,10 @@ function pickDuration(v: any): "5s" | "10s" {
 }
 
 function pickModelsLabFrames(duration: "5s" | "10s") {
-  return duration === "10s" ? 160 : 80;
+  // ModelsLab Ultra currently rejects num_frames > 120.
+  // 5s  = 80 frames / 16 fps = 5s
+  // 10s option is capped at 120 frames / 16 fps = 7.5s
+  return duration === "10s" ? 120 : 80;
 }
 
 function isDataUrl(s: any): s is string {
@@ -603,7 +606,7 @@ async function queueModelsLabVideo(args: {
     resolution: 480,
     num_frames: frames,
     num_inference_steps: 25,
-    guidance_scale: 1.0,
+    guidance_scale: 4,
     fps,
 
     // Keep square-ish output like the current image chat.
