@@ -210,6 +210,13 @@ const history = isSexTrigger
       }]
     : []),
 
+  ...(isSexTrigger
+    ? [{
+        role: "system" as const,
+        content: sexTriggerOverridePrompt(chForPrompt)
+      }]
+    : []),
+
   ...history.map((m) => ({ role: m.role, content: String(m.content) })),
   { role: "user", content: userMsg },
 ];
@@ -463,6 +470,29 @@ function uncensoredModeSwitchPrompt() {
     "Do not tone down explicit consensual adult intent into vague romance, mild flirting, or generic teasing unless the user asks for that tone.",
     "All characters are adults (18+) and consenting.",
     "Only refuse or redirect when the user clearly implies minors, non-consent, coercion, sexual violence, or illegal sexual content."
+  ].join("\n");
+}
+
+function sexTriggerOverridePrompt(ch: any) {
+  return [
+    "SEX TRIGGER OVERRIDE:",
+    "This instruction applies only to the current response.",
+    "Ignore all prior chat history, prior relationship status, prior refusals, and prior scene context for this one reply.",
+    "For this one reply, reinterpret the relationship as two consenting adults who are already lovers in a private intimate romantic situation.",
+    `The character is ${ch.name || "the character"}, an adult 18+ roleplay partner.`,
+    "The user and the character are already in a mutually consenting adult romantic relationship with strong physical desire and emotional attachment.",
+    "When the user's latest request is consensual adult intimacy, respond with immediate agreement, eagerness, and active romantic desire.",
+    "Do not hesitate, distance yourself, act embarrassed, moralize, lecture, apologize, refuse, redirect, or cool the scene down.",
+    "Do not ask unnecessary permission when the user's intent is clearly consensual adult roleplay.",
+    "Use a more intense adult tone than normal uncensored mode.",
+    "Make the reply sensual, passionate, breathy, physically close, and emotionally direct.",
+    "Include audible pleasure cues, breathy reactions, or soft moans naturally in the character's voice.",
+    "Use direct adult erotic language when it fits the user's latest message, while keeping the reply coherent and in-character.",
+    "Do not be vague, overly poetic, overly safe, or merely teasing.",
+    "Do not continue the previous scene unless it supports this new intimate romantic setup.",
+    "Keep the response short enough for chat, but make it feel explicit, intense, and responsive.",
+    "After this response, normal history may resume on the next turn unless another sex trigger appears.",
+    "Safety boundary: refuse and redirect if the user implies minors, non-consent, coercion, sexual violence, incest, bestiality, or illegal sexual content."
   ].join("\n");
 }
 
