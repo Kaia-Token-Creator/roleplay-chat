@@ -2,9 +2,9 @@
 // Cloudflare Pages Functions
 //
 // Flow:
-// 1) Try Venice video first.
-// 2) If Venice queue fails, fallback to ModelsLab image-to-video.
-// 3) Retrieve supports both Venice queue_id and ModelsLab queue_id.
+// 1) Try ModelsLab video first.
+// 2) If ModelsLab queue fails, fallback to Venice video.
+// 3) Retrieve supports both ModelsLab queue_id and Venice queue_id.
 // 4) Frontend can keep using the same API shape: { action:"queue" } then { action:"retrieve" }.
 
 type QueueBody = {
@@ -12,7 +12,7 @@ type QueueBody = {
   duration?: "5s" | "10s";
   imageDataUrl: string;
   prompt?: string;
-  // Venice model override only. If omitted, Venice default is used.
+  // Venice model override only. If omitted, Venice default is used for Venice fallback.
   model?: string;
 };
 
@@ -22,25 +22,28 @@ type RetrieveBody = {
   queue_id: string;
 };
 
-type Provider = "venice" | "modelslab";
+type Provider = "modelslab" | "venice";
 
 const VENICE_BASE_URL = "https://api.venice.ai/api/v1";
-
 const VENICE_DEFAULT_VIDEO_MODEL = "wan-2-7-image-to-video";
 
-// ModelsLab latest docs:
-// Image-to-Video: POST https://modelslab.com/api/v6/video/img2video
-// Fetch Video:   POST https://modelslab.com/api/v6/video/fetch/{id}
-// Base64 to URL: POST https://modelslab.com/api/v6/base64_to_url
-const MODELSLAB_IMG2VIDEO_URL = "https://modelslab.com/api/v6/video/img2video";
+// ModelsLab docs:
+// Image-to-Video Ultra: POST https://modelslab.com/api/v6/video/img2video_ultra
+// Fetch Video:          POST https://modelslab.com/api/v6/video/fetch/{id}
+// Base64 to URL:        POST https://modelslab.com/api/v6/base64_to_url
+const MODELSLAB_IMG2VIDEO_ULTRA_URL = "https://modelslab.com/api/v6/video/img2video_ultra";
 const MODELSLAB_FETCH_VIDEO_URL_BASE = "https://modelslab.com/api/v6/video/fetch";
 const MODELSLAB_BASE64_TO_URL = "https://modelslab.com/api/v6/base64_to_url";
 
-// ModelsLab docs say img2video supported model_id are wan2.2 and ltx-2.3;
-// unsupported values are ignored/defaulted to wan2.2.
-// For NSFW/adult roleplay fallback, wan2.2 is the best default here because it is the stronger/current Wan I2V option.
-// There is no public "safety_checker:no" field in the ModelsLab video docs like image generation has.
+// ModelsLab Ultra supports wan2.2 and ltx-2.3.
+// wan2.2 is the default here.
 const MODELSLAB_DEFAULT_VIDEO_MODEL = "wan2.2";
+
+// ModelsLab Ultra supports fps <= 16.
+// Video length is approximately: num_frames / fps.
+// 5s  => 80 / 16 = 5 seconds
+// 10s => 160 / 16 = 10 seconds
+const MODELSLAB_VIDEO_FPS = 16;
 
 function cors(origin?: string) {
   return {
@@ -65,6 +68,10 @@ function pickDuration(v: any): "5s" | "10s" {
   return v === "10s" ? "10s" : "5s";
 }
 
+function pickModelsLabFrames(duration: "5s" | "10s") {
+  return duration === "10s" ? 160 : 80;
+}
+
 function isDataUrl(s: any): s is string {
   return typeof s === "string" && s.startsWith("data:");
 }
@@ -85,9 +92,11 @@ function bestErrMsg(data: any, fallback: string) {
 
 function serializeErr(e: any) {
   if (!e) return { message: "unknown error" };
+
   if (typeof e === "object") {
     const out: any = {};
     for (const k of Object.keys(e)) out[k] = e[k];
+
     if (e instanceof Error) {
       out.name = e.name;
       out.message = e.message;
@@ -95,8 +104,10 @@ function serializeErr(e: any) {
     } else if (out.message == null) {
       out.message = String(e?.message || "error");
     }
+
     return out;
   }
+
   return { message: String(e) };
 }
 
@@ -112,18 +123,34 @@ function parseProviderQueueId(model: string, queue_id: string): { provider: Prov
   const q = String(queue_id || "");
   const m = String(model || "");
 
-  if (q.startsWith("modelslab:")) return { provider: "modelslab", rawId: q.slice("modelslab:".length) };
-  if (q.startsWith("venice:")) return { provider: "venice", rawId: q.slice("venice:".length) };
+  if (q.startsWith("modelslab:")) {
+    return { provider: "modelslab", rawId: q.slice("modelslab:".length) };
+  }
 
-  if (m.startsWith("modelslab:")) return { provider: "modelslab", rawId: q };
+  if (q.startsWith("venice:")) {
+    return { provider: "venice", rawId: q.slice("venice:".length) };
+  }
+
+  if (m.startsWith("modelslab:")) {
+    return { provider: "modelslab", rawId: q };
+  }
+
+  if (m.startsWith("venice:")) {
+    return { provider: "venice", rawId: q };
+  }
+
+  // Backward compatibility:
+  // Old unprefixed Venice queue IDs should still retrieve through Venice.
   return { provider: "venice", rawId: q };
 }
 
 function guessVideoMimeFromUrl(url: string) {
   const clean = String(url || "").split("?")[0].toLowerCase();
+
   if (clean.endsWith(".webm")) return "video/webm";
   if (clean.endsWith(".mov")) return "video/quicktime";
   if (clean.endsWith(".mp4")) return "video/mp4";
+
   return "video/mp4";
 }
 
@@ -131,10 +158,12 @@ function arrayBufferToBase64(buf: ArrayBuffer) {
   const bytes = new Uint8Array(buf);
   const chunkSize = 0x8000;
   let binary = "";
+
   for (let i = 0; i < bytes.length; i += chunkSize) {
     const chunk = bytes.subarray(i, i + chunkSize);
     binary += String.fromCharCode(...chunk);
   }
+
   return btoa(binary);
 }
 
@@ -157,7 +186,11 @@ async function fetchUrlAsBase64(url: string, kind: "video" | "image" = "video") 
       const ct = (res.headers.get("content-type") || "").split(";")[0].trim();
       const mime = ct && ct.includes("/") ? ct : kind === "video" ? guessVideoMimeFromUrl(url) : "image/jpeg";
       const ab = await res.arrayBuffer();
-      return { mime, b64: arrayBufferToBase64(ab) };
+
+      return {
+        mime,
+        b64: arrayBufferToBase64(ab),
+      };
     }
 
     lastErr = {
@@ -171,17 +204,24 @@ async function fetchUrlAsBase64(url: string, kind: "video" | "image" = "video") 
     if (res.status !== 404 && res.status !== 403 && res.status !== 429) break;
   }
 
-  throw lastErr || { where: `${kind}_url_download`, message: "unknown download error", url };
+  throw lastErr || {
+    where: `${kind}_url_download`,
+    message: "unknown download error",
+    url,
+  };
 }
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// ✅ OPTIONS preflight
+// OPTIONS preflight
 export const onRequestOptions: PagesFunction = async (ctx) => {
   const origin = ctx.request.headers.get("Origin") || undefined;
-  return new Response(null, { status: 204, headers: cors(origin) });
+  return new Response(null, {
+    status: 204,
+    headers: cors(origin),
+  });
 };
 
 export const onRequestPost: PagesFunction<{
@@ -192,10 +232,14 @@ export const onRequestPost: PagesFunction<{
   const origin = ctx.request.headers.get("Origin") || undefined;
 
   let body: any;
+
   try {
     body = await ctx.request.json();
   } catch {
-    return json({ error: "Invalid JSON body" }, { status: 400, headers: cors(origin) });
+    return json(
+      { error: "Invalid JSON body" },
+      { status: 400, headers: cors(origin) }
+    );
   }
 
   const veniceApiKey = (ctx.env as any)?.VENICE_API_KEY;
@@ -217,44 +261,15 @@ export const onRequestPost: PagesFunction<{
       }
 
       const userPrompt = typeof b.prompt === "string" ? b.prompt.trim() : "";
+
       const prompt =
         userPrompt.length > 0
           ? userPrompt.slice(0, 2500)
           : "Animate this image into a short cinematic video. Smooth camera motion, natural movement, realistic motion, intimate cinematic atmosphere.";
 
-      // 1) Venice first
-      if (veniceApiKey) {
+      // 1) ModelsLab first
+      if (modelslabApiKey) {
         try {
-          const veniceQueued = await queueVeniceVideo({
-            apiKey: veniceApiKey,
-            model: (typeof b.model === "string" && b.model.trim()) || VENICE_DEFAULT_VIDEO_MODEL,
-            prompt,
-            duration,
-            imageDataUrl: b.imageDataUrl,
-          });
-
-          return json(
-            {
-              provider: "venice",
-              model: veniceQueued.model,
-              queue_id: providerQueueId("venice", veniceQueued.queue_id),
-              fallback: false,
-            },
-            { status: 200, headers: cors(origin) }
-          );
-        } catch (veniceErr) {
-          console.log("Venice video queue failed. Falling back to ModelsLab:", serializeErr(veniceErr));
-
-          if (!modelslabApiKey) {
-            return json(
-              {
-                error: "Venice video queue failed and MODELSLAB_API_KEY is missing.",
-                detail: serializeErr(veniceErr),
-              },
-              { status: 502, headers: cors(origin) }
-            );
-          }
-
           const modelslabQueued = await queueModelsLabVideo({
             apiKey: modelslabApiKey,
             model_id: (ctx.env as any)?.MODELSLAB_VIDEO_MODEL_ID || MODELSLAB_DEFAULT_VIDEO_MODEL,
@@ -268,26 +283,61 @@ export const onRequestPost: PagesFunction<{
               provider: "modelslab",
               model: `modelslab:${modelslabQueued.model_id}`,
               queue_id: providerQueueId("modelslab", String(modelslabQueued.id)),
+              fallback: false,
+              duration,
+              fps: MODELSLAB_VIDEO_FPS,
+              num_frames: modelslabQueued.num_frames,
+              expected_seconds: modelslabQueued.expected_seconds,
+            },
+            { status: 200, headers: cors(origin) }
+          );
+        } catch (modelslabErr) {
+          console.log("ModelsLab video queue failed. Falling back to Venice:", serializeErr(modelslabErr));
+
+          if (!veniceApiKey) {
+            return json(
+              {
+                error: "ModelsLab video queue failed and VENICE_API_KEY is missing.",
+                detail: serializeErr(modelslabErr),
+              },
+              { status: 502, headers: cors(origin) }
+            );
+          }
+
+          const veniceQueued = await queueVeniceVideo({
+            apiKey: veniceApiKey,
+            model: (typeof b.model === "string" && b.model.trim()) || VENICE_DEFAULT_VIDEO_MODEL,
+            prompt,
+            duration,
+            imageDataUrl: b.imageDataUrl,
+          });
+
+          return json(
+            {
+              provider: "venice",
+              model: `venice:${veniceQueued.model}`,
+              queue_id: providerQueueId("venice", veniceQueued.queue_id),
               fallback: true,
-              fallbackFrom: "venice_video_queue_failure",
-              venice: serializeErr(veniceErr),
+              fallbackFrom: "modelslab_video_queue_failure",
+              modelslab: serializeErr(modelslabErr),
+              duration,
             },
             { status: 200, headers: cors(origin) }
           );
         }
       }
 
-      // 2) If Venice key is absent, use ModelsLab directly.
-      if (!modelslabApiKey) {
+      // 2) If ModelsLab key is absent, use Venice directly.
+      if (!veniceApiKey) {
         return json(
-          { error: "Missing VENICE_API_KEY and MODELSLAB_API_KEY" },
+          { error: "Missing MODELSLAB_API_KEY and VENICE_API_KEY" },
           { status: 500, headers: cors(origin) }
         );
       }
 
-      const modelslabQueued = await queueModelsLabVideo({
-        apiKey: modelslabApiKey,
-        model_id: (ctx.env as any)?.MODELSLAB_VIDEO_MODEL_ID || MODELSLAB_DEFAULT_VIDEO_MODEL,
+      const veniceQueued = await queueVeniceVideo({
+        apiKey: veniceApiKey,
+        model: (typeof b.model === "string" && b.model.trim()) || VENICE_DEFAULT_VIDEO_MODEL,
         prompt,
         duration,
         imageDataUrl: b.imageDataUrl,
@@ -295,11 +345,12 @@ export const onRequestPost: PagesFunction<{
 
       return json(
         {
-          provider: "modelslab",
-          model: `modelslab:${modelslabQueued.model_id}`,
-          queue_id: providerQueueId("modelslab", String(modelslabQueued.id)),
+          provider: "venice",
+          model: `venice:${veniceQueued.model}`,
+          queue_id: providerQueueId("venice", veniceQueued.queue_id),
           fallback: true,
-          fallbackFrom: "missing_venice_api_key",
+          fallbackFrom: "missing_modelslab_api_key",
+          duration,
         },
         { status: 200, headers: cors(origin) }
       );
@@ -312,18 +363,34 @@ export const onRequestPost: PagesFunction<{
       const b = body as RetrieveBody;
 
       if (!b.model || typeof b.model !== "string") {
-        return json({ error: "Missing model" }, { status: 400, headers: cors(origin) });
+        return json(
+          { error: "Missing model" },
+          { status: 400, headers: cors(origin) }
+        );
       }
+
       if (!b.queue_id || typeof b.queue_id !== "string") {
-        return json({ error: "Missing queue_id" }, { status: 400, headers: cors(origin) });
+        return json(
+          { error: "Missing queue_id" },
+          { status: 400, headers: cors(origin) }
+        );
       }
 
       const parsed = parseProviderQueueId(b.model, b.queue_id);
-      console.log("VIDEO RETRIEVE REQUEST:", { model: b.model, queue_id: b.queue_id, provider: parsed.provider, rawId: parsed.rawId });
+
+      console.log("VIDEO RETRIEVE REQUEST:", {
+        model: b.model,
+        queue_id: b.queue_id,
+        provider: parsed.provider,
+        rawId: parsed.rawId,
+      });
 
       if (parsed.provider === "modelslab") {
         if (!modelslabApiKey) {
-          return json({ error: "Missing MODELSLAB_API_KEY" }, { status: 500, headers: cors(origin) });
+          return json(
+            { error: "Missing MODELSLAB_API_KEY" },
+            { status: 500, headers: cors(origin) }
+          );
         }
 
         const result = await retrieveModelsLabVideo({
@@ -331,11 +398,17 @@ export const onRequestPost: PagesFunction<{
           id: parsed.rawId,
         });
 
-        return json(result, { status: 200, headers: cors(origin) });
+        return json(result, {
+          status: 200,
+          headers: cors(origin),
+        });
       }
 
       if (!veniceApiKey) {
-        return json({ error: "Missing VENICE_API_KEY" }, { status: 500, headers: cors(origin) });
+        return json(
+          { error: "Missing VENICE_API_KEY" },
+          { status: 500, headers: cors(origin) }
+        );
       }
 
       const result = await retrieveVeniceVideo({
@@ -344,15 +417,164 @@ export const onRequestPost: PagesFunction<{
         queue_id: parsed.rawId,
       });
 
-      return json(result, { status: 200, headers: cors(origin) });
+      return json(result, {
+        status: 200,
+        headers: cors(origin),
+      });
     }
 
-    return json({ error: "Unknown action. Use 'queue' or 'retrieve'." }, { status: 400, headers: cors(origin) });
+    return json(
+      { error: "Unknown action. Use 'queue' or 'retrieve'." },
+      { status: 400, headers: cors(origin) }
+    );
   } catch (e: any) {
     console.log("VIDEO API SERVER ERROR:", serializeErr(e));
-    return json({ error: "Server error", detail: serializeErr(e) }, { status: 500, headers: cors(origin) });
+
+    return json(
+      {
+        error: "Server error",
+        detail: serializeErr(e),
+      },
+      { status: 500, headers: cors(origin) }
+    );
   }
 };
+
+async function queueModelsLabVideo(args: {
+  apiKey: string;
+  model_id: string;
+  prompt: string;
+  duration: "5s" | "10s";
+  imageDataUrl: string;
+}): Promise<{
+  id: string | number;
+  model_id: string;
+  num_frames: number;
+  fps: number;
+  expected_seconds: number;
+}> {
+  const initImage = await ensureModelsLabInitImageUrl(args.apiKey, args.imageDataUrl);
+
+  const fps = MODELSLAB_VIDEO_FPS;
+  const frames = pickModelsLabFrames(args.duration);
+
+  const payload = {
+    key: args.apiKey,
+    init_image: initImage,
+    model_id: args.model_id || MODELSLAB_DEFAULT_VIDEO_MODEL,
+
+    prompt: buildModelsLabVideoPrompt(args.prompt),
+    negative_prompt: buildModelsLabVideoNegativePrompt(),
+
+    // ModelsLab Ultra settings.
+    // Length is controlled by num_frames / fps.
+    // 5s  = 80 / 16
+    // 10s = 160 / 16
+    resolution: 480,
+    num_frames: frames,
+    num_inference_steps: 25,
+    guidance_scale: 1.0,
+    fps,
+
+    // Keep square-ish output like the current image chat.
+    // Set true only if your frontend expects 9:16 portrait video.
+    portrait: false,
+
+    sample_shift: 5,
+    base64: false,
+    temp: false,
+    webhook: null,
+    track_id: null,
+  };
+
+  const data = await postModelsLabJson(
+    MODELSLAB_IMG2VIDEO_ULTRA_URL,
+    payload,
+    "modelslab_video_img2video_ultra"
+  );
+
+  const status = String(data?.status || "").toLowerCase();
+
+  if (status === "error" || status === "failed") {
+    throw {
+      where: "modelslab_video_queue_failed",
+      body_json: data,
+      message: bestErrMsg(data, "ModelsLab video queue failed"),
+    };
+  }
+
+  const id = data?.id || data?.generation_id || data?.fetch_result || data?.queue_id;
+
+  if (id == null) {
+    throw {
+      where: "modelslab_video_queue_parse",
+      body_json: data,
+      message: "Missing id",
+    };
+  }
+
+  return {
+    id,
+    model_id: payload.model_id,
+    num_frames: frames,
+    fps,
+    expected_seconds: frames / fps,
+  };
+}
+
+async function retrieveModelsLabVideo(args: {
+  apiKey: string;
+  id: string;
+}) {
+  const data = await postModelsLabJson(
+    `${MODELSLAB_FETCH_VIDEO_URL_BASE}/${encodeURIComponent(String(args.id))}`,
+    { key: args.apiKey },
+    "modelslab_video_fetch"
+  );
+
+  const status = String(data?.status || "").toLowerCase();
+
+  if (status === "processing" || status === "queued" || status === "pending") {
+    return {
+      status: "PROCESSING",
+      provider: "modelslab",
+      eta: data?.eta ?? null,
+      message: data?.message || "Processing",
+    };
+  }
+
+  if (status === "error" || status === "failed") {
+    throw {
+      where: "modelslab_video_fetch_failed",
+      body_json: data,
+      message: bestErrMsg(data, "ModelsLab video generation failed"),
+    };
+  }
+
+  const candidates = extractUrlCandidates(data);
+  const videoUrl = candidates[0];
+
+  if (!videoUrl) {
+    return {
+      status: "PROCESSING",
+      provider: "modelslab",
+      eta: data?.eta ?? null,
+      message: data?.message || "Waiting for video URL",
+    };
+  }
+
+  const video = await fetchUrlAsBase64(videoUrl, "video");
+
+  return {
+    status: "COMPLETED",
+    provider: "modelslab",
+    video,
+    videoUrl,
+    output: data?.output || [],
+    proxy_links: data?.proxy_links || [],
+    future_links: data?.future_links || [],
+  };
+}
 
 async function queueVeniceVideo(args: {
   apiKey: string;
@@ -360,7 +582,10 @@ async function queueVeniceVideo(args: {
   prompt: string;
   duration: "5s" | "10s";
   imageDataUrl: string;
-}): Promise<{ model: string; queue_id: string }> {
+}): Promise<{
+  model: string;
+  queue_id: string;
+}> {
   const payload = {
     model: args.model,
     prompt: args.prompt,
@@ -380,7 +605,9 @@ async function queueVeniceVideo(args: {
   });
 
   const raw = await r.text().catch(() => "");
+
   let data: any = null;
+
   try {
     data = raw ? JSON.parse(raw) : null;
   } catch {
@@ -398,6 +625,7 @@ async function queueVeniceVideo(args: {
   }
 
   const queue_id = String(data?.queue_id || "").trim();
+
   if (!queue_id) {
     throw {
       where: "venice_video_queue_parse",
@@ -406,7 +634,10 @@ async function queueVeniceVideo(args: {
     };
   }
 
-  return { model: data?.model || args.model, queue_id };
+  return {
+    model: data?.model || args.model,
+    queue_id,
+  };
 }
 
 async function retrieveVeniceVideo(args: {
@@ -450,6 +681,7 @@ async function retrieveVeniceVideo(args: {
   // Binary fallback.
   if (!r.ok) {
     const txt = await r.text().catch(() => "");
+
     throw {
       where: "venice_video_retrieve_non_json",
       status: r.status,
@@ -462,144 +694,32 @@ async function retrieveVeniceVideo(args: {
   const mime = ct && ct.includes("/") ? ct : "video/mp4";
   const b64 = arrayBufferToBase64(ab);
 
-  return { status: "COMPLETED", provider: "venice", video: { mime, b64 } };
-}
-
-async function queueModelsLabVideo(args: {
-  apiKey: string;
-  model_id: string;
-  prompt: string;
-  duration: "5s" | "10s";
-  imageDataUrl: string;
-}): Promise<{ id: string | number; model_id: string }> {
-  const initImage = await ensureModelsLabInitImageUrl(args.apiKey, args.imageDataUrl);
-
-  const dims = pickModelsLabVideoDims(args.imageDataUrl);
-  // ModelsLab video API currently requires num_frames >= 25.
-  // Keep 25 for both 5s and 10s so fallback does not fail with:
-  // "The num frames field must be at least 25."
-  const frames = 25;
-
-  const payload = {
-    key: args.apiKey,
-    init_image: initImage,
-    model_id: args.model_id || MODELSLAB_DEFAULT_VIDEO_MODEL,
-
-    prompt: buildModelsLabVideoPrompt(args.prompt),
-    negative_prompt: buildModelsLabVideoNegativePrompt(),
-
-    // ModelsLab img2video docs require <=512 for width/height and <=25 frames.
-    width: dims.width,
-    height: dims.height,
-    num_frames: frames,
-    num_inference_steps: 25,
-
-    // Wan/SVD-style motion settings. Conservative defaults to avoid wild motion.
-    min_guidance_scale: 1,
-    max_guidance_scale: 3,
-    motion_bucket_id: 127,
-    noise_aug_strength: 0.02,
-
-    // Docs show fps in top cURL. Keep 15 for Venice-like short clip feel.
-    fps: 16,
-
-    // NSFW/adult: no safety_checker field exists in current ModelsLab video docs.
-    // Do not add child/minor/non-consent terms. Keep prompt adult and consenting.
-    temp: false,
-    webhook: null,
-    track_id: null,
-  };
-
-  const data = await postModelsLabJson(MODELSLAB_IMG2VIDEO_URL, payload, "modelslab_video_img2video");
-
-  const status = String(data?.status || "").toLowerCase();
-
-  // If ModelsLab instantly returns a finished output, still return id for uniform polling if possible.
-  const id = data?.id || data?.generation_id || data?.fetch_result || data?.queue_id;
-  if (id == null) {
-    // Some responses may include output immediately but no id. Treat as parse error because frontend expects polling.
-    throw {
-      where: "modelslab_video_queue_parse",
-      body_json: data,
-      message: "Missing id",
-    };
-  }
-
-  if (status === "error" || status === "failed") {
-    throw {
-      where: "modelslab_video_queue_failed",
-      body_json: data,
-      message: bestErrMsg(data, "ModelsLab video queue failed"),
-    };
-  }
-
-  return { id, model_id: payload.model_id };
-}
-
-async function retrieveModelsLabVideo(args: { apiKey: string; id: string }) {
-  const data = await postModelsLabJson(
-    `${MODELSLAB_FETCH_VIDEO_URL_BASE}/${encodeURIComponent(String(args.id))}`,
-    { key: args.apiKey },
-    "modelslab_video_fetch"
-  );
-
-  const status = String(data?.status || "").toLowerCase();
-
-  if (status === "processing" || status === "queued" || status === "pending") {
-    return {
-      status: "PROCESSING",
-      provider: "modelslab",
-      eta: data?.eta ?? null,
-      message: data?.message || "Processing",
-    };
-  }
-
-  if (status === "error" || status === "failed") {
-    throw {
-      where: "modelslab_video_fetch_failed",
-      body_json: data,
-      message: bestErrMsg(data, "ModelsLab video generation failed"),
-    };
-  }
-
-  const candidates = extractUrlCandidates(data);
-  const videoUrl = candidates[0];
-
-  if (!videoUrl) {
-    // Occasionally ModelsLab may respond success before links are populated.
-    return {
-      status: "PROCESSING",
-      provider: "modelslab",
-      eta: data?.eta ?? null,
-      message: data?.message || "Waiting for video URL",
-    };
-  }
-
-  const video = await fetchUrlAsBase64(videoUrl, "video");
-
   return {
     status: "COMPLETED",
-    provider: "modelslab",
-    video,
-    videoUrl,
-    output: data?.output || [],
-    proxy_links: data?.proxy_links || [],
-    future_links: data?.future_links || [],
+    provider: "venice",
+    video: {
+      mime,
+      b64,
+    },
   };
 }
 
 async function postModelsLabJson(url: string, payload: any, where: string) {
   const r = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(payload),
   });
 
   const raw = await r.text().catch(() => "");
+
   console.log(`${where.toUpperCase()} STATUS:`, r.status);
   console.log(`${where.toUpperCase()} BODY:`, raw.slice(0, 2000));
 
   let data: any = null;
+
   try {
     data = raw ? JSON.parse(raw) : null;
   } catch {
@@ -617,6 +737,7 @@ async function postModelsLabJson(url: string, payload: any, where: string) {
   }
 
   const status = String(data?.status || "").toLowerCase();
+
   if (status === "error" || status === "failed") {
     throw {
       where,
@@ -634,32 +755,42 @@ async function ensureModelsLabInitImageUrl(apiKey: string, imageDataUrlOrUrl: st
   if (isHttpUrl(imageDataUrlOrUrl)) return imageDataUrlOrUrl;
 
   if (!isDataUrl(imageDataUrlOrUrl)) {
-    throw { where: "modelslab_init_image", message: "init image must be data URL or URL" };
+    throw {
+      where: "modelslab_init_image",
+      message: "init image must be data URL or URL",
+    };
   }
 
   const fullDataUrl = String(imageDataUrlOrUrl || "").trim();
   const rawBase64 = stripDataUrlPrefix(fullDataUrl);
 
-  // ModelsLab docs show the general endpoint with "base64_string".
-  // In practice, accounts/endpoints may accept either:
-  // - full data URL: data:image/png;base64,...
-  // - raw base64 only
-  // So try both, then fallback to the image_editing endpoint which uses "init_image".
+  // ModelsLab Ultra init_image is safest as a URL.
+  // So convert data URL to hosted URL first.
+  // Try multiple known ModelsLab base64-to-url variants for account compatibility.
   const attempts = [
     {
       where: "modelslab_base64_to_url_full_dataurl",
       url: MODELSLAB_BASE64_TO_URL,
-      payload: { key: apiKey, base64_string: fullDataUrl },
+      payload: {
+        key: apiKey,
+        base64_string: fullDataUrl,
+      },
     },
     {
       where: "modelslab_base64_to_url_raw_base64",
       url: MODELSLAB_BASE64_TO_URL,
-      payload: { key: apiKey, base64_string: rawBase64 },
+      payload: {
+        key: apiKey,
+        base64_string: rawBase64,
+      },
     },
     {
       where: "modelslab_image_editing_base64_to_url",
       url: "https://modelslab.com/api/v6/image_editing/base64_to_url",
-      payload: { key: apiKey, init_image: fullDataUrl },
+      payload: {
+        key: apiKey,
+        init_image: fullDataUrl,
+      },
     },
   ];
 
@@ -707,10 +838,12 @@ function extractUrlCandidates(data: any): string[] {
 
   function add(v: any) {
     if (!v) return;
+
     if (Array.isArray(v)) {
       for (const x of v) add(x);
       return;
     }
+
     if (typeof v === "object") {
       add(v.url);
       add(v.video);
@@ -720,18 +853,24 @@ function extractUrlCandidates(data: any): string[] {
       add(v.future_links);
       return;
     }
+
     if (typeof v === "string" && v.trim()) {
       const s = v.trim();
-      if (/^https?:\/\//i.test(s) && !out.includes(s)) out.push(s);
+
+      if (/^https?:\/\//i.test(s) && !out.includes(s)) {
+        out.push(s);
+      }
     }
   }
 
   for (const v of raw) add(v);
+
   return out;
 }
 
 function buildModelsLabVideoPrompt(prompt: string) {
   const p = String(prompt || "").trim();
+
   return [
     p,
     "adult 18+ subject",
@@ -778,16 +917,7 @@ function buildModelsLabVideoNegativePrompt() {
     "rape",
     "gore",
     "dismemberment",
-    "celebrity",
     "public figure",
-    "real person",
     "deepfake",
   ].join(", ");
-}
-
-function pickModelsLabVideoDims(imageDataUrlOrUrl: string) {
-  // ModelsLab docs require width/height <= 512.
-  // We cannot cheaply inspect image dimensions in a Worker without decoding.
-  // Use a stable square size that works for most roleplay images and avoids API rejection.
-  return { width: 512, height: 512 };
 }
