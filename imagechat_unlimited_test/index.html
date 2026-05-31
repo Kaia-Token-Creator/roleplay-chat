@@ -2114,7 +2114,7 @@ while (Date.now() - startedAt < maxMs){
   await new Promise(r => setTimeout(r, pollEveryMs));
   pollCount += 1;
 
-  if (pollCount === 1 || pollCount % 6 === 0){
+  if (pollCount === 1 || pollCount % 15 === 0){
     appendMsg(
       "assistant",
       `Still recording... Please keep this page open.\nElapsed: ${Math.round((Date.now() - startedAt) / 1000)}s`,
