@@ -2102,13 +2102,28 @@ if (!qRes.ok){
     throw new Error("Queue failed: missing model/queue_id");
   }
 
-  // 2) poll retrieve
-  const startedAt = Date.now();
-  const maxMs = 6 * 60 * 1000; // 6 minutes client-side
-  const pollEveryMs = 2500;
+// 2) poll retrieve
+const startedAt = Date.now();
 
-  while (Date.now() - startedAt < maxMs){
-    await new Promise(r => setTimeout(r, pollEveryMs));
+// ModelsLab can take much longer than Venice.
+// 5s / 10s options may require several minutes, especially on the standard plan.
+const maxMs = 15 * 60 * 1000; // 15 minutes client-side
+const pollEveryMs = 5000;     // check every 5 seconds
+let pollCount = 0;
+
+while (Date.now() - startedAt < maxMs){
+  await new Promise(r => setTimeout(r, pollEveryMs));
+  pollCount += 1;
+
+  if (pollCount === 1 || pollCount % 6 === 0){
+    appendMsg(
+      "assistant",
+      `Still recording... Please keep this page open.\nElapsed: ${Math.round((Date.now() - startedAt) / 1000)}s`,
+      undefined,
+      undefined,
+      { persist: false, italic: true }
+    );
+  }
 
     const rRes = await fetch("/api/video", {
   method: "POST",
@@ -2127,10 +2142,16 @@ if (!rRes.ok){
   throw (rData || { error: `HTTP ${rRes.status}` });
 }
 
-    if (rData && rData.status === "PROCESSING"){
-      // keep waiting
-      continue;
-    }
+    const rStatus = String(rData?.status || "").toUpperCase();
+
+if (
+  rStatus === "PROCESSING" ||
+  rStatus === "PENDING" ||
+  rStatus === "QUEUED" ||
+  rData?.message === "Try Again"
+){
+  continue;
+}
 
     if (rData && rData.status === "COMPLETED" && rData.video && rData.video.b64 && rData.video.mime){
 
