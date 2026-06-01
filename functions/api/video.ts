@@ -2,8 +2,8 @@
 // Cloudflare Pages Functions
 //
 // Flow:
-// 1) Try ModelsLab video first.
-// 2) If ModelsLab queue fails, fallback to Venice video.
+// 1) Try Venice video first.
+// 2) If Venice queue fails, fallback to ModelsLab video.
 // 3) Retrieve supports both ModelsLab queue_id and Venice queue_id.
 // 4) Frontend can keep using the same API shape: { action:"queue" } then { action:"retrieve" }.
 
@@ -12,7 +12,7 @@ type QueueBody = {
   duration?: "5s" | "10s";
   imageDataUrl: string;
   prompt?: string;
-  // Venice model override only. If omitted, Venice default is used for Venice fallback.
+  // Venice model override only. If omitted, Venice default is used.
   model?: string;
 };
 
@@ -293,43 +293,9 @@ export const onRequestPost: PagesFunction<{
           ? userPrompt.slice(0, 2500)
           : "Animate this image into a short cinematic video. Smooth camera motion, natural movement, realistic motion, intimate cinematic atmosphere.";
 
-      // 1) ModelsLab first
-      if (modelslabApiKey) {
+      // 1) Venice first
+      if (veniceApiKey) {
         try {
-          const modelslabQueued = await queueModelsLabVideo({
-            apiKey: modelslabApiKey,
-            model_id: (ctx.env as any)?.MODELSLAB_VIDEO_MODEL_ID || MODELSLAB_DEFAULT_VIDEO_MODEL,
-            prompt,
-            duration,
-            imageDataUrl: b.imageDataUrl,
-          });
-
-          return json(
-            {
-              provider: "modelslab",
-              model: `modelslab:${modelslabQueued.model_id}`,
-              queue_id: providerQueueId("modelslab", String(modelslabQueued.id)),
-              fallback: false,
-              duration,
-              fps: modelslabQueued.fps,
-              num_frames: modelslabQueued.num_frames,
-              expected_seconds: modelslabQueued.expected_seconds,
-            },
-            { status: 200, headers: cors(origin) }
-          );
-        } catch (modelslabErr) {
-          console.log("ModelsLab video queue failed. Falling back to Venice:", serializeErr(modelslabErr));
-
-          if (!veniceApiKey) {
-            return json(
-              {
-                error: "ModelsLab video queue failed and VENICE_API_KEY is missing.",
-                detail: serializeErr(modelslabErr),
-              },
-              { status: 502, headers: cors(origin) }
-            );
-          }
-
           const veniceQueued = await queueVeniceVideo({
             apiKey: veniceApiKey,
             model: (typeof b.model === "string" && b.model.trim()) || VENICE_DEFAULT_VIDEO_MODEL,
@@ -343,27 +309,61 @@ export const onRequestPost: PagesFunction<{
               provider: "venice",
               model: `venice:${veniceQueued.model}`,
               queue_id: providerQueueId("venice", veniceQueued.queue_id),
-              fallback: true,
-              fallbackFrom: "modelslab_video_queue_failure",
-              modelslab: serializeErr(modelslabErr),
+              fallback: false,
               duration,
+            },
+            { status: 200, headers: cors(origin) }
+          );
+        } catch (veniceErr) {
+          console.log("Venice video queue failed. Falling back to ModelsLab:", serializeErr(veniceErr));
+
+          if (!modelslabApiKey) {
+            return json(
+              {
+                error: "Venice video queue failed and MODELSLAB_API_KEY is missing.",
+                detail: serializeErr(veniceErr),
+              },
+              { status: 502, headers: cors(origin) }
+            );
+          }
+
+          const modelslabQueued = await queueModelsLabVideo({
+            apiKey: modelslabApiKey,
+            model_id: (ctx.env as any)?.MODELSLAB_VIDEO_MODEL_ID || MODELSLAB_DEFAULT_VIDEO_MODEL,
+            prompt,
+            duration,
+            imageDataUrl: b.imageDataUrl,
+          });
+
+          return json(
+            {
+              provider: "modelslab",
+              model: `modelslab:${modelslabQueued.model_id}`,
+              queue_id: providerQueueId("modelslab", String(modelslabQueued.id)),
+              fallback: true,
+              fallbackFrom: "venice_video_queue_failure",
+              venice: serializeErr(veniceErr),
+              duration,
+              fps: modelslabQueued.fps,
+              num_frames: modelslabQueued.num_frames,
+              expected_seconds: modelslabQueued.expected_seconds,
             },
             { status: 200, headers: cors(origin) }
           );
         }
       }
 
-      // 2) If ModelsLab key is absent, use Venice directly.
-      if (!veniceApiKey) {
+      // 2) If Venice key is absent, use ModelsLab directly.
+      if (!modelslabApiKey) {
         return json(
-          { error: "Missing MODELSLAB_API_KEY and VENICE_API_KEY" },
+          { error: "Missing VENICE_API_KEY and MODELSLAB_API_KEY" },
           { status: 500, headers: cors(origin) }
         );
       }
 
-      const veniceQueued = await queueVeniceVideo({
-        apiKey: veniceApiKey,
-        model: (typeof b.model === "string" && b.model.trim()) || VENICE_DEFAULT_VIDEO_MODEL,
+      const modelslabQueued = await queueModelsLabVideo({
+        apiKey: modelslabApiKey,
+        model_id: (ctx.env as any)?.MODELSLAB_VIDEO_MODEL_ID || MODELSLAB_DEFAULT_VIDEO_MODEL,
         prompt,
         duration,
         imageDataUrl: b.imageDataUrl,
@@ -371,12 +371,15 @@ export const onRequestPost: PagesFunction<{
 
       return json(
         {
-          provider: "venice",
-          model: `venice:${veniceQueued.model}`,
-          queue_id: providerQueueId("venice", veniceQueued.queue_id),
+          provider: "modelslab",
+          model: `modelslab:${modelslabQueued.model_id}`,
+          queue_id: providerQueueId("modelslab", String(modelslabQueued.id)),
           fallback: true,
-          fallbackFrom: "missing_modelslab_api_key",
+          fallbackFrom: "missing_venice_api_key",
           duration,
+          fps: modelslabQueued.fps,
+          num_frames: modelslabQueued.num_frames,
+          expected_seconds: modelslabQueued.expected_seconds,
         },
         { status: 200, headers: cors(origin) }
       );
