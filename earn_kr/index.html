@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="ko">
+<head>
+
+   <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4VRNKXVX3J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-4VRNKXVX3J');
+</script>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17946940858"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-17946940858');
+</script>
+  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>수익 창출 | roleplay-chat.com</title>
+  <meta name="description" content="roleplay-chat.com을 홍보하고 PayPal 리워드를 받아보세요. 조회수 기반 리워드 또는 승인된 Reddit 리뷰 게시물당 $2 리워드 중 선택할 수 있습니다." />
+  <meta name="theme-color" content="#000000" />
+   <!-- Open Graph / Social Preview -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://roleplay-chat.com/earn" />
+<meta property="og:title" content="수익 창출 | roleplay-chat.com" />
+<meta property="og:description" content="roleplay-chat.com을 홍보하고 PayPal 리워드를 받아보세요. 조회수 기반 리워드 또는 승인된 Reddit 리뷰 게시물당 $2 리워드 중 선택할 수 있습니다." />
+<meta property="og:image" content="https://roleplay-chat.com/og-image.jpg" />
+
+<!-- Twitter / X Preview -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content="https://roleplay-chat.com/earn" />
+<meta name="twitter:title" content="수익 창출 | roleplay-chat.com" />
+<meta name="twitter:description" content="roleplay-chat.com을 홍보하고 PayPal 리워드를 받아보세요. 조회수 기반 리워드 또는 승인된 Reddit 리뷰 게시물당 $2 리워드 중 선택할 수 있습니다." />
+<meta name="twitter:image" content="https://roleplay-chat.com/og-image.jpg" />
+
+  <!-- Fonts (same as main) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --yellow:#ffcc00;
+      --pink:#ff5fb8;
+      --blue:#2AABEE;
+      --green:#42d392;
+      --muted:rgba(255,255,255,.75);
+      --muted2:rgba(255,255,255,.55);
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.09);
+      --border:rgba(255,255,255,.14);
+      --border2:rgba(255,204,0,.35);
+      --shadow: 0 14px 36px rgba(0,0,0,.55);
+      --glow: 0 0 30px rgba(255,204,0,.18);
+      --radius2: 22px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ min-height:100%; margin:0; }
+
+    body{
+      background:
+        radial-gradient(900px 600px at 10% 0%, rgba(255,204,0,.09), transparent 56%),
+        radial-gradient(850px 540px at 90% 8%, rgba(255,95,184,.10), transparent 58%),
+        radial-gradient(700px 500px at 50% 110%, rgba(42,171,238,.08), transparent 60%),
+        var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+    }
+
+    a{ color:inherit; }
+
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding: 18px 14px 34px;
+    }
+
+    .shell{
+      width: min(860px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 4px 6px 0;
+      gap: 12px;
+    }
+
+    .logo{
+      text-decoration: none;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: clamp(16px, 3.6vw, 24px);
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      user-select:none;
+      white-space: nowrap;
+    }
+
+    .logoRole{ color: #ffcc00; }
+    .logoDot{
+      color: rgba(255,255,255,.95);
+      font-size: 0.5em;
+      vertical-align: baseline;
+    }
+
+    .shareWrap{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .bookmarkHint{
+      font-size: 10px;
+      line-height: 1.1;
+      text-align: right;
+      color: rgba(255,255,255,.55);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .shareBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:.15s ease;
+      flex: 0 0 auto;
+      padding: 0;
+    }
+    .shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+    .shareBtn:active{ transform: translateY(0px); }
+
+    .shareBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #infoBtn{
+      border-color: rgba(255, 204, 0, .55);
+      box-shadow:
+        0 0 0 1px rgba(255, 204, 0, .25),
+        0 0 18px rgba(255, 204, 0, .35),
+        0 0 34px rgba(255, 204, 0, .22),
+        var(--shadow);
+    }
+    #infoBtn:hover{
+      border-color: rgba(255, 204, 0, .75);
+      box-shadow:
+        0 0 0 1px rgba(255, 204, 0, .35),
+        0 0 22px rgba(255, 204, 0, .45),
+        0 0 44px rgba(255, 204, 0, .28),
+        var(--shadow);
+    }
+
+    .infoMenu{
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display: none;
+      z-index: 99999;
+      backdrop-filter: blur(14px);
+    }
+    .infoMenu.active{ display: block; }
+
+    .infoMenu a{
+      display: block;
+      padding: 10px 10px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+    }
+    .infoMenu a:hover{ background: rgba(255,255,255,.08); }
+
+    .sub{
+      text-align:center;
+      margin-top: 0px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(255,204,0,.14), rgba(255,255,255,.04) 42%, rgba(255,95,184,.11)),
+        rgba(255,255,255,.045);
+      box-shadow: var(--shadow), var(--glow);
+      padding: clamp(22px, 5vw, 44px);
+      margin-top: 2px;
+    }
+
+    .hero:before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:999px;
+      background: rgba(255,204,0,.16);
+      filter: blur(30px);
+      right:-95px;
+      top:-105px;
+      pointer-events:none;
+    }
+
+    .hero:after{
+      content:"";
+      position:absolute;
+      width:190px;
+      height:190px;
+      border-radius:999px;
+      background: rgba(42,171,238,.12);
+      filter: blur(26px);
+      left:-80px;
+      bottom:-95px;
+      pointer-events:none;
+    }
+
+    .heroInner{ position:relative; z-index:1; }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color: var(--yellow);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      background: rgba(0,0,0,.35);
+      border:1px solid rgba(255,204,0,.25);
+      padding: 7px 10px;
+      border-radius: 999px;
+      box-shadow: 0 0 22px rgba(255,204,0,.12);
+    }
+
+    .pulseDot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background: var(--yellow);
+      box-shadow:0 0 0 0 rgba(255,204,0,.65);
+      animation:pulse 1.7s infinite;
+    }
+    @keyframes pulse{
+      0%{ box-shadow:0 0 0 0 rgba(255,204,0,.65); }
+      70%{ box-shadow:0 0 0 9px rgba(255,204,0,0); }
+      100%{ box-shadow:0 0 0 0 rgba(255,204,0,0); }
+    }
+
+    h1{
+      font-family:"Baloo 2", Inter, sans-serif;
+      font-size: clamp(38px, 9vw, 72px);
+      line-height:.92;
+      letter-spacing:-.04em;
+      margin: 18px 0 10px;
+    }
+
+    .highlight{
+      color: var(--yellow);
+      text-shadow: 0 0 24px rgba(255,204,0,.25);
+    }
+
+    .lead{
+      color: rgba(255,255,255,.82);
+      font-size: clamp(15px, 2.4vw, 18px);
+      max-width: 690px;
+      margin: 0;
+    }
+
+    .rateRow{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .rateCard{
+      border:1px solid rgba(255,255,255,.13);
+      background: rgba(0,0,0,.34);
+      border-radius: 20px;
+      padding: 14px;
+      min-height: 92px;
+    }
+
+    .rateBig{
+      display:block;
+      font-size: clamp(22px, 5vw, 34px);
+      font-weight: 900;
+      letter-spacing:-.04em;
+      color:#fff;
+    }
+    .rateLabel{ color: var(--muted2); font-size: 12px; font-weight:700; }
+
+    .ctaRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 22px;
+    }
+
+    .cta{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height: 46px;
+      padding: 0 16px;
+      border-radius: 999px;
+      text-decoration:none;
+      font-weight:900;
+      font-size: 14px;
+      border:1px solid rgba(255,255,255,.16);
+      transition:.15s ease;
+    }
+    .cta.primary{
+      background: linear-gradient(135deg, var(--yellow), #fff0a6);
+      color:#000;
+      border-color: rgba(255,204,0,.55);
+      box-shadow: 0 12px 30px rgba(255,204,0,.20);
+    }
+    .cta.secondary{
+      background: rgba(255,255,255,.08);
+      color:#fff;
+    }
+    .cta:hover{ transform:translateY(-1px); filter:brightness(1.04); }
+
+    .sectionGrid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:14px;
+      margin-top: 0;
+    }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      background: rgba(255,255,255,.055);
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3.2vw, 24px);
+      overflow:hidden;
+    }
+
+    .card.soft{
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035)),
+        rgba(255,255,255,.04);
+    }
+
+    h2{
+      margin:0 0 12px;
+      font-family:"Baloo 2", Inter, sans-serif;
+      font-size: 26px;
+      line-height:1;
+      letter-spacing:-.02em;
+    }
+
+    .smallText{ color: var(--muted); font-size: 14px; margin:0; }
+
+    .steps{
+      display:grid;
+      gap:10px;
+      margin-top: 14px;
+    }
+
+    .step{
+      display:grid;
+      grid-template-columns: 34px 1fr;
+      gap:10px;
+      align-items:start;
+      padding: 12px;
+      border-radius: 17px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    .num{
+      width:34px;
+      height:34px;
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,204,0,.13);
+      color: var(--yellow);
+      font-weight: 900;
+      border:1px solid rgba(255,204,0,.25);
+    }
+
+    .step b{ display:block; font-size:14px; margin-bottom:3px; }
+    .step span{ display:block; color:var(--muted2); font-size:13px; }
+
+    .platforms{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:14px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height: 34px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.88);
+      font-size: 13px;
+      font-weight:800;
+    }
+
+    .pill.good{ color:#111; background:linear-gradient(135deg, var(--yellow), #fff1a8); border-color: rgba(255,204,0,.55); }
+
+    .rules{
+      list-style:none;
+      padding:0;
+      margin:14px 0 0;
+      display:grid;
+      gap:8px;
+    }
+
+    .rules li{
+      position:relative;
+      padding: 11px 12px 11px 35px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.23);
+      border:1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.76);
+      font-size: 13px;
+    }
+    .rules li:before{
+      content:"✓";
+      position:absolute;
+      left:12px;
+      top:10px;
+      color: var(--yellow);
+      font-weight:900;
+    }
+
+    .warning{
+      margin-top:12px;
+      padding: 13px 14px;
+      border-radius: 18px;
+      border:1px solid rgba(255,95,184,.25);
+      background: rgba(255,95,184,.08);
+      color: rgba(255,255,255,.80);
+      font-size:13px;
+    }
+
+    .submitBox{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .fieldLike{
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.11);
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+    }
+    .fieldLike b{ color:#fff; }
+
+    .captionBox{
+      margin-top:14px;
+      padding:14px;
+      border-radius: 18px;
+      background: rgba(255,204,0,.08);
+      border:1px dashed rgba(255,204,0,.32);
+      color: rgba(255,255,255,.82);
+      font-size:13px;
+    }
+
+    .captionBox b{ color:var(--yellow); }
+
+
+
+    .optionGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .optionCard{
+      position:relative;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: var(--radius2);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035)),
+        rgba(255,255,255,.045);
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3.2vw, 24px);
+      overflow:hidden;
+    }
+
+    .optionCard.featured{
+      border-color: rgba(255,204,0,.36);
+      box-shadow: var(--shadow), 0 0 28px rgba(255,204,0,.13);
+    }
+
+    .optionTag{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height:30px;
+      padding:0 10px;
+      border-radius:999px;
+      background: rgba(255,204,0,.12);
+      border:1px solid rgba(255,204,0,.30);
+      color: var(--yellow);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+
+    .optionTitle{
+      margin:0 0 8px;
+      font-family:"Baloo 2", Inter, sans-serif;
+      font-size: 28px;
+      line-height:1;
+      letter-spacing:-.025em;
+    }
+
+    .optionPrice{
+      display:flex;
+      align-items:flex-end;
+      gap:8px;
+      margin:13px 0 10px;
+    }
+
+    .optionPrice strong{
+      color:#fff;
+      font-size: clamp(30px, 6vw, 44px);
+      line-height:.9;
+      letter-spacing:-.055em;
+    }
+
+    .optionPrice span{
+      color: var(--muted2);
+      font-size:12px;
+      font-weight:800;
+      padding-bottom:4px;
+    }
+
+    .miniNote{
+      margin-top:12px;
+      color: rgba(255,255,255,.58);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .dividerTitle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin: 18px 0 0;
+      color: rgba(255,255,255,.58);
+      font-size: 12px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .dividerTitle:before,
+    .dividerTitle:after{
+      content:"";
+      height:1px;
+      background: rgba(255,255,255,.13);
+      flex:1;
+    }
+
+    footer{
+      text-align:center;
+      color: rgba(255,255,255,.45);
+      font-size: 11px;
+      padding: 6px 0 0;
+    }
+
+    @media (max-width: 760px){
+      .sectionGrid{ grid-template-columns:1fr; }
+      .optionGrid{ grid-template-columns:1fr; }
+      .rateRow{ grid-template-columns:1fr; }
+      .hero{ padding:24px 18px; border-radius:24px; }
+      .cta{ width:100%; }
+      .bookmarkHint{ display:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="shell">
+
+      <header>
+        <!-- ✅ 2줄 스택 컨테이너 -->
+        <div style="display:block; width:100%;">
+
+          <!-- ✅ 1줄: 기존 헤더 내용 -->
+          <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+            <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer" class="logo">
+              <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+            </a>
+
+            <!-- ✅ 공유 영역 묶기 -->
+            <div class="shareWrap">
+              <div class="bookmarkHint">
+                Bookmark<br>&amp; Share
+              </div>
+
+              <button class="shareBtn" id="shareBtn" type="button" aria-label="Share" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="18" cy="5" r="3"></circle>
+                  <circle cx="6" cy="12" r="3"></circle>
+                  <circle cx="18" cy="19" r="3"></circle>
+                  <path d="M8.6 13.5l6.8 3.9"></path>
+                  <path d="M15.4 6.6L8.6 10.5"></path>
+                </svg>
+              </button>
+
+              <!-- ✅ Info 버튼(최우측) -->
+              <button class="shareBtn" id="infoBtn" type="button" aria-label="Menu" title="Menu">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 8h12"></path>
+                  <path d="M6 12h12"></path>
+                  <path d="M6 16h12"></path>
+                </svg>
+              </button>
+
+              <!-- ✅ Info 메뉴 -->
+              <div class="infoMenu" id="infoMenu" role="menu" aria-label="Info menu">
+                <a href="https://sweetdream.ai?via=roleplay-chat70" target="_blank" rel="noopener noreferrer" style="color: #FF69B4; font-weight: bold; text-decoration: none;">Live Video Chat with girls</a>
+                <a href="https://roleplay-chat.com/human" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Chat with real human</a>
+                <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer">Home</a>
+                <a href="https://roleplay-chat.com/characters" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Featured Characters</a>
+                <a href="https://roleplay-chat.com/how" target="_blank" rel="noopener noreferrer">How to use</a>
+                <a href="https://roleplay-chat.com/about" target="_blank" rel="noopener noreferrer">About</a>
+                <a href="https://roleplay-chat.com/event" target="_blank" rel="noopener noreferrer">Event</a>
+                <a href="https://roleplay-chat.com/pricing" target="_blank" rel="noopener noreferrer">Pricing</a>
+                <a href="https://roleplay-chat.com/all_access_purchase" target="_blank" rel="noopener noreferrer">All-access pass</a>
+                <a href="https://roleplay-chat.com/policy" target="_blank" rel="noopener noreferrer">Policy</a>
+                <a href="https://roleplay-chat.com/faq" target="_blank" rel="noopener noreferrer">FAQ</a>
+                <a href="mailto:showmetheaitools@gmail.com">Contact</a>
+                <a href="https://roleplay-chat.com/earn" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Creator reward program</a>
+                <a href="https://roleplay-chat.com/image2video" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Image to Video generator</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✅ 2줄: Chatango 라인(오른쪽) -->
+          <div align="right">
+            <sup>
+              <a href="https://roleplay-chat.com/human" target="_blank" style="text-decoration:none">
+                <font size="1" color="#ffcc00"><b>Live user chat</b></font>
+              </a>
+            </sup>
+
+            <script
+              id="cid0020000430144912743"
+              data-cfasync="false"
+              async
+              src="https://st.chatango.com/js/gz/emb.js"
+              style="width:200px;height:300px;"
+            >
+              {"handle":"roleplay-chat-com","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"cv":1,"cvfntsz":"10px","cvbg":"000000","cvfg":"ffcc00","cvw":49,"cvh":18}}
+            </script>
+          </div>
+
+        </div>
+      </header>
+
+      <div class="sub">Create the most human-like character, Enjoy roleplay.<br>no-login. Private & Safe.</div>
+
+      <main>
+        <section class="hero">
+          <div class="heroInner">
+            <div class="eyebrow"><span class="pulseDot"></span> 크리에이터 리워드 프로그램</div>
+            <h1>게시하고. 리뷰하고. <span class="highlight">수익을 받아보세요.</span></h1>
+            <p class="lead">
+              <b>roleplay-chat.com</b>을 홍보하고 두 가지 크리에이터 리워드 옵션 중 하나를 선택하세요.
+              옵션 1은 공개 플랫폼의 검증된 조회수 기준으로 지급됩니다. 옵션 2는 승인된 Reddit 리뷰 게시물 1개당 고정 <b>$2</b>가 지급됩니다.
+            </p>
+
+            <div class="rateRow" aria-label="리워드 요약">
+              <div class="rateCard">
+                <span class="rateBig">옵션 1</span>
+                <span class="rateLabel">검증된 조회수 1,000회당 $1<br>최소 지급: $2 = 검증된 조회수 2,000회.</span>
+              </div>
+              <div class="rateCard">
+                <span class="rateBig">옵션 2</span>
+                <span class="rateLabel">승인된 Reddit 리뷰 게시물당 $2<br>조회수 최소 기준 없음.</span>
+              </div>
+              <div class="rateCard">
+                <span class="rateBig">PayPal</span>
+                <span class="rateLabel">수동 검토 후 24시간 이내 지급</span>
+              </div>
+            </div>
+
+            <div class="ctaRow">
+              <a class="cta primary" href="mailto:showmetheaitools@gmail.com?subject=%ED%81%AC%EB%A6%AC%EC%97%90%EC%9D%B4%ED%84%B0%20%EB%A6%AC%EC%9B%8C%EB%93%9C%20%EC%A0%9C%EC%B6%9C%20-%20roleplay-chat.com&body=%EC%95%88%EB%85%95%ED%95%98%EC%84%B8%EC%9A%94%2C%0A%0A%ED%81%AC%EB%A6%AC%EC%97%90%EC%9D%B4%ED%84%B0%20%EB%A6%AC%EC%9B%8C%EB%93%9C%EB%A5%BC%20%EC%A0%9C%EC%B6%9C%ED%95%98%EA%B3%A0%20%EC%8B%B6%EC%8A%B5%EB%8B%88%EB%8B%A4.%0A%0A%EB%A6%AC%EC%9B%8C%EB%93%9C%20%EC%98%B5%EC%85%98%3A%20%EC%98%B5%EC%85%98%201%20%EC%A1%B0%ED%9A%8C%EC%88%98%20%EA%B8%B0%EB%B0%98%20%EB%A6%AC%EC%9B%8C%EB%93%9C%20%2F%20%EC%98%B5%EC%85%98%202%20Reddit%20%EB%A6%AC%EB%B7%B0%20%EB%A6%AC%EC%9B%8C%EB%93%9C%0A%EA%B2%8C%EC%8B%9C%EB%AC%BC%20URL%3A%0A%ED%94%8C%EB%9E%AB%ED%8F%BC%3A%0A%ED%95%B4%EB%8B%B9%20%EC%8B%9C%20%EC%A1%B0%ED%9A%8C%EC%88%98%3A%0APayPal%20%EC%9D%B4%EB%A9%94%EC%9D%BC%3A%0A%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%20%EC%B2%A8%EB%B6%80%3A%20%EC%98%88%0A%0A%EA%B0%90%EC%82%AC%ED%95%A9%EB%8B%88%EB%8B%A4.">
+                이메일로 제출하기
+              </a>
+              <a class="cta secondary" href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer">
+                roleplay-chat.com 방문하기
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="card soft" style="margin-top:14px;">
+          <h2><span style="color:#ffcc00;">수익 신청 전에:</span><br>roleplay-chat.com은 무엇인가요?</h2>
+          <p class="smallText">
+            <b>roleplay-chat.com</b>은 로그인 없이 자신만의 캐릭터를 만들고 바로 대화를 시작할 수 있는 AI 롤플레이 채팅 웹사이트입니다.
+            몰입감 있는 캐릭터 롤플레이, 브라우저 기반의 비공개 대화, 그리고 롤플레이 경험 안에서 선택적으로 이미지 또는 동영상 생성 기능을 제공합니다.
+          </p>
+          <div class="platforms" aria-label="roleplay-chat.com 핵심 특징">
+            <span class="pill good">로그인 없음</span>
+            <span class="pill good">비공개 & 익명</span>
+            <span class="pill good">커스텀 캐릭터 생성</span>
+            <span class="pill good">AI 롤플레이 채팅</span>
+            <span class="pill good">이미지 & 동영상 기능</span>
+          </div>
+          <div class="captionBox">
+            <b>간단히 설명하면:</b><br>
+            회원가입 없이 캐릭터를 만들고, 시나리오를 선택하고, 몰입감 있는 채팅을 즐길 수 있는 비공개 AI 캐릭터 롤플레이 사이트입니다.
+          </div>
+        </section>
+
+        <div class="dividerTitle">리워드 옵션을 선택하세요</div>
+
+        <section class="optionGrid" aria-label="크리에이터 리워드 옵션">
+          <div class="optionCard featured">
+            <div class="optionTag">옵션 1 · 조회수 기반 리워드</div>
+            <h2 class="optionTitle">어디든 공유하고 조회수로 수익 받기</h2>
+            <p class="smallText">
+              TikTok, YouTube, X, Reddit, Instagram, Threads, Facebook, Discord, Telegram, 블로그, 포럼 또는 조회수를 검증할 수 있는 다른 공개 플랫폼에 <b>roleplay-chat.com</b> 관련 공개 콘텐츠를 만들어주세요.
+            </p>
+            <div class="optionPrice">
+              <strong>$1</strong>
+              <span>검증된 조회수 1,000회당</span><br>
+               <strong>무제한</strong><span>지급 가능</span>
+            </div>
+            <ul class="rules">
+              <li>최소 지급 금액은 <b>$2</b>이므로, 게시물이 최소 <b>검증된 조회수 2,000회</b>에 도달해야 합니다.</li>
+              <li>지급 한도는 없습니다.</li>
+              <li>게시물에는 <b>roleplay-chat.com</b>이 명확하게 언급되거나 표시되어야 합니다.</li>
+              <li>공개 게시물 URL과 조회수가 표시된 스크린샷을 제출해야 합니다.</li>
+              <li>지급액은 제출 시점의 조회수를 기준으로 계산됩니다.</li>
+              <li>최근 30일 이내의 게시물만 인정되며, 각 게시물은 한 번만 제출할 수 있습니다.</li>
+            </ul>
+            <div class="miniNote">짧은 영상, 바이럴 게시물, 리뷰, 튜토리얼, 리액션, 스크린샷, 솔직한 추천 콘텐츠에 적합합니다.</div>
+          </div>
+
+          <div class="optionCard">
+            <div class="optionTag">옵션 2 · Reddit 리뷰 리워드</div>
+            <h2 class="optionTitle">Reddit 리뷰를 올리고 $2 받기</h2>
+            <p class="smallText">
+              <b>roleplay-chat.com</b>을 리뷰하거나 소개하는 공개 Reddit 게시물을 작성해주세요. 직접 광고나 성의 없는 스팸이 아니라, 리뷰형 또는 토론형 콘텐츠여야 합니다.
+            </p>
+            <div class="optionPrice">
+              <strong>$2</strong>
+              <span>승인된 Reddit 게시물당</span>
+            </div>
+            <ul class="rules">
+              <li>관련성 있는 서브레딧에 게시되어야 합니다.</li>
+              <li>관련 주제에는 AI 챗봇, AI 도구, 롤플레이, 가상 동반자, 캐릭터 채팅, 온라인 롤플레이 또는 유사한 주제가 포함됩니다.</li>
+              <li>검토 시점에 게시물이 공개 상태이고 접근 가능하며 삭제되지 않은 상태여야 합니다.</li>
+              <li>게시물에는 <b>roleplay-chat.com</b>이 명확하게 언급되어야 합니다.</li>
+              <li>같은 Reddit 계정으로 여러 번 참여할 수 있지만, 각 제출물은 새롭고 고유한 공개 게시물 URL이어야 합니다.</li>
+               <li>같은 내용을 반복해서 스팸처럼 올리지 마세요. 게시물 URL이 다르더라도 복사 붙여넣기 형태이거나 반복적인 스팸성 제출물은 중복 지급되지 않습니다.</li>
+              <li>삭제됨, 제거됨, 숨김, 접근 불가, 복사 콘텐츠, 스팸성, 오해를 유발하는 내용 또는 관련 없는 게시물은 거절될 수 있습니다.</li>
+            </ul>
+            <div class="miniNote">개인 경험담, 추천, 비교, 질문 또는 토론형 Reddit 게시물에 적합합니다.</div>
+          </div>
+        </section>
+
+        <div class="sectionGrid" style="margin-top:14px;">
+          <section class="card soft">
+            <h2>제출 방법</h2>
+            <p class="smallText">증빙 자료를 이메일로 보내주세요. 어떤 리워드 옵션으로 신청하는지 명확히 적어주세요.</p>
+
+            <div class="steps">
+              <div class="step">
+                <div class="num">1</div>
+                <div>
+                  <b>공개 게시물 작성</b>
+                  <span>옵션 1은 조회수를 검증할 수 있는 공개 플랫폼에 게시하세요. 옵션 2는 관련 서브레딧에 진정성 있는 Reddit 리뷰 또는 토론 글을 게시하세요.</span>
+                </div>
+              </div>
+              <div class="step">
+                <div class="num">2</div>
+                <div>
+                  <b>공개 상태 유지</b>
+                  <span>검토 시점에 게시물에 접근할 수 있어야 합니다. 삭제됨, 제거됨, 비공개, 숨김 또는 접근 불가 게시물은 승인될 수 없습니다.</span>
+                </div>
+              </div>
+              <div class="step">
+                <div class="num">3</div>
+                <div>
+                  <b>증빙 자료 보내기</b>
+                  <span>게시물 URL, 플랫폼 이름, 스크린샷, 선택한 리워드 옵션, PayPal 이메일을 showmetheaitools@gmail.com으로 보내주세요.</span>
+                </div>
+              </div>
+              <div class="step">
+                <div class="num">4</div>
+                <div>
+                  <b>검토 후 지급받기</b>
+                  <span>모든 제출물은 수동으로 검토됩니다. 조건을 충족한 제출물은 검토 후 PayPal로 지급됩니다.</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>허용 플랫폼</h2>
+            <p class="smallText">옵션 1은 다양한 공개 플랫폼을 허용합니다. 옵션 2는 Reddit만 가능합니다.</p>
+            <div class="platforms">
+              <span class="pill good">TikTok</span>
+              <span class="pill good">YouTube</span>
+              <span class="pill good">X</span>
+              <span class="pill good">Reddit</span>
+              <span class="pill good">Instagram</span>
+              <span class="pill good">Threads</span>
+              <span class="pill good">Facebook</span>
+              <span class="pill good">Discord</span>
+              <span class="pill good">Telegram</span>
+              <span class="pill">기타 공개 플랫폼 - 게시물 조회수를 증명할 수 있다면 옵션 1에서는 어떤 플랫폼이든 가능합니다.</span>
+            </div>
+
+            <div class="captionBox">
+              <b>콘텐츠 형식은 자유입니다.</b><br>
+              직접 글을 작성하거나, 짧은 영상을 만들거나, 사용 경험을 공유하거나, 개인정보 보호/로그인 없음 컨셉을 설명하거나, AI 롤플레이 기능을 자연스럽게 소개할 수 있습니다. <b>시청자가 쉽게 사이트를 찾을 수 있도록 게시물에는 roleplay-chat.com URL이 명확히 포함되어야 합니다.</b>
+            </div>
+          </section>
+        </div>
+
+        <div class="sectionGrid" style="margin-top:14px;">
+          <section class="card">
+            <h2>제출 조건</h2>
+            <ul class="rules">
+              <li>제출 시 <b>옵션 1</b> 또는 <b>옵션 2</b> 중 하나를 선택하세요.</li>
+              <li>게시물은 <b>roleplay-chat.com</b>을 언급하거나 소개해야 합니다.</li>
+              <li>각 게시물 URL은 한 번만 제출 및 지급될 수 있습니다.</li>
+              <li>같은 게시물의 반복 제출은 허용되지 않습니다.</li>
+              <li>지급은 PayPal로만 이루어집니다.</li>
+              <li>PayPal 수수료는 수령인 부담입니다.</li>
+            </ul>
+          </section>
+
+          <section class="card soft">
+            <h2>이메일 체크리스트</h2>
+            <div class="submitBox">
+              <div class="fieldLike"><b>보낼 곳:</b> showmetheaitools@gmail.com</div>
+              <div class="fieldLike"><b>포함할 내용:</b> 리워드 옵션, 게시물 URL, 플랫폼 이름, 스크린샷, PayPal 이메일.</div>
+              <div class="fieldLike"><b>옵션 1:</b> 제출 시점의 조회수를 포함해주세요.</div>
+              <div class="fieldLike"><b>옵션 2:</b> 공개 Reddit 게시물 URL을 제출해주세요.</div>
+            </div>
+          </section>
+        </div>
+
+        <section class="card soft" style="margin-top:14px;">
+          <h2><span style="color:#ffcc00;">유료 이용 내역 환불</span><br>크리에이터 참여자 대상</h2>
+          <p class="smallText">
+            홍보 콘텐츠 제작을 위해 <b>roleplay-chat.com</b>의 유료 기능을 결제했다면,
+            크리에이터 참여자에 한해 해당 결제 금액은 전액 환불될 수 있습니다.
+          </p>
+
+          <div class="submitBox">
+            <div class="fieldLike">
+              <b>환불 요청 방법:</b> 리뷰/게시물 제출 이메일을 보낼 때 함께 요청할 수 있으며,
+              게시물이 아직 최소 조회수 기준에 도달하지 않았더라도 먼저 연락할 수 있습니다.
+            </div>
+
+            <div class="fieldLike">
+              <b>리뷰 제출 전 환불 요청:</b> 어뷰징 방지를 위해 조기 환불 요청은 내부 검토가 진행될 수 있습니다.
+              플랫폼 계정이나 콘텐츠 활동이 실제 홍보 효과를 만들 가능성이 있는지,
+              그리고 리워드 조건을 충족할 가능성이 있는지 확인할 수 있습니다. 콘텐츠 또는 계정이 크리에이터 리워드 프로그램에 적합하지 않다고 판단될 경우 환불 요청이 거절될 수 있습니다.
+            </div>
+
+            <div class="fieldLike">
+              <b>필수 결제 증빙:</b> PayPal 결제 이메일 주소 또는 거래 ID가 명확히 보이는 거래 스크린샷을 첨부해주세요.
+            </div>
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:14px;">
+          <h2>공정 이용 및 어뷰징 방지 정책</h2>
+          <p class="smallText">
+            가짜 조회수, 봇 트래픽, 스팸, 오해를 유발하는 제출물, 같은 게시물의 반복 제출, 비정상적이거나 의미 없는 조회수 생성은 허용되지 않습니다.
+            의심스러운 활동은 검토 과정에서 거절될 수 있습니다. 우리는 진정성 있는 콘텐츠를 통한 실제 노출에 리워드를 지급합니다.
+          </p>
+          <div class="warning">
+            정직하고 검증 가능한 게시물만 제출해주세요. 게시물, 조회수, 서브레딧 관련성 또는 콘텐츠 품질을 확인할 수 없는 경우 제출물이 승인되지 않을 수 있습니다.
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        크리에이터 리워드는 수동으로 검토됩니다. roleplay-chat.com은 유효하지 않거나 어뷰징성 제출물을 거절할 권리를 보유합니다.
+      </footer>
+
+    </div>
+  </div>
+
+  <script>
+    // Share button
+    const shareBtn = document.querySelector("#shareBtn");
+    if (shareBtn){
+      shareBtn.addEventListener("click", async () => {
+        const url = window.location.href;
+        try{
+          if (navigator.share){
+            await navigator.share({ title: document.title, url });
+          }else{
+            await navigator.clipboard.writeText(url);
+            shareBtn.title = "복사됨!";
+            setTimeout(() => (shareBtn.title = "공유"), 900);
+          }
+        }catch(e){
+          // user cancelled / blocked
+        }
+      });
+    }
+
+    // Info button dropdown
+    const infoBtn = document.querySelector("#infoBtn");
+    const infoMenu = document.querySelector("#infoMenu");
+
+    function closeInfoMenu(){
+      if (infoMenu) infoMenu.classList.remove("active");
+    }
+
+    if (infoBtn && infoMenu){
+      infoBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        infoMenu.classList.toggle("active");
+      });
+
+      infoMenu.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      document.addEventListener("click", closeInfoMenu);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeInfoMenu();
+      });
+    }
+  </script>
+</body>
+</html>
