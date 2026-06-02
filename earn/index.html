@@ -26,20 +26,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>Earn | roleplay-chat.com</title>
-  <meta name="description" content="Earn PayPal rewards by sharing roleplay-chat.com on social media. Get paid $1 per 1,000 verified views." />
+  <meta name="description" content="Earn PayPal rewards by sharing roleplay-chat.com. Choose view-based rewards or a $2 Reddit review bounty." />
   <meta name="theme-color" content="#000000" />
    <!-- Open Graph / Social Preview -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://roleplay-chat.com/earn" />
 <meta property="og:title" content="Earn | roleplay-chat.com" />
-<meta property="og:description" content="Earn PayPal rewards by sharing roleplay-chat.com on social media. Get paid $1 per 1,000 verified views." />
+<meta property="og:description" content="Earn PayPal rewards by sharing roleplay-chat.com. Choose view-based rewards or a $2 Reddit review bounty." />
 <meta property="og:image" content="https://roleplay-chat.com/og-image.jpg" />
 
 <!-- Twitter / X Preview -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:url" content="https://roleplay-chat.com/earn" />
 <meta name="twitter:title" content="Earn | roleplay-chat.com" />
-<meta name="twitter:description" content="Earn PayPal rewards by sharing roleplay-chat.com on social media. Get paid $1 per 1,000 verified views." />
+<meta name="twitter:description" content="Earn PayPal rewards by sharing roleplay-chat.com. Choose view-based rewards or a $2 Reddit review bounty." />
 <meta name="twitter:image" content="https://roleplay-chat.com/og-image.jpg" />
 
   <!-- Fonts (same as main) -->
@@ -520,6 +520,104 @@
 
     .captionBox b{ color:var(--yellow); }
 
+
+
+    .optionGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .optionCard{
+      position:relative;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: var(--radius2);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035)),
+        rgba(255,255,255,.045);
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3.2vw, 24px);
+      overflow:hidden;
+    }
+
+    .optionCard.featured{
+      border-color: rgba(255,204,0,.36);
+      box-shadow: var(--shadow), 0 0 28px rgba(255,204,0,.13);
+    }
+
+    .optionTag{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height:30px;
+      padding:0 10px;
+      border-radius:999px;
+      background: rgba(255,204,0,.12);
+      border:1px solid rgba(255,204,0,.30);
+      color: var(--yellow);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+
+    .optionTitle{
+      margin:0 0 8px;
+      font-family:"Baloo 2", Inter, sans-serif;
+      font-size: 28px;
+      line-height:1;
+      letter-spacing:-.025em;
+    }
+
+    .optionPrice{
+      display:flex;
+      align-items:flex-end;
+      gap:8px;
+      margin:13px 0 10px;
+    }
+
+    .optionPrice strong{
+      color:#fff;
+      font-size: clamp(30px, 6vw, 44px);
+      line-height:.9;
+      letter-spacing:-.055em;
+    }
+
+    .optionPrice span{
+      color: var(--muted2);
+      font-size:12px;
+      font-weight:800;
+      padding-bottom:4px;
+    }
+
+    .miniNote{
+      margin-top:12px;
+      color: rgba(255,255,255,.58);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .dividerTitle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin: 18px 0 0;
+      color: rgba(255,255,255,.58);
+      font-size: 12px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .dividerTitle:before,
+    .dividerTitle:after{
+      content:"";
+      height:1px;
+      background: rgba(255,255,255,.13);
+      flex:1;
+    }
+
     footer{
       text-align:center;
       color: rgba(255,255,255,.45);
@@ -529,6 +627,7 @@
 
     @media (max-width: 760px){
       .sectionGrid{ grid-template-columns:1fr; }
+      .optionGrid{ grid-template-columns:1fr; }
       .rateRow{ grid-template-columns:1fr; }
       .hero{ padding:24px 18px; border-radius:24px; }
       .cta{ width:100%; }
@@ -624,29 +723,29 @@
         <section class="hero">
           <div class="heroInner">
             <div class="eyebrow"><span class="pulseDot"></span> Creator Reward Program</div>
-            <h1>Post. Share. <span class="highlight">Earn.</span></h1>
+            <h1>Post. Review. <span class="highlight">Earn.</span></h1>
             <p class="lead">
-              Introduce <b>roleplay-chat.com</b> on TikTok, YouTube, X, Reddit, Instagram, Threads, or any public social platform.
-              Submit a screenshot of your post and verified views, and earn <b>$1 per 1,000 verified views</b>.
+              Choose one of two creator reward options for <b>roleplay-chat.com</b>.
+              Option 1 pays by verified views across public platforms. Option 2 pays a fixed <b>$2</b> for each approved Reddit review post.
             </p>
 
             <div class="rateRow" aria-label="Reward summary">
               <div class="rateCard">
-                <span class="rateBig">Unlimited</span>
+                <span class="rateBig">Option 1</span>
                 <span class="rateLabel">$1 per 1,000 verified views<br>Minimum payout: $5 = 5,000 verified views.</span>
               </div>
               <div class="rateCard">
-                <span class="rateBig">24h</span>
-                <span class="rateLabel">payment after review</span>
+                <span class="rateBig">Option 2</span>
+                <span class="rateLabel">$2 per approved Reddit review post<br>No view-count minimum.</span>
               </div>
               <div class="rateCard">
                 <span class="rateBig">PayPal</span>
-                <span class="rateLabel">payout method</span>
+                <span class="rateLabel">payment after manual review</span>
               </div>
             </div>
 
             <div class="ctaRow">
-              <a class="cta primary" href="mailto:showmetheaitools@gmail.com?subject=Creator%20Reward%20Submission%20-%20roleplay-chat.com&body=Hello%2C%0A%0AI%20would%20like%20to%20submit%20my%20creator%20reward%20post.%0A%0APost%20URL%3A%0APlatform%3A%0AView%20count%20at%20submission%3A%0APayPal%20email%3A%0AAttached%20screenshot%3A%20Yes%0A%0AThank%20you.">
+              <a class="cta primary" href="mailto:showmetheaitools@gmail.com?subject=Creator%20Reward%20Submission%20-%20roleplay-chat.com&body=Hello%2C%0A%0AI%20would%20like%20to%20submit%20my%20creator%20reward.%0A%0AReward%20option%3A%20Option%201%20View-based%20reward%20%2F%20Option%202%20Reddit%20review%20bounty%0APost%20URL%3A%0APlatform%3A%0AView%20count%20if%20applicable%3A%0APayPal%20email%3A%0AAttached%20screenshot%3A%20Yes%0A%0AThank%20you.">
                 Submit by Email
               </a>
               <a class="cta secondary" href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer">
@@ -675,39 +774,83 @@
           </div>
         </section>
 
+        <div class="dividerTitle">Choose your reward option</div>
+
+        <section class="optionGrid" aria-label="Creator reward options">
+          <div class="optionCard featured">
+            <div class="optionTag">Option 1 · View-based reward</div>
+            <h2 class="optionTitle">Share anywhere and earn by views</h2>
+            <p class="smallText">
+              Create public content about <b>roleplay-chat.com</b> on TikTok, YouTube, X, Reddit, Instagram, Threads, Facebook, Discord, Telegram, blogs, forums, or another public platform where views can be verified.
+            </p>
+            <div class="optionPrice">
+              <strong>$1</strong>
+              <span>per 1,000 verified views</span>
+            </div>
+            <ul class="rules">
+              <li>Minimum payout is <b>$5</b>, so the post must reach at least <b>5,000 verified views</b>.</li>
+              <li>The post must clearly mention or show <b>roleplay-chat.com</b>.</li>
+              <li>You must submit a public post URL and a screenshot showing the view count.</li>
+              <li>The payout is calculated based on the view count at the time of submission.</li>
+              <li>Only posts from the last 30 days are eligible, and each post can be submitted only once.</li>
+            </ul>
+            <div class="miniNote">Best for short videos, viral posts, reviews, tutorials, reactions, screenshots, or honest recommendations.</div>
+          </div>
+
+          <div class="optionCard">
+            <div class="optionTag">Option 2 · Reddit review bounty</div>
+            <h2 class="optionTitle">Post a Reddit review and earn $2</h2>
+            <p class="smallText">
+              Create a public Reddit post reviewing or introducing <b>roleplay-chat.com</b>. This is for review-style or discussion-style content only, not direct advertising or low-effort spam.
+            </p>
+            <div class="optionPrice">
+              <strong>$2</strong>
+              <span>per approved Reddit post</span>
+            </div>
+            <ul class="rules">
+              <li>The post must be published on a relevant subreddit.</li>
+              <li>Relevant topics include AI chatbots, AI tools, roleplay, virtual companions, character chat, online roleplay, or similar topics.</li>
+              <li>The post must be public, accessible, and still live when we review it.</li>
+              <li>The post must mention <b>roleplay-chat.com</b> clearly.</li>
+              <li>You may participate multiple times with the same Reddit account, but each submission must be a new, unique, public post URL.</li>
+              <li>Deleted, removed, hidden, inaccessible, copied, spammy, misleading, or irrelevant posts may be rejected.</li>
+            </ul>
+            <div class="miniNote">Best for personal experience posts, recommendations, comparisons, questions, or discussion-style Reddit posts.</div>
+          </div>
+        </section>
+
         <div class="sectionGrid" style="margin-top:14px;">
           <section class="card soft">
-            <h2>How it works</h2>
-            <p class="smallText">Create your own content freely. Reviews, reactions, tutorials, screenshots, short posts, or honest recommendations are all welcome.</p>
+            <h2>How to submit</h2>
+            <p class="smallText">Send your proof by email. Please tell us clearly which reward option you are applying for.</p>
 
             <div class="steps">
               <div class="step">
                 <div class="num">1</div>
                 <div>
                   <b>Create a public post</b>
-                  <span>Post about roleplay-chat.com on TikTok, YouTube, X, Reddit, Instagram, Threads, or another social platform. Your post must clearly include the roleplay-chat.com URL so viewers can easily find the website.</span>
+                  <span>For Option 1, post on any public platform with verifiable views. For Option 2, post a genuine Reddit review or discussion on a relevant subreddit.</span>
                 </div>
               </div>
               <div class="step">
                 <div class="num">2</div>
                 <div>
-                  <b>Get views</b>
-                  <span>The view count must be visible and verifiable. Public posts are easier to approve. Only posts from the last 30 days are eligible, and each post can be submitted only once.</span>
+                  <b>Keep it public</b>
+                  <span>Your post must be accessible at the time of review. Deleted, removed, private, hidden, or inaccessible posts cannot be approved.</span>
                 </div>
               </div>
               <div class="step">
                 <div class="num">3</div>
                 <div>
                   <b>Send your proof</b>
-                  <span>Email the post link, screenshot showing views, and your PayPal email to showmetheaitools@gmail.com.</span>
+                  <span>Email the post URL, platform name, screenshot, selected reward option, and your PayPal email to showmetheaitools@gmail.com.</span>
                 </div>
               </div>
               <div class="step">
                 <div class="num">4</div>
                 <div>
-                  <b>Get paid</b>
-                  <span>After review, eligible submissions are paid within 24 hours via PayPal.<br>To qualify for payout, your submission must reach at least <b>5,000 verified views</b> 
-  because the minimum payout is <b>$5</b>.</span>
+                  <b>Get reviewed and paid</b>
+                  <span>All submissions are reviewed manually. Eligible submissions are paid after review via PayPal.</span>
                 </div>
               </div>
             </div>
@@ -715,7 +858,7 @@
 
           <section class="card">
             <h2>Accepted platforms</h2>
-            <p class="smallText">Use the platform where your audience naturally responds best.</p>
+            <p class="smallText">Option 1 accepts many public platforms. Option 2 is Reddit only.</p>
             <div class="platforms">
               <span class="pill good">TikTok</span>
               <span class="pill good">YouTube</span>
@@ -726,12 +869,12 @@
               <span class="pill good">Facebook</span>
               <span class="pill good">Discord</span>
               <span class="pill good">Telegram</span>
-              <span class="pill">Other public platforms - Any platform is acceptable, as long as you can prove the post’s view count.</span>
+              <span class="pill">Other public platforms - Any platform is acceptable for Option 1, as long as you can prove the post’s view count.</span>
             </div>
 
             <div class="captionBox">
               <b>Content style is up to you.</b><br>
-              You can write your own post, make a short video, share your experience, explain the privacy/no-login concept, or introduce the AI roleplay features naturally. <b>But your post must clearly include the roleplay-chat.com URL so viewers can easily find the website.</b>
+              You can write your own post, make a short video, share your experience, explain the privacy/no-login concept, or introduce the AI roleplay features naturally. <b>Your post must clearly include the roleplay-chat.com URL so viewers can easily find the website.</b>
             </div>
           </section>
         </div>
@@ -740,15 +883,12 @@
           <section class="card">
             <h2>Submission requirements</h2>
             <ul class="rules">
+              <li>Select either <b>Option 1</b> or <b>Option 2</b> when you submit.</li>
               <li>The post must mention or introduce <b>roleplay-chat.com</b>.</li>
-              <li>You must submit a screenshot that clearly shows the post and its view count. Only posts from the last 30 days are eligible, and each post can be submitted only once.</li>
-              <li>The payout is calculated based on the view count at the time of submission.</li>
-              <li>Each post can be submitted and rewarded only once.</li>
-               <li>your post must clearly include the roleplay-chat.com URL so viewers can easily find the website.</li>
-               <li>To qualify for payout, your submission must reach at least <b>5,000 verified views</b> 
-  because the minimum payout is <b>$5</b>.</li>
-               <li>Payment is made through PayPal only.</li>
-               <li>Any PayPal fees are the recipient’s responsibility.</li>
+              <li>Each post URL can be submitted and rewarded only once.</li>
+              <li>Repeated submissions for the same post are not allowed.</li>
+              <li>Payment is made through PayPal only.</li>
+              <li>Any PayPal fees are the recipient’s responsibility.</li>
             </ul>
           </section>
 
@@ -756,13 +896,14 @@
             <h2>Email checklist</h2>
             <div class="submitBox">
               <div class="fieldLike"><b>Send to:</b> showmetheaitools@gmail.com</div>
-              <div class="fieldLike"><b>Include:</b> post URL, platform name, view count, screenshot, and PayPal email.</div>
-              <div class="fieldLike"><b>Review time:</b> eligible submissions are paid within 24 hours after review.</div>
+              <div class="fieldLike"><b>Include:</b> reward option, post URL, platform name, screenshot, and PayPal email.</div>
+              <div class="fieldLike"><b>For Option 1:</b> include the view count at the time of submission.</div>
+              <div class="fieldLike"><b>For Option 2:</b> submit the public Reddit post URL.</div>
             </div>
           </section>
         </div>
 
-                 <section class="card soft" style="margin-top:14px;">
+        <section class="card soft" style="margin-top:14px;">
           <h2><span style="color:#ffcc00;">Paid access refund</span><br>for creators</h2>
           <p class="smallText">
             If you paid for any premium access on <b>roleplay-chat.com</b> to create your promotional content,
@@ -778,7 +919,7 @@
             <div class="fieldLike">
               <b>Before review submission:</b> To prevent abuse, early refund requests may be reviewed internally.
               We may check whether your platform account or content activity appears likely to generate genuine promotion
-              and potentially reach <b>5,000 verified views</b>. If the content or account does not appear suitable for the Creator Reward Program, the refund request may be declined.
+              and potentially meet the reward requirements. If the content or account does not appear suitable for the Creator Reward Program, the refund request may be declined.
             </div>
 
             <div class="fieldLike">
@@ -795,7 +936,7 @@
             Suspicious activity may be rejected during review. We reward real exposure from genuine content.
           </p>
           <div class="warning">
-            Please submit only honest, verifiable posts. If the view count cannot be confirmed, the submission may not be approved.
+            Please submit only honest, verifiable posts. If the post, view count, subreddit relevance, or content quality cannot be confirmed, the submission may not be approved.
           </div>
         </section>
       </main>
