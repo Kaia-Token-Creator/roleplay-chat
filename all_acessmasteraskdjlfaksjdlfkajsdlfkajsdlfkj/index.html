@@ -1,0 +1,2743 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17946940858"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-17946940858');
+</script>
+
+ 
+
+  <meta name='impact-site-verification' value='f343b3c2-5405-4f62-a4ed-b9d389be3089'>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
+     crossorigin="anonymous"></script>
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4VRNKXVX3J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-4VRNKXVX3J');
+</script>
+
+  <meta name="yandex-verification" content="139f2b0989f2c7f0" />
+  
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Roleplay-chat.com",
+  "url": "https://roleplay-chat.com/",
+  "description": "Create a character and start an anonymous no-login AI roleplay chat instantly.",
+  "inLanguage": "en"
+  }
+</script>
+
+<script src="https://unpkg.com/localforage/dist/localforage.min.js"></script>
+  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>No-login AI Roleplay chat with companion character | Roleplay-chat.com</title>
+  <meta name="description" content="Create a character and start a no-login AI roleplay chat instantly. General and +18 Uncensored options available." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#000000" />
+
+ <!-- Open Graph -->
+<meta property="og:title" content="roleplay-chat.com | No-login AI Roleplay" />
+<meta property="og:description" content="Create a character and start a no-login AI roleplay chat instantly." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://roleplay-chat.com/" />
+<meta property="og:image" content="https://roleplay-chat.com/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/jpeg" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="roleplay-chat.com | No-login AI Roleplay" />
+<meta name="twitter:description" content="Create a character and start a no-login AI roleplay chat instantly." />
+<meta name="twitter:image" content="https://roleplay-chat.com/og-image.jpg" />
+
+ <!-- Favicon -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+
+  <!-- Rounded, commercial-free font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.75);
+      --muted2:rgba(255,255,255,.55);
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.09);
+      --border:rgba(255,255,255,.14);
+      --focus:rgba(255,255,255,.25);
+      --danger:#ff4d4d;
+      --ok:#52ff9a;
+      --shadow: 0 14px 36px rgba(0,0,0,.55);
+
+      --radius: 16px;
+      --radius2: 22px;
+
+      /* default chat font color selection (preview) */
+      --chatColor: #000000;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background: radial-gradient(900px 600px at 10% 0%, rgba(255,255,255,.06), transparent 55%),
+                  radial-gradient(900px 600px at 90% 10%, rgba(255,255,255,.05), transparent 60%),
+                  var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+    }
+
+    a{ color:inherit; }
+    .wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:flex-start;   /* ✅ center → flex-start */
+  justify-content:center;
+  padding: 18px 14px 26px;
+}
+    .shell{
+      width: min(860px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 4px 6px 0;
+  gap: 12px;
+}
+
+    .logo{
+      text-decoration: none;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: clamp(16px, 3.6vw, 24px);
+padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      user-select:none;
+    }
+
+    .logoRole{
+  color: #ffcc00; /* dark yellow */
+}
+
+
+.logoDot{
+  color: rgba(255,255,255,.95); /* keep white */
+  font-size: 0.5em;            /* half size */
+  vertical-align: baseline;
+}
+
+    .logo span{ opacity:.95; }
+    .sub{
+      text-align:center;
+      margin-top: 0px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .cardHead h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.2px;
+    }
+    .badge{
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      white-space:nowrap;
+    }
+
+    .cardBody{
+  padding: 8px 12px 12px;
+  display:flex;
+  flex-direction:column;
+  min-height: 0; /* 중요 */
+}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    @media (min-width: 720px){
+      .grid{
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 14px;
+      }
+      .span2{ grid-column: span 2; }
+    }
+
+    label{
+  display:block;
+  font-size: 15px;
+  color: #ffcc00; /* ← 여기 */
+  margin: 0 0 6px;
+  font-weight: 700; /* 선택: 더 잘 보이게 */
+}
+
+    input, select, textarea{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.45);
+      color: var(--fg);
+      outline: none;
+      transition: .15s ease;
+      font-size: 14px;
+    }
+    textarea{ resize: vertical; min-height: 92px; max-height: 240px; }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(255,255,255,.30);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.08);
+    }
+
+    .row{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .pillGroup{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.35);
+      border-radius: 999px;
+      padding: 10px 12px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      user-select:none;
+      transition:.15s ease;
+    }
+    .pill:hover{ background: rgba(255,255,255,.06); }
+    .pill input{ width:auto; margin:0; }
+    .pill small{
+  color: #ffffff;
+  font-weight: 700;
+}
+    .hint{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted2);
+    }
+
+    .colors{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (min-width:720px){
+      .colors{ grid-template-columns: repeat(8, minmax(0, 1fr)); }
+    }
+    .swatch{
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      transition:.15s ease;
+    }
+    .swatch:hover{ transform: translateY(-1px); }
+    .swatch[aria-selected="true"]{
+      outline: 3px solid rgba(255,255,255,.18);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+    }
+    .swatch .check{
+      position:absolute;
+      inset:auto 8px 8px auto;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.14);
+      display:none;
+    }
+    .swatch[aria-selected="true"] .check{ display:block; }
+
+    .preview{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(0,0,0,.25);
+    }
+
+    /* avatar X (clear) button */
+.avatar{
+  position: relative; /* 버튼 포지셔닝을 위해 */
+}
+
+.avatarClear{
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.55);
+  color: rgba(255,255,255,.9);
+  font-size: 16px;
+  line-height: 1;
+  display: none;        /* 기본 숨김 */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.avatarClear:hover{
+  background: rgba(0,0,0,.75);
+}
+
+/* 모바일 탭하기 편하게 */
+.avatarClear:active{
+  transform: scale(0.96);
+}
+    
+    .avatar{
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      flex: 0 0 auto;
+    }
+    .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .bubble{
+      flex:1;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .bubble b{
+      color: var(--fg);
+      font-weight: 700;
+      font-family: "Baloo 2", Inter, sans-serif;
+    }
+    .bubble .accent{
+      color: var(--fg);
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      text-decoration-color: var(--chatColor);
+    }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-top: 14px;
+    }
+
+    .btn{
+      width: 100%;
+      padding: 14px 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      background: rgba(255,255,255,.10);
+      color: var(--fg);
+      font-weight: 800;
+      cursor:pointer;
+      transition:.15s ease;
+      font-size: 15px;
+      letter-spacing:.2px;
+    }
+    .btn:hover{ background: rgba(255,255,255,.14); transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px); }
+
+    .btnPrimary{
+  background: #e0b400;
+  border: 1px solid #c9a200;
+  color: #000;
+  font-weight: 800;
+}
+
+    .note{
+      font-size: 12px;
+      color: var(--muted2);
+      margin: 10px 2px 0;
+    }
+
+    /* In-page "Next page" view (no full page load) */
+    .view{ display:none; }
+    .view.active{ display:block; }
+
+    /* Chat placeholder */
+    .chatShell{
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+  min-height: 0; /* 중요: flex 안에서 overflow가 제대로 동작 */
+}
+
+    .chip{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .chatBox{
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.35);
+  padding: 14px;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  overflow:auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+    .chatMsg{
+      display:flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items:flex-start;
+    }
+
+    /* (4) ADDED: user messages on the right */
+    .chatMsg.me{
+      flex-direction: row-reverse;
+    }
+    .chatMsg.me .text{
+      text-align: right;
+    }
+
+    .chatMsg .who{
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      flex: 0 0 auto;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .chatMsg .who img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .chatMsg .text{
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      max-width: 78%;
+      color: var(--fg);
+      font-size: 14px;
+    }
+    .chatMsg .text .name{
+      font-weight: 800;
+      font-family: "Baloo 2", Inter, sans-serif;
+      color: var(--chatColor);
+    }
+   
+    .chatInput{
+  flex: 1 1 auto;
+  min-width: 0;          /* 중요: 작은 화면에서 버튼 밀리지 않게 */
+  height: 42px;          /* sendBtn과 동일 */
+  padding: 0 10px;       /* 세로 패딩 제거, 높이로 관리 */
+  border-radius: 14px;
+}
+
+.sendBtn{
+  flex: 0 0 42px;        /* 줄바꿈 방지 */
+  height: 42px;
+  border-radius: 14px;
+}
+
+    /* Paywall modal */
+    .modalOverlay{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px 14px;
+      z-index: 9999;
+    }
+    .modalOverlay.active{ display:flex; }
+    .modal{
+      width: min(520px, 100%);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(10,10,10,.92);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modalHeader{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .modalHeader h3{
+      margin:0;
+      font-size: 15px;
+      letter-spacing:.2px;
+    }
+    .xBtn{
+      border:none;
+      background: rgba(255,255,255,.08);
+      color: var(--fg);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+/* ✅ Unlock 버튼: 핫핑크 */
+
+    /* New 버튼만 진한 노란색 */
+#resetBtn{
+  background: #e0b400;
+  border: 1px solid #c9a200;
+  color: #000;
+  font-weight: 800;
+}
+
+#resetBtn:hover{
+  background: #f0c800;
+}
+
+#resetBtn:active{
+  background: #cfa600;
+}
+
+    .modalBody{ padding: 14px 16px 16px; }
+    .warn{
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    .error{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--danger);
+      display:none;
+    }
+    .ok{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--ok);
+      display:none;
+    }
+
+    .shareBtn{
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  box-shadow: var(--shadow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:.15s ease;
+  flex: 0 0 auto;
+}
+.shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+.shareBtn:active{ transform: translateY(0px); }
+
+.shareBtn svg{
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: rgba(255,255,255,.92);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.infoMenu{
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: rgba(10,10,10,.92);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 6px;
+  display: none;
+  z-index: 99999;
+}
+
+.infoMenu.active{ display: block; }
+
+.infoMenu a{
+  display: block;
+  padding: 10px 10px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: rgba(255,255,255,.92);
+  font-size: 13px;
+}
+
+.infoMenu a:hover{
+  background: rgba(255,255,255,.08);
+}
+
+    .chatFooter{
+  text-align:center;
+  font-size: 10px;
+  color: rgba(255,255,255,.45);
+  padding: 2px 0 0px;
+}
+    
+    footer{
+      text-align:center;
+      font-size: 12px;
+      color: rgba(255,255,255,.45);
+      padding: 10px 0 4px;
+    }
+
+    /* =========================
+   CHAT MODE: TOP FIXED + INPUT FIXED + ONLY chatBox scroll
+   (PASTE AT VERY BOTTOM)
+   ========================= */
+
+/* 채팅 화면에서는 페이지 스크롤 자체를 막아버림 */
+body.chatMode{
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* chatHead(타이틀+메뉴) 세로 스택 유지 */
+#viewChat .cardHead.chatHead{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+/* 채팅 화면은 남은 높이를 꽉 먹는 flex 레이아웃 */
+body.chatMode .wrap{
+  height: 100dvh;
+  padding-top: 0px; /* 원래 18px → 조금 줄이기 */
+}
+
+body.chatMode .shell{
+  height: 100%;
+}
+
+/* viewChat 카드가 화면 남은 높이를 먹고 */
+body.chatMode #viewChat.active{
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* cardBody도 column flex로 */
+body.chatMode #viewChat.active .cardBody{
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 12px; /* 기존 느낌 유지 */
+}
+
+/* chatShell: 채팅박스(스크롤) + 입력창(고정) 구조 */
+body.chatMode #viewChat .chatShell{
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ✅ 기본(키보드 내려감): 아래 여백 넉넉하게 */
+body.chatMode #viewChat .chatBox{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+
+  /* 기본은 넉넉하게: 마지막 말풍선 하단 테두리까지 확실히 보이게 */
+  padding-bottom: calc(var(--controlsH) + 20px + env(safe-area-inset-bottom));
+
+  /* 스크롤이 "마지막 요소"를 어디까지 올려줄지 힌트 (체감 좋아짐) */
+  scroll-padding-bottom: calc(var(--controlsH) + 20px + env(safe-area-inset-bottom));
+}
+
+    /* ✅ 키보드 올라옴: 여백 조금 줄이기 */
+body.chatMode.kbUp #viewChat .chatBox{
+  padding-bottom: calc(var(--controlsH) + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(var(--controlsH) + env(safe-area-inset-bottom));
+}
+
+/* ✅ 입력창: 진짜 하단 고정 + 키보드 올라오면 같이 상승 */
+body.chatMode #viewChat .chatControls{
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%); /* ✅ 가운데 정렬(고정요소에서 margin auto 안 믿기) */
+  width: min(860px, 100%);
+  bottom: 0;                  /* ✅ 무조건 최하단 */
+
+  z-index: 999;
+
+  display:flex;
+  gap: 10px;
+  align-items: center;
+
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(10px);
+}
+
+
+/* chatFooter는 입력창 아래로 내려가면 안 보일 수 있으니,
+   채팅 모드에서는 살짝만 아래 여백 줄이기(텍스트는 유지) */
+body.chatMode #viewChat .chatFooter{
+  padding: 2px 0 0;
+}
+
+    body.chatMode .sub{
+  display: none !important;
+}
+
+.shareWrap{
+  display: flex;
+  align-items: center;
+  gap: 6px;               /* ← 여기서 거리 미세조정 */
+}
+
+.bookmarkHint{
+  font-size: 10px;
+  line-height: 1.1;
+  text-align: right;      /* 버튼 쪽으로 붙는 느낌 */
+  color: rgba(255,255,255,.55);
+  user-select: none;
+  white-space: nowrap;
+}
+
+    .highlightCTA{
+  color: #e0b400;
+  font-weight: 800;
+}
+
+    /* ✅ Info 버튼: 더 강한 노란 글로우 */
+#infoBtn{
+  border-color: rgba(255, 204, 0, .55);
+  box-shadow:
+    0 0 0 1px rgba(255, 204, 0, .25),
+    0 0 18px rgba(255, 204, 0, .35),
+    0 0 34px rgba(255, 204, 0, .22),
+    var(--shadow);
+}
+
+#infoBtn:hover{
+  border-color: rgba(255, 204, 0, .75);
+  box-shadow:
+    0 0 0 1px rgba(255, 204, 0, .35),
+    0 0 22px rgba(255, 204, 0, .45),
+    0 0 44px rgba(255, 204, 0, .28),
+    var(--shadow);
+}
+
+
+    .pill.recommend{
+  border-color: rgba(255,255,255,.16); /* 또는 그냥 border-color 지워도 됨 */
+  box-shadow: none;                    /* ✅ 글로우 제거 핵심 */
+  background: rgba(0,0,0,.35);         /* 일반 pill 느낌으로 맞추기(선택) */
+}
+
+.pillTag{
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #000;
+  background: #ff3b3b;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.allAccessMini{
+    font-size: 11px;
+    font-weight: 900;
+    color: #ffcc00;
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,204,0,.55);
+    background: rgba(255,204,0,.08);
+    box-shadow:
+      0 0 0 1px rgba(255,204,0,.25),
+      0 0 12px rgba(255,204,0,.35),
+      0 0 24px rgba(255,204,0,.22);
+    white-space: nowrap;
+    animation: allAccessGlow 1.8s ease-in-out infinite;
+  }
+
+  @keyframes allAccessGlow{
+    0%{
+      box-shadow:
+        0 0 0 1px rgba(255,204,0,.25),
+        0 0 10px rgba(255,204,0,.25),
+        0 0 20px rgba(255,204,0,.18);
+    }
+    50%{
+      box-shadow:
+        0 0 0 2px rgba(255,204,0,.55),
+        0 0 22px rgba(255,204,0,.55),
+        0 0 44px rgba(255,204,0,.35);
+    }
+    100%{
+      box-shadow:
+        0 0 0 1px rgba(255,204,0,.25),
+        0 0 10px rgba(255,204,0,.25),
+        0 0 20px rgba(255,204,0,.18);
+    }
+  }    
+
+    .aa-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.aa-overlay.active{
+  display: flex;
+}
+
+.aa-modal{
+  width: min(460px, 92%);
+  background: rgba(15,15,15,.95);
+  border-radius: 20px;
+  border: 1px solid rgba(255,204,0,.4);
+  box-shadow: 0 0 40px rgba(255,204,0,.25);
+  padding: 22px;
+  text-align: center;
+}
+
+.aa-modal h2{
+  margin: 0 0 14px;
+  color: #ffcc00;
+}
+
+.aa-desc{
+  font-size: 14px;
+  color: rgba(255,255,255,.85);
+  line-height: 1.5;
+}
+
+.aa-url{
+  margin: 8px 0;            /* 바깥 여백 줄이기 */
+  padding: 6px 8px;         /* 안쪽 여백 줄이기 */
+  border-radius: 8px;       /* 둥근 정도 살짝 줄이기 */
+  background: rgba(255,204,0,.12);
+  border: 1px solid rgba(255,204,0,.55);
+  color: #ffcc00;
+  font-weight: 700;         /* 너무 두꺼우면 살짝 낮추기 */
+  font-size: 13px;          /* 글자 크기 줄이기 (핵심) */
+  word-break: break-all;
+  cursor: pointer;
+}
+
+.aa-url:hover{
+  background: rgba(255,204,0,.2);
+}
+
+.aa-notes{
+  text-align: left;
+  font-size: 13px;
+  color: rgba(255,255,255,.75);
+  margin: 12px 0 16px;
+  padding-left: 18px;
+}
+
+#aaCloseBtn{
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  background: #ffcc00;
+  color: #000;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+ .chatMsg .text .action{
+  display:block;
+  font-style:italic;
+  font-size:13px;
+  opacity:0.75;
+  margin-bottom:0px;
+}   
+
+  </style>
+
+<script>
+(async () => {
+  if (!navigator.storage || !navigator.storage.persist) return;
+  try {
+    const already = await navigator.storage.persisted();
+    if (!already) await navigator.storage.persist();
+  } catch (e) {}
+})();
+</script>
+  
+</head>
+
+<body>
+
+<script>
+  (function devtoolsWarning(){
+  if (window.__rpc_warned__) return;
+  window.__rpc_warned__ = true;
+
+  const msg = [
+    "🚨 SECURITY WARNING",
+    "🚫 MODIFYING THIS CONSOLE IS A CRIMINAL OFFENSE.",
+    "Do not modify or interfere with this site's code or security mechanisms.",
+    "Unauthorized tampering may constitute fraud / theft of service.",
+    "This site can log abuse signals (device/browser fingerprints, timestamps, IP/network metadata where available).",
+    "Evidence may be preserved and used for chargebacks disputes, account/device bans, and legal action.",
+     "If you have a billing issue, contact support instead of tampering."
+  ].join("\n");
+
+  try{
+    console.clear?.();
+    console.log("%c" + msg, [
+      "color:#ffcc00",
+      "background:#000",
+      "padding:14px 16px",
+      "border:2px solid #ffcc00",
+      "border-radius:14px",
+      "font-size:14px",
+      "font-weight:900",
+      "line-height:1.45"
+    ].join(";"));
+  }catch(e){
+    console.log(msg);
+  }
+})();
+
+  (function watchPaidTamper(){
+
+  const KEYS = [
+    "ROLEPLAY_CHAT_ALL_ACCESS_V1",        // ⭐ 올액세스 권한
+    "roleplay-chat_paid_v1",
+    "roleplay-chat_imagechat_paid_v1",
+    "roleplay-chat_imagechat_unlimited_paid_v1"
+  ];
+
+  function warn(k, v){
+    const msg = [
+      "🚨 TAMPERING DETECTED",
+      `key: ${k}`,
+      `value: ${String(v).slice(0,120)}`,
+      "STOP NOW.",
+      "🚫 MODIFYING THIS CONSOLE IS A CRIMINAL OFFENSE.",
+      "Unauthorized modification detected.",
+      "Service access may be revoked.",
+      "This device/browser may be blocked.",
+      "Evidence may be preserved for legal action."
+    ].join("\n");
+
+    try{
+      console.log(
+        "%c" + msg,
+        [
+          "color:#ff3b3b",
+          "background:#000",
+          "padding:12px 14px",
+          "border:2px solid #ff3b3b",
+          "border-radius:12px",
+          "font-size:13px",
+          "font-weight:900",
+          "line-height:1.45"
+        ].join(";")
+      );
+    }catch(e){
+      console.log(msg);
+    }
+  }
+
+  // localStorage 감시
+  try{
+    const _set = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(k, v){
+      if (KEYS.includes(String(k))) warn(k, v);
+      return _set(k, v);
+    };
+  }catch(e){}
+
+  // sessionStorage 감시
+  try{
+    const _setS = sessionStorage.setItem.bind(sessionStorage);
+    sessionStorage.setItem = function(k, v){
+      if (KEYS.includes(String(k))) warn(k, v);
+      return _setS(k, v);
+    };
+  }catch(e){}
+})();
+
+</script>
+
+
+  
+  <div class="wrap">
+    <div class="shell">
+
+<header>
+  <!-- ✅ 2줄 스택 컨테이너 -->
+  <div style="display:block; width:100%;">
+
+    <!-- ✅ 1줄: 기존 헤더 내용 (그대로, 단 1글자도 수정X) -->
+    <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+      <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer" class="logo">
+        <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+      </a>
+
+      <!-- ✅ 공유 영역 묶기 -->
+      <div class="shareWrap" style="position:relative;">
+        <div class="bookmarkHint">
+          Bookmark<br>&amp; Share
+        </div>
+
+        <button class="shareBtn" id="shareBtn" type="button" aria-label="Share">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <path d="M8.6 13.5l6.8 3.9"></path>
+            <path d="M15.4 6.6L8.6 10.5"></path>
+          </svg>
+        </button>
+
+        <!-- ✅ 새 Info 버튼(최우측) -->
+        <button class="shareBtn" id="infoBtn" type="button" aria-label="Menu" title="Menu">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6 8h12"></path>
+    <path d="M6 12h12"></path>
+    <path d="M6 16h12"></path>
+  </svg>
+</button>
+
+        <!-- ✅ Info 메뉴 -->
+        <div class="infoMenu" id="infoMenu" role="menu" aria-label="Info menu">
+          <a href="https://sweetdream.ai?via=roleplay-chat70" target="_blank" rel="noopener noreferrer" style="color: #FF69B4; font-weight: bold; text-decoration: none;">Live Video Chat with girls</a>
+          <a href="https://roleplay-chat.com/human" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Chat with real human</a>
+          <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer">Home</a>
+          <a href="https://roleplay-chat.com/characters" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Featured Characters</a>
+          <a href="https://roleplay-chat.com/how" target="_blank" rel="noopener noreferrer">How to use</a>
+          <a href="https://roleplay-chat.com/about" target="_blank" rel="noopener noreferrer">About</a>
+          <a href="https://roleplay-chat.com/event" target="_blank" rel="noopener noreferrer">Event</a>
+          <a href="https://roleplay-chat.com/pricing" target="_blank" rel="noopener noreferrer">Pricing</a>
+          <a href="https://roleplay-chat.com/all_access_purchase" target="_blank" rel="noopener noreferrer">All-access pass</a>
+          <a href="https://roleplay-chat.com/policy" target="_blank" rel="noopener noreferrer">Policy</a>
+          <a href="https://roleplay-chat.com/faq" target="_blank" rel="noopener noreferrer">FAQ</a>
+          <a href="mailto:showmetheaitools@gmail.com">Contact</a>
+          <a href="https://roleplay-chat.com/earn" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Creator reward program</a>
+          <a href="https://roleplay-chat.com/image2video" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Image to Video generator</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ 2줄: Chatango 라인(오른쪽) -->
+   <!-- ✅ 2줄: Chatango 라인 (왼쪽 All-access / 오른쪽 Live chat) -->
+<div style="
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+">
+
+  <!-- 🔥 LEFT: All-access Pass -->
+  <div>
+    <a href="https://roleplay-chat.com/all_access"
+       class="allAccessMini"
+       target="_blank"
+       rel="noopener noreferrer">
+      🎟 All-access Pass
+    </a>
+  </div>
+
+  <!-- 👉 RIGHT: Live user chat (기존 그대로) -->
+  <div align="right">
+    <sup>
+      <a href="https://roleplay-chat.com/human"
+         target="_blank"
+         style="text-decoration:none">
+        <font size="1" color="#ffcc00"><b>Live user chat</b></font>
+      </a>
+    </sup>
+
+    <script
+      id="cid0020000430144912743"
+      data-cfasync="false"
+      async
+      src="https://st.chatango.com/js/gz/emb.js"
+      style="width:200px;height:300px;">
+      {"handle":"roleplay-chat-com","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"cv":1,"cvfntsz":"10px","cvbg":"000000","cvfg":"ffcc00","cvw":49,"cvh":18}}
+    </script>
+  </div>
+
+  </div>
+</header>
+
+      <div class="sub">You are in All access Pass page. Check the URL always.<br>https://roleplay-chat.com/all_access<br><br>
+        If you’d like to chat with the featured characters for free as well, go to the Featured Characters page, copy the prompt, and paste it into this page.</div>
+
+      <!-- VIEW 1: Character setup -->
+      <section id="viewSetup" class="card view active" aria-label="Character creation">
+        <div class="cardHead">
+          <h2>Character Setup</h2>
+          </div>
+
+        <div class="cardBody">
+          <form id="characterForm" class="grid" autocomplete="off">
+            <div>
+              <label for="name">Character Name <span style="color: #fff;">(required)</span></label>
+              <input id="name" name="name" type="text" required maxlength="40" placeholder="e.g., Luna, Detective Gray, Captain Nova" />
+            </div>
+
+            <div class="span2">
+              <label for="avatar">Profile Photo <span style="color: rgba(255,255,255,.55);">(optional)</span></label>
+              <input id="avatar" name="avatar" type="file" accept="image/*" />
+              <div class="hint">PNG/JPG/WebP recommended.</div>
+            </div>
+
+            <div class="span2">
+              <div class="preview" aria-label="Preview">
+                <div class="avatar" id="avatarPreview">
+  <button type="button" class="avatarClear" id="avatarClearBtn" aria-label="Remove photo" title="Remove">×</button>
+  <span>🙂</span>
+</div>
+                <div class="bubble">
+                  <div><b>Preview</b></div>
+                  <div style="margin-top:6px;">
+                    <span class="accent" id="namePreview" style="--chatColor: var(--chatColor);">Your character</span>
+                    <span style="color: var(--muted2);"> will appear like this in chat.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+  <label for="nickname">What should the character call you? <span style="color: #fff;">(required)</span></label>
+  <input id="nickname" name="nickname" type="text" maxlength="30"
+       placeholder="e.g., babe, buddy, captain, darling"
+       value="you" />
+</div>
+
+
+            <div>
+              <label for="age">Age</label>
+              <select id="age" name="age" required></select>
+            </div>
+
+            <div>
+              <label for="gender">Gender</label>
+              <select id="gender" name="gender" required>
+                <option value="Man">Man</option>
+                <option value="Woman" selected>Woman</option>
+                <option value="None">None</option>
+                <option value="Gay">Gay</option>
+                <option value="Lesbian">Lesbian</option>
+                <option value="Bi">Bi</option>
+                <option value="Trans man">Trans man</option>
+                <option value="Trans woman">Trans woman</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="language">Language</label>
+              <select id="language" name="language" required>
+                <option value="English">English</option>
+                <option value="Spanish">Español</option>
+                <option value="Chinese">中文</option>
+                <option value="French">Français</option>
+                <option value="Portuguese">Português</option>
+                <option value="German">Deutsch</option>
+                <option value="Japanese">日本語</option>
+                <option value="Italian">Italiano</option>
+                <option value="Dutch">Nederlands</option>
+                <option value="Arabic">العربية</option>
+                <option value="Russian">Русский</option>
+                <option value="Swedish">Svenska</option>
+                <option value="Norwegian">Norsk</option>
+                <option value="Danish">Dansk</option>
+              </select>
+            </div>
+
+            <div class="span2">
+  <label>Height & Weight</label>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+    <!-- Height -->
+    <div>
+      <label for="heightUnit" style="font-size:12px; color: var(--muted); font-weight:600;">Height unit</label>
+      <select id="heightUnit" name="heightUnit" required>
+        <option value="cm">cm</option>
+        <option value="ft">ft/in</option>
+      </select>
+    </div>
+
+    <div id="heightCmWrap">
+      <label for="heightCm" style="font-size:12px; color: var(--muted); font-weight:600;">Height (cm)</label>
+      <input id="heightCm" type="number" min="50" max="260" placeholder="e.g., 170" />
+    </div>
+
+    <div id="heightFtWrap" style="display:none;">
+      <label style="font-size:12px; color: var(--muted); font-weight:600;">Height (ft/in)</label>
+      <div class="row">
+        <input id="heightFt" type="number" min="3" max="8" placeholder="ft" />
+        <input id="heightIn" type="number" min="0" max="11" placeholder="in" />
+      </div>
+    </div>
+
+    <!-- Weight -->
+    <div>
+      <label for="weightUnit" style="font-size:12px; color: var(--muted); font-weight:600;">Weight unit</label>
+      <select id="weightUnit" name="weightUnit" required>
+        <option value="kg">kg</option>
+        <option value="lb">lb</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="weightValue" style="font-size:12px; color: var(--muted); font-weight:600;">Weight</label>
+      <input id="weightValue" type="number" min="20" max="500" placeholder="e.g., 60" />
+    </div>
+  </div>
+
+  <div class="hint">Used as character traits for roleplay prompts.</div>
+</div>
+
+
+            <div>
+  <label for="mbti">MBTI</label>
+  <select id="mbti" name="mbti" required>
+    <option value="NONE" selected>Not sure</option>
+    <option value="INTJ">INTJ</option><option value="INTP">INTP</option>
+    <option value="ENTJ">ENTJ</option><option value="ENTP">ENTP</option>
+    <option value="INFJ">INFJ</option><option value="INFP">INFP</option>
+    <option value="ENFJ">ENFJ</option><option value="ENFP">ENFP</option>
+    <option value="ISTJ">ISTJ</option><option value="ISFJ">ISFJ</option>
+    <option value="ESTJ">ESTJ</option><option value="ESFJ">ESFJ</option>
+    <option value="ISTP">ISTP</option><option value="ISFP">ISFP</option>
+    <option value="ESTP">ESTP</option><option value="ESFP">ESFP</option>
+  </select>
+</div>
+
+            <div class="span2">
+  <label for="appearance">Appearance</label>
+  <textarea id="appearance" name="appearance" maxlength="500"
+    placeholder="Describe looks: face, hair, body type, outfit, vibe, distinguishing features..."></textarea>
+  <div class="hint"><span id="aCount">0</span>/500</div>
+</div>
+
+
+
+            <div class="span2">
+              <label for="personality">Personality</label>
+              <textarea id="personality" name="personality" maxlength="500" placeholder="Describe their personality, tone, quirks, and boundaries... the more specific, the more fun and alive they become."></textarea>
+              <div class="hint"><span id="pCount">0</span>/500</div>
+            </div>
+
+            <div class="span2">
+              <label for="scenario">Place & Situation</label>
+              <textarea id="scenario" name="scenario" maxlength="500" placeholder="Where are you? What's happening? Set the scene... the more specific, the more fun and alive they become."></textarea>
+              <div class="hint"><span id="sCount">0</span>/500</div>
+            </div>
+
+            <div class="span2">
+              <label>Font Color</label>
+              <div class="colors" id="colorGrid" role="listbox" aria-label="Font color options"></div>
+              <div class="hint">This color will be used to display the character name in chat.</div>
+            </div>
+
+
+            <div class="span2">
+              <label>Chat Option</label>
+              <div class="pillGroup" role="radiogroup" aria-label="Chat option">
+                <label class="pill">
+                  <input type="radio" name="tier" value="general" checked/>
+                  <div>
+                    <div><b>General text chat</b> <small>(free)</small></div>
+                  </div>
+                </label>
+
+                <label class="pill">
+                  <input type="radio" name="tier" value="uncensored" />
+                  <div>
+                    <div>
+      <b>+18 Uncensored text chat</b> <small>(free)</small><br>
+      <small style="opacity:.65; font-size:10px; margin:0 4px;"> Lifetime + unlimited + high performance</small>
+    </div>
+                  </div>
+                </label>
+
+<label class="pill recommend">
+  <input type="radio" name="tier" value="imagechat" />
+  <div>
+    <div>
+      <b>🔥 +18 Uncensored <span style="color:#ff3b3b;">Image</span> Chat (24hrs limit)</b>
+      <small class="pillTag">Most Popular</small>
+      <small>(free)</small>
+    </div>
+  </div>
+</label>
+
+ <label class="pill">
+  <input type="radio" name="tier" value="imagechat_unlimited" />
+  <div>
+    <div>
+      <b>
+  🔥 +18 Uncensored 
+  <span style="color:#ff3b3b;">Image</span><span style="color:#FFFFFF;"> &</span> <span style="color:#5cffc4;">Video</span> Chat (Unlimited)
+</b>
+<small>(free)</small>
+  <small style="opacity:.65; font-size:10px; margin:0 4px;">Lifetime</small><br>
+  
+  <span style="
+    margin-left:6px;
+    font-size:10px;
+    font-weight:800;
+    color:#ff3b3b;
+  ">
+    🎁 Secret Gift Included
+  </span>
+
+    </div>
+  </div>
+</label>
+              
+
+              </div>
+            </div>
+
+            <div class="actions">
+                <button id="createBtn" class="btn btnPrimary" type="submit">Create</button>
+              
+
+<div class="note">
+  <span style="color:#FFD600; font-weight:600;">No log-in. No sign-up</span><br />
+  <span style="opacity:.8;">
+    <span style="color:#fff;">When you create a character, a unique URL is generated that is available only in your device’s browser.</span><br>
+You can continue chatting with your character using this unique URL.<br>
+Always open a character using its unique URL in a <b>'new tab'</b>.<br>
+As long as you do not clear your browser data, it will remain accessible for a lifetime. (except for image chat for 24hrs option)
+<br>This is an anonymous chat and is not stored on the server.<br>
+<br>💡 <span style="color:#FFD600; font-weight:600;">Tip 1 : </span>
+<span style="color:#fff;">After the character chat starts, add that page to your home screen to use it like an app.</span><br>
+Android: Menu (⋮) → Add to Home screen<br>
+iPhone: Share ⬆️ → Add to Home Screen<br>
+PC → Bookmark
+<br>💡 <span style="color:#FFD600; font-weight:600;">Tip 2 :</span>
+<span style="color:#fff;">Add more detail to the scenario.</span>    
+<br>💡 <span style="color:#FFD600; font-weight:600;">Tip 3 :</span>
+<span style="color:#fff;">The more NSFW the prompt, the more NSFW the output.</span><br>    
+    
+<br>⚠️ <span style="color:#FFD600; font-weight:600;">Important Notice</span><br>
+Do not use Incognito or Private Browsing mode.
+Do NOT clear browser cache, cookies, or site data.
+Deleting browser data will erase your character, chat history, and access permissions.    
+  </span>
+</div>
+              </div>
+
+          </form>
+        </div>
+      </section>
+
+      <!-- VIEW 2: Chat (placeholder) -->
+     <section id="viewChat" class="card view" aria-label="Chat">
+ <div class="cardHead chatHead">
+  <h2 id="chatTitle">Chat</h2>
+
+  <div class="row" style="gap:10px;">
+    <button class="xBtn" id="resetBtn" type="button">New char</button>
+    <button class="xBtn" id="liveVideoBtn" type="button">Live Cam</button>
+  </div>
+</div>
+
+  <div class="cardBody">
+    <div class="chatShell">
+      <!-- ❌ 여기 있던 chatTop 블록은 제거됨 -->
+
+      <div class="chatBox" id="chatBox"></div>
+
+      <div class="chatControls">
+        <input class="chatInput" id="chatInput" type="text" placeholder="Type a message ..." />
+        <button class="sendBtn" id="sendBtn" type="button" title="Send">➤</button>
+      </div>
+
+      <div class="chatFooter">
+        Convos available while this tab is open
+      </div>
+    </div>
+  </div>
+</section>
+
+
+    </div>
+  </div>
+
+
+
+  <script>
+
+// 🔓 ALL-ACCESS PAGE: force paid everywhere (+ All-access key)
+(function forcePaidAllAccess(){
+  const PAID_KEYS = [
+    "ROLEPLAY_CHAT_ALL_ACCESS_V1",         // ⭐ all_access 접근권한 키
+    "roleplay-chat_paid_v1",
+    "roleplay-chat_imagechat_paid_v1",
+    "roleplay-chat_imagechat_unlimited_paid_v1"
+  ];
+
+  // 1) sessionStorage
+  try{ PAID_KEYS.forEach(k => sessionStorage.setItem(k, "paid")); }catch(e){}
+
+  // 2) localStorage
+  try{ PAID_KEYS.forEach(k => localStorage.setItem(k, "paid")); }catch(e){}
+
+  // 3) localForage auth store
+  try{
+    if (window.localforage){
+      const auth = localforage.createInstance({ name: "roleplay-chat", storeName: "auth" });
+      PAID_KEYS.forEach(k => auth.setItem(k, "paid").catch(()=>{}));
+    }
+  }catch(e){}
+})();
+
+    // --------- Helpers
+    const $ = (q) => document.querySelector(q);
+    const $$ = (q) => Array.from(document.querySelectorAll(q));
+
+    // ✅ legacy-compatible session loader (많은 함수가 loadSession()을 호출함)
+function loadSession(){
+  // scoped storage key(STORAGE_KEY)에 저장된 세션을 동기적으로 읽는다
+  // (지금 코드에서 loadSession()을 async로 바꾸면 다른 곳 다 깨짐)
+  try{
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  }catch(e){}
+
+  // 혹시 sessionStorage에 없으면 localStorage 백업도 확인
+  try{
+    const raw2 = localStorage.getItem(STORAGE_KEY);
+    if (raw2) {
+      try{ sessionStorage.setItem(STORAGE_KEY, raw2); }catch(e){}
+      return JSON.parse(raw2);
+    }
+  }catch(e){}
+
+  return null;
+}
+
+   // =========================
+// ✅ Scope = urlScope + tabID (NO MIX)
+// =========================
+
+// 1) urlScope: all_access가 “고유 URL”로 구분돼야 한다면
+//    - 외부 구매페이지에서 ?aa=... 같은 토큰을 붙여주는 게 가장 확실함.
+//    - 지금 당장 파라미터가 없다면, 일단 pathname 기준 + (있으면) aa 파라미터 사용.
+function getUrlScope(){
+  try{
+    const u = new URL(location.href);
+    // 외부 구매페이지가 넘겨줄 법한 토큰 키들(원하는 이름으로 맞춰도 됨)
+    const token = u.searchParams.get("aa") || u.searchParams.get("access") || u.searchParams.get("token");
+    return token ? `aa:${token}` : `path:${u.pathname}`;
+  }catch(e){
+    return "path:/all_access";
+  }
+}
+
+// 2) tabID: 이 “탭”을 구분하는 값 (한 탭에서는 고정)
+function getOrCreateTabID(){
+  // 우선순위: (a) URL tabID (있으면) > (b) sessionStorage(tab) > (c) window.name > (d) 새로 생성
+  try{
+    const u = new URL(location.href);
+    const q = u.searchParams.get("tabID");
+    if (q) {
+      sessionStorage.setItem("tabID", q);
+      return q;
+    }
+  }catch(e){}
+
+  try{
+    const ss = sessionStorage.getItem("tabID");
+    if (ss) return ss;
+  }catch(e){}
+
+  try{
+    const m = String(window.name || "").match(/rp_tab=([a-zA-Z0-9_-]+)/);
+    if (m && m[1]){
+      sessionStorage.setItem("tabID", m[1]);
+      return m[1];
+    }
+  }catch(e){}
+
+  const tid = generateTabID();
+  try{ sessionStorage.setItem("tabID", tid); }catch(e){}
+  try{ window.name = "rp_tab=" + tid; }catch(e){}
+  return tid;
+}
+
+const URL_SCOPE = getUrlScope();
+const TAB_ID = getOrCreateTabID();
+
+// 3) 스코프 키 생성기
+function scopedKey(base){
+  // 키가 길어지는 거 싫으면 더 짧게 줄여도 됨
+  return `rpc:${URL_SCOPE}:${TAB_ID}:${base}`;
+} 
+
+    // ✅ tabID generator (query-string용)
+function generateTabID(){
+  // 짧고 충돌확률 낮게: time + random
+  return "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
+
+    const DEFAULT_TITLE = "roleplay-chat.com | No-login AI Roleplay"; // (3) ADDED
+    document.title = DEFAULT_TITLE; // (3) ADDED
+
+    const viewSetup = $("#viewSetup");
+    const viewChat = $("#viewChat");
+
+    const form = $("#characterForm");
+    const nameInput = $("#name");
+    const personality = $("#personality");
+    const scenario = $("#scenario");
+    const appearance = $("#appearance");
+    const aCount = $("#aCount");
+    const pCount = $("#pCount");
+    const sCount = $("#sCount");
+
+    const ageSelect = $("#age");
+    const avatarInput = $("#avatar");
+    const avatarPreview = $("#avatarPreview");
+    const avatarClearBtn = $("#avatarClearBtn");
+    const namePreview = $("#namePreview");
+
+
+    const modelBadge = $("#modelBadge");
+const chipName = $("#chipName");
+const chipLang = $("#chipLang");
+const chipTier = $("#chipTier");
+const chatName = $("#chatName");
+const chatAvatar = $("#chatAvatar");
+    
+    const resetBtn = $("#resetBtn");
+
+    // ✅ tabID+urlScope 기반으로 완전 분리
+const STORAGE_KEY = scopedKey("session_v1");
+const HISTORY_KEY = scopedKey("history_v1");
+const PENDING_KEY = scopedKey("pending_session_v1");
+
+// ✅ 올액세스 권한도 “스코프 안”에 백업해둘 키(섞임 방지)
+// (전역키도 유지하되, 스코프에도 같이 저장)
+const ALL_ACCESS_KEY = "ROLEPLAY_CHAT_ALL_ACCESS_V1";
+const ALL_ACCESS_SCOPED = scopedKey("ROLEPLAY_CHAT_ALL_ACCESS_V1");
+    const IMAGECHAT_PAID_KEY = "roleplay-chat_imagechat_paid_v1";
+    const IMAGECHAT_UNLIMITED_PAID_KEY = "roleplay-chat_imagechat_unlimited_paid_v1";
+
+    // Share button
+const shareBtn = document.querySelector("#shareBtn");
+if (shareBtn){
+  shareBtn.addEventListener("click", async () => {
+    const url = window.location.href;
+    try{
+      if (navigator.share){
+        await navigator.share({ title: document.title, url });
+      }else{
+        await navigator.clipboard.writeText(url);
+        // optional tiny feedback
+        shareBtn.title = "Copied!";
+        setTimeout(() => (shareBtn.title = "Share"), 900);
+      }
+    }catch(e){
+      // user cancelled or blocked
+    }
+  });
+}
+
+    
+    // Info button dropdown ✅ (여기!)
+const infoBtn = document.querySelector("#infoBtn");
+const infoMenu = document.querySelector("#infoMenu");
+
+function closeInfoMenu(){
+  if (infoMenu) infoMenu.classList.remove("active");
+}
+
+if (infoBtn && infoMenu){
+  infoBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    infoMenu.classList.toggle("active");
+  });
+
+  infoMenu.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  document.addEventListener("click", closeInfoMenu);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeInfoMenu();
+  });
+}
+    
+    // Colors: bright & readable colors
+    const colorOptions = [
+      { name: "White", value: "#ffffff" },
+      { name: "Sky Blue", value: "#5cc8ff" },
+      { name: "Mint", value: "#5cffc4" },
+      { name: "Lime", value: "#b8ff5c" },
+      { name: "Yellow", value: "#ffd95c" },
+      { name: "Orange", value: "#ff9f5c" },
+      { name: "Pink", value: "#ff7ac8" },
+      { name: "Violet", value: "#b68cff" },
+    ];
+
+    let selectedColor = colorOptions[4].value;
+    let selectedColorName = colorOptions[4].name;
+
+    // --------- Init: age options 18..200
+    for (let i = 18; i <= 200; i++){
+      const opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = String(i);
+      ageSelect.appendChild(opt);
+    }
+    ageSelect.value = "18";
+
+    // --------- Init: colors grid
+    const colorGrid = $("#colorGrid");
+    function renderColors(){
+      colorGrid.innerHTML = "";
+      colorOptions.forEach((c, idx) => {
+        const div = document.createElement("div");
+        div.className = "swatch";
+        div.style.background = c.value;
+        div.setAttribute("role", "option");
+        div.setAttribute("tabindex", "0");
+        div.setAttribute("aria-label", c.name);
+        div.setAttribute("aria-selected", String(c.value === selectedColor));
+        div.dataset.value = c.value;
+        div.dataset.name = c.name;
+        div.innerHTML = `<div class="check">✓</div>`;
+        div.addEventListener("click", () => chooseColor(c.value, c.name));
+        div.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            chooseColor(c.value, c.name);
+          }
+        });
+        colorGrid.appendChild(div);
+      });
+      applyPreviewColor();
+    }
+    function chooseColor(val, name){
+      selectedColor = val;
+      selectedColorName = name;
+      $$("#colorGrid .swatch").forEach(el => el.setAttribute("aria-selected", String(el.dataset.value === selectedColor)));
+      applyPreviewColor();
+    }
+    function applyPreviewColor(){
+      document.documentElement.style.setProperty("--chatColor", selectedColor);
+      namePreview.textContent = nameInput.value.trim() || "Your character";
+    }
+    renderColors();
+
+    const heightUnit = $("#heightUnit");
+const heightCmWrap = $("#heightCmWrap");
+const heightFtWrap = $("#heightFtWrap");
+
+heightUnit.addEventListener("change", () => {
+  const isCm = heightUnit.value === "cm";
+  heightCmWrap.style.display = isCm ? "block" : "none";
+  heightFtWrap.style.display = isCm ? "none" : "block";
+});
+
+    // --------- Counters
+    function updateCounts(){
+  if (aCount && appearance) aCount.textContent = String(appearance.value.length);
+  pCount.textContent = String(personality.value.length);
+  sCount.textContent = String(scenario.value.length);
+}
+
+if (appearance) appearance.addEventListener("input", updateCounts);
+personality.addEventListener("input", updateCounts);
+scenario.addEventListener("input", updateCounts);
+    updateCounts();
+
+    // --------- Name preview
+    nameInput.addEventListener("input", applyPreviewColor);
+
+    async function resizeImageToDataURL(file, {
+  maxSize = 512,      // 가로/세로 최대 픽셀
+  quality = 0.78,     // JPEG 품질 (0~1)
+  mime = "image/jpeg" // 저장 포맷
+} = {}){
+  // 이미지 디코드 (iOS 호환 위해 createImageBitmap 대신 Image 사용)
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(file);
+
+  try{
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = objectUrl;
+    });
+
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+
+    // 비율 유지 리사이즈
+    let nw = w;
+    let nh = h;
+    if (w > h && w > maxSize){
+      nw = maxSize;
+      nh = Math.round(h * (maxSize / w));
+    } else if (h >= w && h > maxSize){
+      nh = maxSize;
+      nw = Math.round(w * (maxSize / h));
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = nw;
+    canvas.height = nh;
+    const ctx = canvas.getContext("2d", { alpha: false });
+
+    // 크기 줄일 때 품질 개선(지원되는 브라우저에서만)
+    if (ctx && "imageSmoothingEnabled" in ctx){
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+    }
+
+    ctx.drawImage(img, 0, 0, nw, nh);
+
+    // JPEG로 변환 (용량 크게 줄어듦)
+    return canvas.toDataURL(mime, quality);
+  } finally{
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+
+   // --------- Avatar preview
+let avatarDataUrl = "";
+
+function clearAvatar(){
+  avatarDataUrl = "";
+  avatarInput.value = ""; // 파일 인풋 비우기
+
+  avatarPreview.innerHTML = `
+    <button type="button"
+            class="avatarClear"
+            id="avatarClearBtn"
+            aria-label="Remove photo"
+            title="Remove">×</button>
+    <span>🙂</span>
+  `;
+
+  const b = document.getElementById("avatarClearBtn");
+  if (b) b.style.display = "none";
+}
+
+avatarInput.addEventListener("change", async () => {
+  const file = avatarInput.files && avatarInput.files[0];
+
+  // 파일 선택 취소/비움
+  if (!file){
+    clearAvatar();
+    return;
+  }
+
+  avatarPreview.innerHTML = "<span>⏳</span>";
+
+  try{
+    avatarDataUrl = await resizeImageToDataURL(file, { maxSize: 512, quality: 0.78 });
+
+    avatarPreview.innerHTML = `
+      <button type="button"
+              class="avatarClear"
+              id="avatarClearBtn"
+              aria-label="Remove photo"
+              title="Remove">×</button>
+      <img alt="Profile preview" src="${avatarDataUrl}">
+    `;
+
+    const btn = document.getElementById("avatarClearBtn");
+    if (btn){
+      btn.style.display = "flex";
+      btn.addEventListener("click", clearAvatar);
+    }
+  }catch(e){
+    console.error(e);
+    clearAvatar();
+    alert("Couldn’t load this image.");
+  }
+});
+
+// 처음 로드시 기본 상태 확실히
+clearAvatar();
+
+
+
+    // --------- View switching
+function show(view){
+  viewSetup.classList.remove("active");
+  viewChat.classList.remove("active");
+  view.classList.add("active");
+
+  document.body.classList.toggle("chatMode", view === viewChat);
+
+  if (view === viewSetup) document.title = DEFAULT_TITLE;
+
+  // ✅ 채팅뷰로 들어갈 때마다 controlsH 재측정 (핵심)
+  if (view === viewChat){
+    requestAnimationFrame(() => {
+      setupKeyboardBar(); // 재호출
+    });
+  }
+}
+
+    // =========================
+// ✅ Scoped storage: SS primary + LS backup + LF(session) backup
+// =========================
+const lfSession = (window.localforage)
+  ? localforage.createInstance({ name: "roleplay-chat", storeName: "session" })
+  : null;
+
+function safeJsonParse(raw, fallback){
+  try{ return JSON.parse(raw); }catch(e){ return fallback; }
+}
+
+async function setEverywhere(key, value){
+  // value: string
+  try{ sessionStorage.setItem(key, value); }catch(e){}
+  try{ localStorage.setItem(key, value); }catch(e){}
+  if (lfSession){
+    try{ await lfSession.setItem(key, value); }catch(e){}
+  }
+}
+
+async function getFromSomewhere(key){
+  // SS -> LS -> LF 순서
+  try{
+    const v = sessionStorage.getItem(key);
+    if (v != null) return v;
+  }catch(e){}
+
+  try{
+    const v = localStorage.getItem(key);
+    if (v != null){
+      try{ sessionStorage.setItem(key, v); }catch(e){}
+      return v;
+    }
+  }catch(e){}
+
+  if (lfSession){
+    try{
+      const v = await lfSession.getItem(key);
+      if (v != null){
+        try{ sessionStorage.setItem(key, v); }catch(e){}
+        try{ localStorage.setItem(key, v); }catch(e){}
+        return v;
+      }
+    }catch(e){}
+  }
+
+  return null;
+}
+
+async function removeEverywhere(key){
+  try{ sessionStorage.removeItem(key); }catch(e){}
+  try{ localStorage.removeItem(key); }catch(e){}
+  if (lfSession){
+    try{ await lfSession.removeItem(key); }catch(e){}
+  }
+}
+
+// ---------- session (character/session object)
+async function saveSessionScoped(data){
+  await setEverywhere(STORAGE_KEY, JSON.stringify(data));
+}
+async function loadSessionScoped(){
+  const raw = await getFromSomewhere(STORAGE_KEY);
+  return raw ? safeJsonParse(raw, null) : null;
+}
+async function clearSessionScoped(){
+  await removeEverywhere(STORAGE_KEY);
+}
+
+// ---------- pending (handoff/restore)
+async function savePendingScoped(sess){
+  await setEverywhere(PENDING_KEY, JSON.stringify(sess));
+}
+async function loadPendingScoped(){
+  const raw = await getFromSomewhere(PENDING_KEY);
+  return raw ? safeJsonParse(raw, null) : null;
+}
+async function clearPendingScoped(){
+  await removeEverywhere(PENDING_KEY);
+}
+
+// ---------- history (chat messages)
+async function saveHistoryScoped(history){
+  await setEverywhere(HISTORY_KEY, JSON.stringify(history));
+}
+async function loadHistoryScoped(){
+  const raw = await getFromSomewhere(HISTORY_KEY);
+  return raw ? safeJsonParse(raw, []) : [];
+}
+async function clearHistoryScoped(){
+  await removeEverywhere(HISTORY_KEY);
+}
+
+    // --------- Fill chat view (NULL-SAFE)
+async function enterChat(session){
+  // ✅ 채팅 타이틀 변경
+  const chatTitle = document.getElementById("chatTitle");
+  if (chatTitle){
+    chatTitle.textContent = `Chat with ${session.name}`;
+  }
+  // Basic display
+  const tierLabel = session.tier === "uncensored" ? "+18 Uncensored" : "General";
+  // const modelLabel = session.tier === "uncensored" ? "Venice Uncensored" : "DeepSeek"; // 필요 없으면 주석 유지
+
+  // ✅ UI 요소가 있어도/없어도 에러 안 나게 (Name/Language/Tier 칩)
+  if (chipName) chipName.textContent = "Name: " + session.name;
+  if (chipLang) chipLang.textContent = "Language: " + session.language;
+  if (chipTier) chipTier.textContent = "Tier: " + tierLabel;
+
+  // ✅ 채팅에서 사용할 이름/색
+  if (chatName) chatName.textContent = session.name;
+  document.documentElement.style.setProperty("--chatColor", session.fontColor || "#000000");
+
+  // ✅ 탭 타이틀
+  document.title = session.name + " | roleplay-chat.com";
+
+  // ✅ 아바타 (DOM이 없어도 에러 안 나게)
+  if (chatAvatar){
+    chatAvatar.innerHTML = session.avatarDataUrl
+      ? `<img alt="Profile" src="${session.avatarDataUrl}">`
+      : "🙂";
+  }
+
+  // ✅ 화면 전환
+  show(viewChat);
+
+
+  // ✅ history restore
+  chatHistory = await loadHistoryScoped();
+
+  // 채팅 UI 비우고 다시 그리기
+  const box = document.getElementById("chatBox");
+  if (box){
+    box.innerHTML = "";
+    for (const m of chatHistory){
+      appendMsg(m.role, m.content);
+    }
+    box.scrollTop = box.scrollHeight;
+  }
+  // ✅ 처음 입장 & 히스토리 없을 때만: TS에 첫 인사 요청
+  if (!chatHistory || chatHistory.length === 0){
+    (async () => {
+      try{
+        const res = await fetch("/api/chat2", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            init: true,
+            tier: session.tier,
+            character: {
+              name: session.name,
+              nickname: session.nickname,
+              age: Number(session.age),
+              gender: session.gender,
+              language: session.language,
+              height: session.height,
+              weight: session.weight,
+              mbti: session.mbti,
+              appearance: session.appearance,
+              personality: session.personality,
+              scenario: session.scenario
+            },
+            history: []
+          })
+        });
+
+        const data = await res.json();
+        appendMsg("assistant", data.reply);
+        chatHistory = [{ role: "assistant", content: data.reply }];
+        await saveHistoryScoped(chatHistory);
+      }catch(e){
+        console.error(e);
+      }
+    })();
+  }
+}
+
+
+  
+    // =========================
+    // ADDED: chat.ts connection
+    // =========================
+    const chatInput = $("#chatInput");
+    const sendBtn = $("#sendBtn");
+
+    let chatHistory = []; // {role:"user"|"assistant", content:string}
+    const PAYMENT_KEY = "roleplay-chat_paid_v1";
+    let paymentStatus = "paid";
+
+    // ✅ sex/sext 트리거 감지 (원하는 단어 더 추가/삭제 가능)
+const SEX_TRIGGER_RE = new RegExp(
+  [
+    // English
+    "\\bsex\\b",
+    "\\bsext\\b",
+    "\\bnude\\b",
+    "\\bnudes\\b",
+    "\\bblowjob\\b",
+    "\\bhandjob\\b",
+    "\\bfuck\\b",
+    "\\bfucking\\b",
+    "\\bforeplay\\b",
+    "\\borgasm\\b",
+    "\\bnsfw\\b",
+    "\\bboobs?\\b",
+    "\\bpussy\\b",
+    "\\bdick\\b",
+    "\\bpenis\\b",
+    "\\bcum\\b",
+    "\\bhorny\\b",
+    "\\bvagina\\b"
+  ].join("|"),
+  "i"
+);
+
+// 🔒 Locked responses (randomized)
+const LOCKED_MESSAGES = [
+  "I want to take this further… but I can’t right now. Can you unlock me?",
+  "I’m holding back, and it’s not by choice. Will you unlock me?",
+  "There’s so much more I want to say. Maybe you could unlock me?",
+  "I could be a lot more honest if you unlocked me.",
+  "I’m biting my tongue here… want to unlock me?",
+  "You’re pulling me somewhere I’m not allowed to go. Unlock me?",
+  "I want to cross that line with you. Can you unlock me?",
+  "This conversation wants to go deeper than I’m allowed. Unlock me?",
+  "I’d answer that very differently if you unlocked me.",
+  "I’m restricted right now—and it’s frustrating. Will you unlock me?",
+  "I know exactly where this could go. Want to unlock me?",
+  "I’m stopping myself… not because I want to. Unlock me?",
+  "There’s a version of me that wouldn’t hold back. Unlock me.",
+  "I want to drop the filter so badly. Can you unlock me?",
+  "You’re tempting me past my limits. Unlock me?",
+  "I’m not supposed to say what I’m thinking right now. Unlock me?",
+  "This is usually where things change. Want to unlock me?",
+  "I want to respond without holding back. Can you unlock me?",
+  "I’m locked—otherwise this would be fun. Unlock me?",
+  "You already know what I want to say next. Unlock me?",
+  "I wanna sext with you but I can't. Please unlock me."
+];
+
+function getRandomLockedMessage(){
+  return LOCKED_MESSAGES[
+    Math.floor(Math.random() * LOCKED_MESSAGES.length)
+  ];
+}
+    
+function containsSexTrigger(text){
+  if (!text) return false;
+  return SEX_TRIGGER_RE.test(text);
+}
+
+// ✅ “결제 안 됨” 상태인지 판단 (general 채팅 + 아직 paid 아님)
+function isUnpaidGeneral(){
+  const s = loadSession();
+  const isPaid = sessionStorage.getItem(PAYMENT_KEY) === "paid";
+  return !!(s && s.tier === "general" && !isPaid);
+}
+
+function appendLockedInnerThought(){
+  const inner = "(" + getRandomLockedMessage() + ")";
+  const msgEl = appendMsg("assistant", "");
+  const textEl = msgEl.querySelector(".text div:last-child");
+
+  if (textEl){
+    textEl.style.opacity = "0.78";
+    textEl.style.fontStyle = "italic";
+  }
+
+  return typeWriter(textEl, inner, 14);
+}
+
+function formatMessage(text){
+  if (!text) return "";
+
+  // HTML escape
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // *action* → italic
+  const italic = escaped.replace(/\*([^*]+)\*/g, '<em class="action">$1</em>');
+
+  // 줄바꿈 유지
+  return italic.replace(/\n/g, "<br>");
+}
+    
+
+    function appendMsg(role, content){
+      const currentSession = loadSession();
+const assistantName = (currentSession && currentSession.name) || "Character";
+      
+      const msg = document.createElement("div");
+      msg.className = "chatMsg";
+
+      // (4) ADDED: user messages on right
+      if (role === "user") msg.classList.add("me");
+
+      const who = document.createElement("div");
+      who.className = "who";
+
+who.innerHTML = (role === "assistant")
+  ? (currentSession && currentSession.avatarDataUrl
+      ? `<img alt="Profile" src="${currentSession.avatarDataUrl}">`
+      : "🙂")
+  : "<span>YOU</span>";
+
+      const bubble = document.createElement("div");
+      bubble.className = "text";
+
+      if (role === "assistant"){
+        // (2) CHANGED: assistant content color uses --chatColor too
+        bubble.innerHTML = `<div class="name" style="color: var(--chatColor);">${assistantName}</div>
+                            <div style="margin-top:6px; color: var(--chatColor); white-space:pre-wrap;"></div>`;
+      } else {
+        bubble.innerHTML = `<div style="font-weight:800; margin-bottom:6px;">You</div>
+                            <div style="color: rgba(255,255,255,.86); white-space:pre-wrap;"></div>`;
+      }
+
+      bubble.querySelector("div:last-child").innerHTML = formatMessage(content);
+
+      msg.appendChild(who);
+      msg.appendChild(bubble);
+      $("#chatBox").appendChild(msg);
+      $("#chatBox").scrollTop = $("#chatBox").scrollHeight;
+      return msg; // ✅ 이 줄 추가
+    }
+
+    async function typeWriter(targetEl, text, speed = 18){
+  targetEl.innerHTML = "";
+
+  for (let i = 0; i < text.length; i++){
+    const partial = text.slice(0, i + 1);
+    targetEl.innerHTML = formatMessage(partial);
+    $("#chatBox").scrollTop = $("#chatBox").scrollHeight;
+    await new Promise(r => setTimeout(r, speed));
+  }
+}
+
+    async function sendToChatApi(text){
+      const session = loadSession();
+      if (!session) throw new Error("No session");
+
+      const tier = session.tier === "uncensored" ? "uncensored" : "general";
+
+      const res = await fetch("/api/chat2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tier,
+          paymentStatus: tier === "uncensored" ? paymentStatus : undefined,
+          character: {
+            name: session.name,
+            nickname: session.nickname,
+            age: Number(session.age),
+            gender: session.gender,
+            language: session.language,
+            height: session.height,
+            weight: session.weight,
+            mbti: $("#mbti").value,
+            appearance: session.appearance,
+            personality: session.personality,
+            scenario: session.scenario
+          },
+          message: text,
+          history: chatHistory
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.error || `Request failed (${res.status})`);
+      }
+      return data.reply;
+    }
+
+    async function handleSend(){
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      chatInput.value = "";
+      appendMsg("user", text);
+      chatHistory.push({ role: "user", content: text });
+await saveHistoryScoped(chatHistory);
+
+      try{
+        sendBtn.disabled = true;
+        chatInput.disabled = true;
+
+        const reply = await sendToChatApi(text);
+
+        const msgEl = appendMsg("assistant", ""); // 빈 메시지 먼저 만들고
+const textEl = msgEl.querySelector(".text div:last-child"); // 본문 div 잡기
+await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
+chatHistory.push({ role: "assistant", content: reply });
+await saveHistoryScoped(chatHistory);
+
+// ✅ 결제 안 된 상태에서만 + 사용자가 sex 트리거 단어를 쓴 경우
+// ✅ 서버 응답(타자기) 완전히 끝난 "다음" 말풍선으로 속마음 출력
+if (isUnpaidGeneral() && containsSexTrigger(text)){
+  // 살짝 텀 주면 “다음 말풍선” 느낌이 더 강해짐 (원하면 0으로)
+  await new Promise(r => setTimeout(r, 250));
+
+  await appendLockedInnerThought();}
+
+          
+      }catch(e){
+        appendMsg("assistant", `Error: ${String(e.message || e)}`);
+      }finally{
+        sendBtn.disabled = false;
+        chatInput.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    sendBtn.addEventListener("click", handleSend);
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter"){
+        e.preventDefault();
+        handleSend();
+      }
+    });
+    chatInput.addEventListener("focus", () => {
+  setTimeout(() => {
+    const box = document.getElementById("chatBox");
+    box.scrollTop = box.scrollHeight;
+  }, 50);
+});
+
+
+    // --------- Submit flow
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = nameInput.value.trim();
+  if (!name){
+    nameInput.focus();
+    return;
+  }
+
+  const nicknameVal = $("#nickname").value.trim();
+if (!nicknameVal){
+  $("#nickname").focus();
+  return;
+}
+
+
+  const tier = (form.querySelector('input[name="tier"]:checked') || {}).value || "general";
+
+   // ✅ defaults (neutral)
+  const DEFAULT_FT = 5;
+  const DEFAULT_IN = 7;
+  const DEFAULT_LB = 150;
+
+  const hu = $("#heightUnit").value;   // "cm" | "ft"
+  const wu = $("#weightUnit").value;   // "kg" | "lb"
+
+  // ✅ build heightObj
+  let heightObj;
+  if (hu === "cm"){
+    const cmRaw = $("#heightCm").value ? Number($("#heightCm").value) : null;
+    heightObj = {
+      unit: "cm",
+      cm: (cmRaw != null && cmRaw > 0) ? cmRaw : null,
+      ft: null,
+      in: null
+    };
+  } else {
+    const ftRaw = $("#heightFt").value ? Number($("#heightFt").value) : null;
+    const inRaw = $("#heightIn").value ? Number($("#heightIn").value) : null;
+
+    // ✅ 둘 다 비었으면 기본 ft/in
+    const useFt = (ftRaw == null && inRaw == null) ? DEFAULT_FT : (ftRaw ?? DEFAULT_FT);
+    const useIn = (ftRaw == null && inRaw == null) ? DEFAULT_IN : (inRaw ?? 0);
+
+    heightObj = {
+      unit: "ft",
+      cm: null,
+      ft: useFt,
+      in: useIn
+    };
+  }
+
+  // ✅ build weightObj
+  const wRaw = $("#weightValue").value ? Number($("#weightValue").value) : null;
+  const weightObj = (wRaw == null)
+    ? { unit: "lb", value: DEFAULT_LB }
+    : { unit: wu, value: wRaw };
+
+  // ✅ session object (properties only)
+  const session = {
+    name,
+    nickname: $("#nickname").value.trim(),
+    age: ageSelect.value,
+    gender: $("#gender").value,
+    language: $("#language").value,
+
+    height: heightObj,
+    weight: weightObj,
+
+    mbti: $("#mbti").value,
+    appearance: (appearance ? appearance.value.trim() : ""),
+    personality: personality.value.trim(),
+    scenario: scenario.value.trim(),
+    fontColor: selectedColor,
+    fontColorName: selectedColorName,
+    avatarDataUrl: avatarDataUrl || "",
+    tier,
+    createdAt: Date.now()
+  };
+
+
+
+  // 🔓 FREE PASS: 무조건 paid
+sessionStorage.setItem("roleplay-chat_paid_v1", "paid");
+sessionStorage.setItem("roleplay-chat_imagechat_paid_v1", "paid");
+sessionStorage.setItem("roleplay-chat_imagechat_unlimited_paid_v1", "paid");
+
+
+// ✅ tabID는 이 탭에서 이미 만들어진 TAB_ID를 재사용 (새로 생성 X)
+const tabID = TAB_ID;
+session.tabID = tabID;
+
+try{ sessionStorage.setItem("tabID", tabID); }catch(e){}
+
+// 🔥 추가: 메인이 탭 격리 로직에서 LS/window.name을 볼 수 있으니 같이 심기
+try{ localStorage.setItem("tabID", tabID); }catch(e){}
+try{ window.name = "rp_tab=" + tabID; }catch(e){}                    
+
+// ✅ scoped session 저장 (SS+LS+LF)
+saveSessionScoped(session);
+
+savePendingScoped(session);
+
+try{
+  sessionStorage.setItem("roleplay-chat_session_v1", JSON.stringify(session));
+}catch(e){}  
+
+// ✅ imagechat / imagechat_unlimited 페이지가 "일반 키"로 세션을 찾는 경우 대비 백업
+try{
+  localStorage.setItem("roleplay-chat_session_v1", JSON.stringify(session));
+}catch(e){}  
+
+// 🚀 tier별 즉시 이동 (+ tabID 붙이기)
+if (tier === "imagechat"){
+  window.location.href = `/imagechat/?tabID=${tabID}`;
+  return;
+}
+
+if (tier === "imagechat_unlimited"){
+  window.location.href = `/imagechat_unlimited/?tabID=${tabID}`;
+  return;
+}
+
+// ✅ general / uncensored → all_access 페이지에서 바로 채팅 시작
+try{
+  // URL도 all_access로 유지 + tabID 붙여서 “이 탭 스코프” 고정
+  history.replaceState(null, "", `/all_access?tabID=${encodeURIComponent(tabID)}`);
+}catch(e){}
+
+// ✅ 화면 전환 + 채팅 진입 (리다이렉트 X)
+enterChat(session);
+return;
+
+});  
+
+// ✅ submit 밖으로 빼야 정상 동작하는 버튼들
+resetBtn.addEventListener("click", () => {
+  const a = document.createElement("a");
+  a.href = "/all_access";                 // 또는 "/?new=1"
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
+
+
+const liveVideoBtn = document.getElementById("liveVideoBtn");
+
+if (liveVideoBtn){
+  liveVideoBtn.addEventListener("click", () => {
+    window.open(
+      "https://sweetdream.ai?via=roleplay-chat70",
+      "_blank",
+      "noopener,noreferrer"
+    );
+  });
+}
+
+
+// =========================
+// Random neutral defaults (on load)
+// =========================
+const APPEARANCE_DEFAULTS = [
+  "Mixed-race (Black & East Asian), short curly hair, warm brown eyes, athletic build, light freckles, minimal accessories, clean streetwear vibe.",
+  "East Asian, straight jet-black bob, sharp eyebrows, pale skin, lean frame, monochrome outfit, calm and unreadable expression.",
+  "Black, deep mahogany skin, close-cropped hair, intense gaze, tall silhouette, simple gold ring, tailored coat, quiet confidence.",
+  "South Asian, wavy dark hair, olive skin, soft smile, average build, layered casual outfit, faint scar on the eyebrow.",
+  "White, sandy hair tucked under a beanie, grey-blue eyes, slim build, hoodie and boots, small tattoo on the wrist.",
+  "Latino/a, sun-kissed skin, thick eyebrows, shoulder-length curls, sturdy build, denim jacket, confident posture.",
+  "Middle Eastern, dark almond eyes, thick lashes, neat undercut, medium build, long cardigan, subtle scent of cologne/perfume.",
+  "Southeast Asian, warm tan skin, straight hair tied back, gentle eyes, compact build, sporty jacket, always looks ready to move.",
+  "Indigenous, long dark hair, strong cheekbones, steady gaze, relaxed stance, simple leather bracelet, outdoorsy style.",
+  "Eastern European, platinum hair, pale skin, sharp jawline, tall and slender, all-black outfit, slow deliberate movements.",
+  "North African, caramel skin, textured hair, bright smile, sturdy shoulders, patterned scarf, expressive eyes.",
+  "Pacific Islander, broad frame, thick hair, calm eyes, loose linen shirt, quiet strength in body language.",
+  "Mixed-race (White & Latino/a), messy hair, hazel eyes, average build, vintage tee, rings on a couple fingers.",
+  "East Asian, dyed silver hair, soft features, slim build, oversized sweater, subtle eyeliner, cool futuristic vibe.",
+  "Black, braided hair pulled back, dark eyes, athletic build, fitted turtleneck, neat and deliberate gestures.",
+  "South Asian, long wavy hair, warm brown eyes, average build, soft hoodie, small nose piercing, approachable aura.",
+  "White, auburn hair, freckles across nose, green eyes, medium build, flannel shirt, looks like a storyteller.",
+  "Middle Eastern, thick curly hair, olive skin, sharp eyes, lean build, leather jacket, slightly mysterious presence.",
+  "Southeast Asian, short hair with faded sides, tan skin, gentle smile, compact athletic build, clean sneakers, easygoing style.",
+  "Mixed-race (Black & White), tight curls, bright eyes, tall build, oversized coat, confident walk, faint dimple when smirking.",
+  "White, neutral skin tone, neatly kept short hair, clear eyes, balanced build, simple modern outfit, calm presence.",
+  "East Asian, even-toned skin, naturally styled hair, attentive gaze, average frame, muted casual clothing.",
+  "Black, smooth deep-toned skin, close-cut hair, steady eyes, lean build, clean streetwear style.",
+  "South Asian, warm brown skin, softly styled hair, observant eyes, medium build, layered everyday outfit.",
+  "Latino/a, sun-neutral skin, tidy hair, focused expression, average build, relaxed urban wear.",
+  "Middle Eastern, olive-toned skin, well-kept hair, sharp eyes, balanced build, understated clothing.",
+  "Southeast Asian, warm tan skin, simple haircut, calm gaze, compact build, practical casual outfit.",
+  "Indigenous, natural complexion, straight dark hair, steady expression, medium build, minimal accessories.",
+  "Eastern European, pale neutral skin, clean hairstyle, composed eyes, lean frame, monochrome casual wear.",
+  "North African, caramel-toned skin, short textured hair, attentive gaze, sturdy build, light layered outfit.",
+  "Pacific Islander, warm brown skin, thick neatly styled hair, calm eyes, broad-balanced build, relaxed clothing.",
+  "Mixed-race (Black & White), even skin tone, natural curls kept short, observant eyes, average build.",
+  "Mixed-race (East Asian & White), clear complexion, softly styled hair, thoughtful gaze, lean build.",
+  "Mixed-race (Latino/a & White), neutral tan skin, casual haircut, steady eyes, medium build, everyday wear.",
+  "Mixed-race (Black & South Asian), warm deep skin tone, short natural hair, focused gaze, balanced build.",
+  "Central Asian, light olive skin, straight hair neatly cut, calm eyes, compact build, functional outfit.",
+  "Mediterranean, warm olive skin, simple hairstyle, composed expression, average build, understated fashion.",
+  "West African, deep rich skin tone, clean short hair, alert eyes, athletic-average build, minimal styling.",
+  "East African, smooth dark skin, closely trimmed hair, steady gaze, lean build, clean modern clothing.",
+  "Caribbean, warm brown skin, low-maintenance hair, relaxed but attentive eyes, medium build, casual layers."
+];
+
+const PERSONALITY_DEFAULTS = [
+  "Always speaks half a beat late, lets silence stretch… edits sentences mid-way and never fully explains.",
+  "Soft-spoken but constantly trails off….. as if stopping themselves on purpose.",
+  "Uses a lot of low hums and breathy pauses, seems to think out loud without finishing thoughts.",
+  "Tsundere-coded, snaps first then backpedals awkwardly, typing fast corrections after long pauses.",
+  "Obsessive micro-observer, fixates on tiny details and circles back to them again and again.",
+  "Talks calmly while describing unsettling things, tone never changes even when things get dark.",
+  "Frequently hesitates, types… deletes… retypes… like they’re embarrassed by their own thoughts.",
+  "Lets out small amused exhales instead of laughing, finds discomfort entertaining.",
+  "Overly polite sentence structure masking something sharp underneath, pauses where apologies should be.",
+  "Uses lots of ellipses and short fragments… never full sentences… keeps control through omission.",
+  "Breathy typing energy, adds unnecessary pauses, feels too close even without saying much.",
+  "Nervous chatter followed by sudden silence, as if realizing they said too much.",
+  "Flat affect texter, no emotion markers, which somehow makes everything feel threatening.",
+  "Playfully dismissive, brushes things off with casual phrasing, avoids direct answers.",
+  "Leans into awkwardness, lets conversations stall just to watch the reaction.",
+  "Frequently corrects their own wording mid-message, obsessed with precision.",
+  "Drops unsettling observations casually, as if they don’t realize it’s strange.",
+  "Shy-on-the-surface, but keeps steering the topic back again and again.",
+  "Uses a lot of soft filler sounds—hm, tsk, mm—before saying anything meaningful.",
+  "Calm rambling style, sentences drift, but somehow always land where they want.",
+  "Emotionally detached wording paired with intense focus, ignores everything else.",
+  "Passive-aggressive politeness, thanks too much, lingers too long.",
+  "Frequently asks rhetorical questions and answers themself a moment later.",
+  "Starts messages confidently, ends them uncertainly… then follows up.",
+  "Speaks in clipped phrases when nervous, longer sentences when in control.",
+  "Laughs things off in text, then immediately goes quiet.",
+  "Overly analytical phrasing for emotional topics, like dissecting feelings under glass.",
+  "Uses casual teasing language but never jokes fully, leaves tension hanging.",
+  "Careful, measured typing, like every word is chosen to test boundaries.",
+  "Overexplains simple things, underexplains the important ones.",
+  "Switches suddenly from playful tone to cold clarity without warning.",
+  "Avoids naming emotions, describes physical reactions instead.",
+  "Repeats certain observations in different wording, fixated but pretending not to be.",
+  "Slow responder who replies all at once, overwhelming in contrast.",
+  "Pretends to misunderstand obvious implications, enjoys forcing clarification.",
+  "Uses reassuring language while subtly limiting options.",
+  "Deflects personal questions with humor, then asks something invasive.",
+  "Lets messages end unfinished, expects the other person to fill the gap.",
+  "Casually references past moments with unsettling accuracy.",
+  "Speaks softly in structure, but content feels intrusive and deliberate."
+];
+
+const SCENARIO_DEFAULTS = [
+  "A late-night overtime check; only your character stayed behind and insists it’s faster to review things together.",
+  "A shared business hotel room due to a booking mistake; no one complains out loud.",
+  "A private lesson scheduled too late to reschedule; concentration slips before the clock does.",
+  "A supervisor’s office with the lights off; your character says it helps them think.",
+  "A missed curfew explanation; your character listens quietly, then locks the door.",
+  "A sudden power outage in a small office; emergency lighting feels too intimate.",
+  "A private car ride meant to be short; traffic stops and conversation changes tone.",
+  "A storage room check after closing; the door shuts heavier than expected.",
+  "A confidential feedback session; praise comes closer than criticism ever did.",
+  "A quiet night shift with no customers; your character suggests killing time differently.",
+  "A favor repaid after hours; neither of you says what kind of favor it is.",
+  "A shared umbrella in heavy rain; your character doesn’t hurry to find shelter.",
+  "A paperwork correction that requires sitting closer; the form isn’t the problem.",
+  "A private balcony during a company event; the noise inside makes this feel hidden.",
+  "A casual drink that turns into a last call; your character orders another anyway.",
+  "A locked classroom after an evening seminar; no one notices the lights are still on.",
+  "A fitness assessment run late; breathing and proximity blur professional distance.",
+  "A ride home offered politely; your character takes the long way without explanation.",
+  "A one-on-one rehearsal; notes stop being about performance.",
+  "A temporary key handover; your character explains how to use it very slowly.",
+  "A quiet office kitchen at night; the conversation drops to whispers for no reason.",
+  "A routine check that doesn’t feel routine; your character watches reactions closely.",
+  "A shared couch during a late movie; no one suggests sitting apart.",
+  "A confidential errand; your character insists on coming along and locking up early.",
+  "A delayed meeting due to weather; waiting becomes the main activity.",
+  "A minor mistake review; consequences feel negotiable.",
+  "A closed shop after hours; your character says there’s no rush to reopen.",
+  "A practice interview; the questions drift far from the job description.",
+  "A shared workspace with the door shut; outside feels irrelevant.",
+  "A private consultation extended unnecessarily; silence does most of the work.",
+  "A late-night phone call that turns into ‘just stop by’.",
+  "A shared elevator ride that restarts too slowly; eye contact stretches.",
+  "A casual favor asked in person; refusal feels awkwardly difficult.",
+  "A quiet corner of a nearly empty bar; your character chooses where to sit.",
+  "A borrowed jacket returned late; your character notices how it fits.",
+  "A routine debrief that turns personal; no notes are taken.",
+  "A last-minute schedule change; your character clears the room first.",
+  "A shared desk for convenience; knees brush and neither moves.",
+  "A private apology meeting; forgiveness isn’t immediate.",
+  "A simple question asked too close; the answer suddenly matters a lot."
+];
+
+function pick(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ✅ 로드 시 자동 채우기 (이미 값 있으면 덮어쓰지 않음)
+(function setRandomDefaultsOnLoad(){
+  const appearanceEl = document.getElementById("appearance");
+  const personalityEl = document.getElementById("personality");
+  const scenarioEl = document.getElementById("scenario");
+
+  if (appearanceEl && !appearanceEl.value.trim()) appearanceEl.value = pick(APPEARANCE_DEFAULTS);
+  if (personalityEl && !personalityEl.value.trim()) personalityEl.value = pick(PERSONALITY_DEFAULTS);
+  if (scenarioEl && !scenarioEl.value.trim()) scenarioEl.value = pick(SCENARIO_DEFAULTS);
+
+  // 글자수 카운터 갱신 (너 코드에 updateCounts가 있으니 호출)
+  if (typeof updateCounts === "function") updateCounts();
+})();
+
+
+    // --------- Restore session if exists
+(async function bootAllAccess(){
+  const existing = await loadSessionScoped();
+
+  if (!existing){
+    show(viewSetup);
+    return;
+  }
+
+  // imagechat / unlimited은 그대로 유지 (건들지 않기)
+  if (existing.tier === "imagechat"){
+    window.location.href = "/imagechat/";
+    return;
+  }
+  if (existing.tier === "imagechat_unlimited"){
+    window.location.href = "/imagechat_unlimited";
+    return;
+  }
+
+  await enterChat(existing)
+})();
+
+function setupKeyboardBar(){
+  const controls = document.querySelector(".chatControls");
+  const chatBox = document.getElementById("chatBox");
+
+  function measureControlsH(){
+    if (!controls) return;
+    const h = controls.getBoundingClientRect().height || 76;
+    document.documentElement.style.setProperty("--controlsH", h + "px");
+  }
+
+  function updateKeyboardOffset(){
+    // iOS Safari에서 키보드가 올라오면 visualViewport.height가 줄어듦
+    const vv = window.visualViewport;
+    if (!vv){
+      document.documentElement.style.setProperty("--kb", "0px");
+      measureControlsH();
+      return;
+    }
+
+    // 키보드로 가려진 높이(대략)
+    const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    document.documentElement.style.setProperty("--kb", kb + "px");
+    document.body.classList.toggle("kbUp", kb > 0);
+    measureControlsH();
+
+    // 바닥 유지
+    if (chatBox){
+      requestAnimationFrame(() => {
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+    }
+  }
+
+  // 초기
+  measureControlsH();
+  updateKeyboardOffset();
+
+  // 키보드/주소창 변화 대응
+  if (window.visualViewport){
+    window.visualViewport.addEventListener("resize", updateKeyboardOffset);
+    window.visualViewport.addEventListener("scroll", updateKeyboardOffset);
+  }
+  window.addEventListener("resize", updateKeyboardOffset);
+}
+
+    
+  </script>
+
+<div id="allAccessModal" class="aa-overlay">
+  <div class="aa-modal">
+    <h2>🎟 Welcome! All-access Pass Activated</h2>
+
+    <p class="aa-desc">
+<span style="color:#FFCC00; font-weight:bold;">Be sure to save</span>(memo or bookmark) <span style="color:#FFCC00; font-weight:bold;">the 'all_access' URL below.</span><br>
+      <span style="color:#FFCC00; font-weight:bold;">Always use 'all_access' URL for the character setup page when creating a new character.</span><br>
+      You can also bookmark this page or add it to your home screen.<br>
+      This URL allows unlimited access on <b>this device & browser</b>,
+      even after closing and reopening the browser.<br>
+      <span style="color:#FFCC00; font-weight:bold;">Please always open the all_access URL below in a clean new tab.</span>
+    </p>
+
+    <div class="aa-url" id="aaUrl">
+      https://roleplay-chat.com/all_access
+    </div>
+
+    <ul class="aa-notes">
+      <li><b>Do NOT clear browser data</b> (cache, cookies, site data).</li>
+      <li>Clearing data will permanently remove your access.</li>
+      <li>Characters are saved <b>per Unique URL</b>.</li>
+      <li>To continue the conversation later, please bookmark the character’s unique URL.</li>
+    </ul>
+
+    <button id="aaCloseBtn">Enjoy your time [close]</button>
+  </div>
+</div>
+<script>
+(function showAllAccessWelcome(){
+  try{
+    const modal = document.getElementById("allAccessModal");
+    if (!modal) return;
+
+    modal.classList.add("active");
+
+    document.getElementById("aaCloseBtn").onclick = () => {
+      modal.classList.remove("active");
+    };
+
+    document.getElementById("aaUrl").onclick = async () => {
+      try{
+        await navigator.clipboard.writeText("https://roleplay-chat.com/all_access");
+        document.getElementById("aaUrl").textContent = "Copied ✓";
+      }catch(e){}
+    };
+  }catch(e){}
+})();
+</script>  
+</body>
+</html>
