@@ -1461,25 +1461,16 @@ Deleting browser data will erase your character, chat history, and access permis
   <script>
 
 // 🔓 ALL-ACCESS PAGE: force paid everywhere (+ All-access key)
-(function forcePaidAllAccess(){
+(function forcePaidCreatorAccess(){
   const PAID_KEYS = [
-     "roleplay-chat_paid_v1",
+    "roleplay-chat_paid_v1",
     "roleplay-chat_imagechat_paid_v1",
     "roleplay-chat_imagechat_unlimited_paid_v1"
   ];
 
-  // 1) sessionStorage
-  try{ PAID_KEYS.forEach(k => sessionStorage.setItem(k, "paid")); }catch(e){}
-
-  // 2) localStorage
-  try{ PAID_KEYS.forEach(k => localStorage.setItem(k, "paid")); }catch(e){}
-
-  // 3) localForage auth store
+  // ✅ 현재 탭에서만 무료 권한 부여
   try{
-    if (window.localforage){
-      const auth = localforage.createInstance({ name: "roleplay-chat", storeName: "auth" });
-      PAID_KEYS.forEach(k => auth.setItem(k, "paid").catch(()=>{}));
-    }
+    PAID_KEYS.forEach(k => sessionStorage.setItem(k, "paid"));
   }catch(e){}
 })();
 
