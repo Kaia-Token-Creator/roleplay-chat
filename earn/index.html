@@ -335,6 +335,91 @@
     }
     .rateLabel{ color: var(--muted2); font-size: 12px; font-weight:700; }
 
+         .referralBonus{
+      margin-top: 14px;
+      border: 1px solid rgba(255,204,0,.34);
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(255,204,0,.14), rgba(255,255,255,.045) 48%, rgba(42,171,238,.10)),
+        rgba(0,0,0,.28);
+      box-shadow: 0 0 26px rgba(255,204,0,.12);
+      padding: 16px;
+    }
+
+    .referralBonusTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+
+    .referralBonusBadge{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      background: rgba(255,204,0,.16);
+      border:1px solid rgba(255,204,0,.35);
+      color: var(--yellow);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .referralBonusTitle{
+      margin:0;
+      font-family:"Baloo 2", Inter, sans-serif;
+      font-size: clamp(22px, 4vw, 32px);
+      line-height:1;
+      letter-spacing:-.03em;
+    }
+
+    .referralBonusText{
+      margin: 8px 0 0;
+      color: rgba(255,255,255,.82);
+      font-size: 14px;
+    }
+
+    .referralBonusText a{
+      color: var(--yellow);
+      font-weight: 900;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255,204,0,.55);
+    }
+
+    .referralBonusOptions{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .referralMiniCard{
+      padding: 12px;
+      border-radius: 17px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.11);
+    }
+
+    .referralMiniCard b{
+      display:block;
+      color:#fff;
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+
+    .referralMiniCard span{
+      display:block;
+      color: rgba(255,255,255,.62);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
     .ctaRow{
       display:flex;
       gap:10px;
@@ -629,6 +714,7 @@
       .sectionGrid{ grid-template-columns:1fr; }
       .optionGrid{ grid-template-columns:1fr; }
       .rateRow{ grid-template-columns:1fr; }
+      .referralBonusOptions{ grid-template-columns:1fr; }
       .hero{ padding:24px 18px; border-radius:24px; }
       .cta{ width:100%; }
       .bookmarkHint{ display:none; }
@@ -741,6 +827,34 @@
               <div class="rateCard">
                 <span class="rateBig">PayPal</span>
                 <span class="rateLabel">payment after manual review within 24 hours</span>
+              </div>
+            </div>
+
+                         <div class="referralBonus" aria-label="Referral reward bonus">
+              <div class="referralBonusTop">
+                <div class="referralBonusBadge">Extra earning option</div>
+              </div>
+
+              <h2 class="referralBonusTitle">
+                Recommend this reward page and earn too
+              </h2>
+
+              <p class="referralBonusText">
+                You can also earn by recommending this reward system page:
+                <a href="https://roleplay-chat.com/earn" target="_blank" rel="noopener noreferrer">roleplay-chat.com/earn</a>.
+                The reward conditions are the same.
+              </p>
+
+              <div class="referralBonusOptions">
+                <div class="referralMiniCard">
+                  <b>$1 per 1,000 verified views</b>
+                  <span>Minimum payout: $2 = 2,000 verified views.</span>
+                </div>
+
+                <div class="referralMiniCard">
+                  <b>$2 per approved Reddit post</b>
+                  <span>No view-count minimum for approved Reddit review posts.</span>
+                </div>
               </div>
             </div>
 
