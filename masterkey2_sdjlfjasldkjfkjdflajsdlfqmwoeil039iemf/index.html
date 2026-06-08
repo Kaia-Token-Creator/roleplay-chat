@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Temporary Recovery | roleplay-chat.com</title>
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =========================
+       ✅ HEADER CSS (from Blank header)
+       - header HTML is inserted as-is
+       - only header-related CSS included here to avoid colliding with the ticket page's .wrap
+    ========================== */
+
+    a{ color:inherit; }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 4px 6px 0;
+      gap: 12px;
+    }
+
+    .logo{
+      text-decoration: none;
+      font-family: "Baloo 2", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: clamp(16px, 3.6vw, 24px);
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      user-select:none;
+      white-space: nowrap;
+    }
+
+    .logoRole{ color: #ffcc00; }
+    .logoDot{
+      color: rgba(255,255,255,.95);
+      font-size: 0.5em;
+      vertical-align: baseline;
+    }
+
+    .shareWrap{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .bookmarkHint{
+      font-size: 10px;
+      line-height: 1.1;
+      text-align: right;
+      color: rgba(255,255,255,.55);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .shareBtn{
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 14px 36px rgba(0,0,0,.55);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:.15s ease;
+      flex: 0 0 auto;
+      padding: 0;
+    }
+    .shareBtn:hover{ background: rgba(255,255,255,.10); transform: translateY(-1px); }
+    .shareBtn:active{ transform: translateY(0px); }
+
+    .shareBtn svg{
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: rgba(255,255,255,.92);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ✅ Info 버튼: 노란 글로우 */
+    #infoBtn{
+      border-color: rgba(255, 204, 0, .55);
+      box-shadow:
+        0 0 0 1px rgba(255, 204, 0, .25),
+        0 0 18px rgba(255, 204, 0, .35),
+        0 0 34px rgba(255, 204, 0, .22),
+        0 14px 36px rgba(0,0,0,.55);
+    }
+    #infoBtn:hover{
+      border-color: rgba(255, 204, 0, .75);
+      box-shadow:
+        0 0 0 1px rgba(255, 204, 0, .35),
+        0 0 22px rgba(255, 204, 0, .45),
+        0 0 44px rgba(255, 204, 0, .28),
+        0 14px 36px rgba(0,0,0,.55);
+    }
+
+    .infoMenu{
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      background: rgba(10,10,10,.92);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      box-shadow: 0 14px 36px rgba(0,0,0,.55);
+      padding: 6px;
+      display: none;
+      z-index: 99999;
+    }
+    .infoMenu.active{ display: block; }
+
+    .infoMenu a{
+      display: block;
+      padding: 10px 10px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+    }
+    .infoMenu a:hover{ background: rgba(255,255,255,.08); }
+
+    .sub{
+      text-align:center;
+      margin-top: 0px;
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+    }
+
+    /* ✅ header wrapper (new; does not touch existing UI) */
+    .topWrap{
+      width: 100%;
+      display:flex;
+      justify-content:center;
+      padding: 18px 14px 0;
+    }
+    .topShell{
+      width: min(860px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    /* =========================
+       ✅ ORIGINAL "All-access Pass" CSS (mostly unchanged)
+    ========================== */
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --gold:#ffcc00;
+      --card:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.16);
+      --shadow:0 18px 40px rgba(0,0,0,.6);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%}
+    body{
+      background:
+        radial-gradient(900px 600px at 20% 0%, rgba(255,204,0,.12), transparent 55%),
+        radial-gradient(900px 600px at 80% 10%, rgba(255,255,255,.06), transparent 60%),
+        #000;
+      color:#fff;
+      font-family:Inter,system-ui,sans-serif;
+    }
+
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .ticket{
+      width:min(880px,100%);
+      background:linear-gradient(180deg, rgba(255,204,0,.14), rgba(0,0,0,.85));
+      border:1px solid rgba(255,204,0,.45);
+      border-radius:26px;
+      box-shadow:
+        0 0 0 2px rgba(255,204,0,.18),
+        0 0 30px rgba(255,204,0,.35),
+        var(--shadow);
+      padding:34px 28px 28px;
+      position:relative;
+    }
+
+    .ticket:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:26px;
+      pointer-events:none;
+      box-shadow:inset 0 0 40px rgba(255,204,0,.18);
+    }
+
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-family:"Baloo 2",sans-serif;
+      font-size:clamp(26px,4.6vw,44px);
+      letter-spacing:.5px;
+      color:var(--gold);
+    }
+
+    .price{
+      font-size:22px;
+      font-weight:800;
+      color:#fff;
+      margin-left: auto;
+      text-align: right;
+      line-height: 1.2;
+    }
+    .price span{
+      display:block;
+      font-size:12px;
+      opacity:.75;
+      margin-left:0;
+      margin-top:4px;
+      font-weight:600;
+    }
+
+    .tagline{
+      margin:12px 0 22px;
+      font-size:15px;
+      color:rgba(255,255,255,.85);
+    }
+
+    .list{
+      display:grid;
+      gap:10px;
+      font-size:14px;
+      line-height:1.45;
+    }
+    .list strong{color:var(--gold)}
+
+    .list ul{
+      margin:6px 0 6px 18px;
+      padding:0;
+    }
+
+    .cta{
+      margin-top:26px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .note{
+      margin-top:14px;
+      font-size:11px;
+      color:rgba(255,255,255,.55);
+      text-align:center;
+    }
+
+    .highlight{
+      color: #ffcc00;
+    }
+
+    .sectionTitle{
+      margin-top: 18px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .6px;
+      color: #ffcc00;
+    }
+
+    .sectionTitle.important{
+      color: #ff4d4d;
+    }
+
+    /* ✅ 더 확실한 경고 박스 (추가) */
+    .dangerBox{
+      margin-top: 10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,77,77,.55);
+      background: rgba(255,77,77,.08);
+      box-shadow: 0 0 0 1px rgba(255,77,77,.12);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .dangerBox b{ color: #ff4d4d; }
+  </style>
+</head>
+
+<body>
+
+  <!-- ✅ HEADER INSERTED (HTML unchanged) -->
+  <div class="topWrap">
+    <div class="topShell">
+      <header>
+        <!-- ✅ 2줄 스택 컨테이너 -->
+        <div style="display:block; width:100%;">
+
+          <!-- ✅ 1줄: 기존 헤더 내용 -->
+          <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+            <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer" class="logo">
+              <span class="logoRole">Roleplay-chat</span><span class="logoDot">.com</span>
+            </a>
+
+            <!-- ✅ 공유 영역 묶기 -->
+            <div class="shareWrap">
+              <div class="bookmarkHint">
+                Bookmark<br>&amp; Share
+              </div>
+
+              <button class="shareBtn" id="shareBtn" type="button" aria-label="Share" title="Share">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="18" cy="5" r="3"></circle>
+                  <circle cx="6" cy="12" r="3"></circle>
+                  <circle cx="18" cy="19" r="3"></circle>
+                  <path d="M8.6 13.5l6.8 3.9"></path>
+                  <path d="M15.4 6.6L8.6 10.5"></path>
+                </svg>
+              </button>
+
+              <!-- ✅ Info 버튼(최우측) -->
+              <button class="shareBtn" id="infoBtn" type="button" aria-label="Menu" title="Menu">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6 8h12"></path>
+    <path d="M6 12h12"></path>
+    <path d="M6 16h12"></path>
+  </svg>
+</button>
+
+              <!-- ✅ Info 메뉴 -->
+              <div class="infoMenu" id="infoMenu" role="menu" aria-label="Info menu">
+                <a href="https://sweetdream.ai?via=roleplay-chat70" target="_blank" rel="noopener noreferrer" style="color: #FF69B4; font-weight: bold; text-decoration: none;">Live Video Chat with girls</a>
+                <a href="https://roleplay-chat.com/human" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Chat with real human</a>
+                <a href="https://roleplay-chat.com" target="_blank" rel="noopener noreferrer">Home</a>
+                <a href="https://roleplay-chat.com/characters" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Featured Characters</a>
+                <a href="https://roleplay-chat.com/how" target="_blank" rel="noopener noreferrer">How to use</a>
+                <a href="https://roleplay-chat.com/about" target="_blank" rel="noopener noreferrer">About</a>
+                <a href="https://roleplay-chat.com/event" target="_blank" rel="noopener noreferrer">Event</a>
+                <a href="https://roleplay-chat.com/pricing" target="_blank" rel="noopener noreferrer">Pricing</a>
+                <a href="https://roleplay-chat.com/all_access_purchase" target="_blank" rel="noopener noreferrer">All-access pass</a>
+                <a href="https://roleplay-chat.com/policy" target="_blank" rel="noopener noreferrer">Policy</a>
+                <a href="https://roleplay-chat.com/faq" target="_blank" rel="noopener noreferrer">FAQ</a>
+                <a href="mailto:showmetheaitools@gmail.com">Contact</a>
+                <a href="https://roleplay-chat.com/earn" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Creator reward program</a>
+                <a href="https://roleplay-chat.com/image2video" target="_blank" rel="noopener noreferrer" style="color: #FFD700; font-weight: bold; text-decoration: none;">Image to Video generator</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✅ 2줄: Chatango 라인(오른쪽) -->
+          <div align="right">
+            <sup>
+              <a href="https://roleplay-chat.com/human" target="_blank" style="text-decoration:none">
+                <font size="1" color="#ffcc00"><b>Live user chat</b></font>
+              </a>
+            </sup>
+
+            <script
+              id="cid0020000430144912743"
+              data-cfasync="false"
+              async
+              src="https://st.chatango.com/js/gz/emb.js"
+              style="width:200px;height:300px;"
+            >
+              {"handle":"roleplay-chat-com","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100,"cv":1,"cvfntsz":"10px","cvbg":"000000","cvfg":"ffcc00","cvw":49,"cvh":18}}
+            </script>
+          </div>
+
+        </div>
+      </header>
+      <div class="sub">Create the most human-like character, Enjoy roleplay.<br>no-login. Private & Safe.</div>
+    </div>
+  </div>
+
+  <!-- ✅ ORIGINAL PAGE (min changes) -->
+  <div class="wrap">
+    <div class="ticket">
+
+      <div class="header">
+        <div class="title">🔑 Temporary Recovery</div>
+        <div class="price">
+          Temporary Recovery
+          <span>Page</span>
+        </div>
+      </div>
+
+      <div class="tagline">
+        <strong>Recovery link — restore your All-access Pass.</strong>
+      </div>
+
+      <div class="list">
+
+        <!-- FEATURES -->
+        <div class="sectionTitle important">FEATURES</div>
+        <div>• <strong>All-access Pass</strong> : Lifetime for 1 device for 1 browser(Browser-bound, not a tab)</div>
+        <div>• <strong>Unlimited access on this browser</strong></div>
+        <div>• <strong>Unlimited character creation.</strong></div>
+        <div>• <strong>Fully uncensored</strong></div>
+        <div>• <strong>No extra fee</strong> <span style="opacity:.7">(video excluded)</span></div>
+        <div>• <strong>Unlimited access for all options:</strong></div>
+        <ul>
+          <li>General / uncensored text chat (free)</li>
+          <li>Uncensored image chat (free)</li>
+          <li>Uncensored image & only video chat (only video requires extra fee)</li>
+        </ul>
+
+        <!-- HOW TO USE -->
+        <div class="sectionTitle important">HOW TO USE</div>
+        <div>• <strong>The All-access Pass link works as a master key for character setup and can be used from any browser tab.</strong></div>
+        <li>You can create unlimited characters, with one character per tab.</li>
+        <li>Each character’s data is stored only within its own tab.</li>
+        <div>• No-login. Private & anonymous</div>
+        <div>• Your access remains active even if you close the tab or quit the browser.</div>
+        <div>• Save your unlimited-access URL and use it on this browser anytime</div>
+
+        <!-- IMPORTANT -->
+        <div class="sectionTitle important">⚠️ IMPORTANT</div>
+        <div>• But please do not clear your browser data, or your access may be lost.</div>
+        <div>• And do not use Incognito or Private Browsing mode.</div>
+        <div>• All-access Pass purchase = automatic age verification</div>
+        <div>• Appears as “Playing All games” on payment statements</div>
+
+        <br>
+
+        <div>
+          • If you accidentally lost your <b>All-access Pass</b>, please email
+          <b>showmetheaitools@gmail.com</b> with your payment record made within the last <b>12 months</b>.<br>
+          • We will send you a <b>temporary recovery link</b> to restore your All-access Pass.<br>
+          • The recovery link is <b>valid for 12 hours after the email reply</b>, and this support is provided <b>once per user only</b>.
+        </div>
+
+        <!-- ✅ 확실히 보이게 추가 -->
+        <div class="dangerBox">
+          <b>⏳ This recovery page expires within 12 hours after you receive the email.</b><br>
+          After 12 hours, this page will <b>no longer work</b> and the recovery link will be <b>invalid</b>.
+        </div>
+
+        <br><br>
+
+        <div class="sectionTitle">Start now. Instant access.</div>
+
+      </div>
+
+      <div class="cta">
+        <button id="getAgainBtn" style="
+          padding:14px 28px;
+          font-size:16px;
+          font-weight:700;
+          border-radius:999px;
+          border:none;
+          cursor:pointer;
+          color:#000;
+          background:linear-gradient(180deg,#ffd84d,#ffb800);
+          box-shadow:0 10px 26px rgba(255,204,0,.45);
+        ">
+          Get again
+        </button>
+      </div>
+
+      <div class="note">
+        Temporary recovery · One-time support · Link expires in 12 hours
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* ✅ HEADER JS (unchanged) */
+
+    // Share button
+    const shareBtn = document.querySelector("#shareBtn");
+    if (shareBtn){
+      shareBtn.addEventListener("click", async () => {
+        const url = window.location.href;
+        try{
+          if (navigator.share){
+            await navigator.share({ title: document.title, url });
+          }else{
+            await navigator.clipboard.writeText(url);
+            shareBtn.title = "Copied!";
+            setTimeout(() => (shareBtn.title = "Share"), 900);
+          }
+        }catch(e){
+          // user cancelled / blocked
+        }
+      });
+    }
+
+    // Info button dropdown
+    const infoBtn = document.querySelector("#infoBtn");
+    const infoMenu = document.querySelector("#infoMenu");
+
+    function closeInfoMenu(){
+      if (infoMenu) infoMenu.classList.remove("active");
+    }
+
+    if (infoBtn && infoMenu){
+      infoBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        infoMenu.classList.toggle("active");
+      });
+
+      infoMenu.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      document.addEventListener("click", closeInfoMenu);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeInfoMenu();
+      });
+    }
+
+    /* ✅ RECOVERY BUTTON LOGIC (new) */
+
+    const STORAGE_KEY = "ROLEPLAY_CHAT_ALL_ACCESS_V1";
+    const getAgainBtn = document.getElementById("getAgainBtn");
+
+    getAgainBtn.addEventListener("click", () => {
+      // 기존 결제 플로우에서 하던 것처럼 "paid"를 저장하고,
+      // 원래 이동했어야 하는 URL로 이동
+      const paidKey = "paid";
+      localStorage.setItem(STORAGE_KEY, paidKey);
+
+      const url = "https://roleplay-chat.com/all_access?key=" + encodeURIComponent(paidKey);
+      window.location.href = url;
+    });
+  </script>
+</body>
+</html>
