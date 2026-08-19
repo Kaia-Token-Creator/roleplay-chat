@@ -1342,7 +1342,7 @@ body.modalOpen{
                 <label class="pill">
                   <input type="radio" name="tier" value="general" checked/>
                   <div>
-                    <div><b>General text chat</b> <small>(free)</small></div>
+                    <div><b>General text chat</b> <small>(Free Trial · 10 messages)</small></div>
                   </div>
                 </label>
 
@@ -2584,6 +2584,9 @@ setUnlockUIVisibility();
   // ✅ history restore
   chatHistory = await loadHistory();
 
+  // General Free Trial remaining count / limit state restore
+  updateGeneralTrialUI();
+
   // 채팅 UI 비우고 다시 그리기
   const box = document.getElementById("chatBox");
   if (box){
@@ -2916,6 +2919,7 @@ function mountPayPalButtons(onSuccess, priceUsd = "2.00", description = "Playing
     const sendBtn = $("#sendBtn");
 
     let chatHistory = []; // {role:"user"|"assistant", content:string}
+    const GENERAL_FREE_TRIAL_LIMIT = 10; // 10 user messages + 10 AI replies
     const PAYMENT_KEY = "roleplay-chat_paid_v1";
     function setPaid(keyName, value){
   const tabKey = k(keyName);
@@ -3098,6 +3102,39 @@ who.innerHTML = (role === "assistant")
   }
 }
 
+    function getGeneralTrialUsed(){
+      return Array.isArray(chatHistory)
+        ? chatHistory.filter(m => m && m.role === "user").length
+        : 0;
+    }
+
+    function isGeneralTrialEnded(){
+      const s = loadSession();
+      return !!(s && s.tier === "general" && getGeneralTrialUsed() >= GENERAL_FREE_TRIAL_LIMIT);
+    }
+
+    function updateGeneralTrialUI(){
+      if (!chatInput || !sendBtn) return;
+
+      const s = loadSession();
+      const isGeneral = !!(s && s.tier === "general");
+      const used = getGeneralTrialUsed();
+      const ended = isGeneral && used >= GENERAL_FREE_TRIAL_LIMIT;
+
+      if (ended){
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+        chatInput.placeholder = "Free trial ended — Unlock to continue";
+        if (unlockBtn) unlockBtn.style.display = "inline-flex";
+      } else {
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
+        chatInput.placeholder = isGeneral
+          ? `Type a message ... (${Math.max(0, GENERAL_FREE_TRIAL_LIMIT - used)} free left)`
+          : "Type a message ...";
+      }
+    }
+
     async function sendToChatApi(text){
       const session = loadSession();
       if (!session) throw new Error("No session");
@@ -3140,6 +3177,12 @@ who.innerHTML = (role === "assistant")
       const text = chatInput.value.trim();
       if (!text) return;
 
+      // General Free Trial: allow up to 10 user messages (10 AI replies).
+      if (isGeneralTrialEnded()){
+        updateGeneralTrialUI();
+        return;
+      }
+
       chatInput.value = "";
       appendMsg("user", text);
       chatHistory.push({ role: "user", content: text });
@@ -3157,6 +3200,8 @@ await typeWriter(textEl, reply, 18); // ✅ 타자기 출력
 chatHistory.push({ role: "assistant", content: reply });
 saveHistory(chatHistory); // async지만 await 없어도 백업은 진행됨
 
+        // 10번째 General 답변까지 정상 출력한 뒤 Free Trial을 종료한다.
+        updateGeneralTrialUI();
 
         // ✅ 결제 안 된 상태에서만 + 사용자가 sex 트리거 단어를 쓴 경우
 // ✅ 서버 응답(타자기) 완전히 끝난 "다음" 말풍선으로 속마음 출력
@@ -3170,9 +3215,8 @@ if (isUnpaidGeneral() && containsSexTrigger(text)){
       }catch(e){
         appendMsg("assistant", `Error: ${String(e.message || e)}`);
       }finally{
-        sendBtn.disabled = false;
-        chatInput.disabled = false;
-        chatInput.focus();
+        updateGeneralTrialUI();
+        if (!chatInput.disabled) chatInput.focus();
       }
     }
 
@@ -3724,6 +3768,7 @@ function openPayModalForCurrentChat(){
       }
 
       setUnlockUIVisibility();
+      updateGeneralTrialUI();
     },
     "3.00",
     "Upgrade game"
@@ -3951,6 +3996,5 @@ if (earnBtn){
   </script>
 </body>
 </html>
-
 
 
