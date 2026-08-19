@@ -1699,6 +1699,68 @@ Deleting browser data will erase your character, chat history, and access permis
   </div>
 </div>
 
+<!-- States War Promo Modal: General text chat only -->
+<div id="statesWarPromoModal"
+     class="modalOverlay"
+     role="dialog"
+     aria-modal="true"
+     aria-label="States War"
+     style="z-index:10050;">
+  <div class="modal" style="width:min(430px,100%);">
+
+    <div class="modalHeader">
+      <h3 style="margin:0; color:#FFD600; font-size:15px; font-weight:900;">
+        🇺🇸 SAVE AMERICA
+      </h3>
+      <button class="xBtn" id="closeStatesWarPromo" type="button">X</button>
+    </div>
+
+    <div class="modalBody" style="text-align:center; padding:22px 18px 20px;">
+      <div style="font-size:27px; font-weight:900; line-height:1.12; margin-bottom:12px;">
+        Take Over America.
+      </div>
+
+      <div style="color:rgba(255,255,255,.76); font-size:13px; line-height:1.65;">
+        Pick a side. Fight for your state.<br>
+        Turn America <b style="color:#ff6868;">RED</b> or
+        <b style="color:#6da2ff;">BLUE</b> — and become a State Master.
+      </div>
+
+      <a href="https://stateswar.com"
+         target="_blank"
+         rel="noopener noreferrer"
+         id="statesWarPromoGo"
+         class="btn"
+         style="
+           margin-top:19px;
+           display:flex;
+           align-items:center;
+           justify-content:center;
+           background:#e0b400;
+           border:1px solid #c9a200;
+           color:#000;
+           font-weight:900;
+           text-decoration:none;
+         ">
+        🇺🇸 Enter States War
+      </a>
+
+      <button class="btn"
+              id="statesWarPromoLater"
+              type="button"
+              style="
+                margin-top:9px;
+                background:rgba(255,255,255,.05);
+                color:#fff;
+                font-size:11px;
+              ">
+        Maybe later
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <!-- Image & Video Suggestion Modal -->
 <div id="mediaSuggestModal" class="modalOverlay" role="dialog" aria-modal="true">
   <div class="modal" style="display:flex; flex-direction:column; max-height:86dvh;">
@@ -2404,6 +2466,78 @@ async function clearHistory(){
 }
 
 
+    // --------- States War promo (General text chat only)
+let statesWarPromoTimer = null;
+
+function closeStatesWarPromo(){
+  const modal = document.getElementById("statesWarPromoModal");
+  if (!modal) return;
+  modal.classList.remove("active");
+
+  // Keep body scroll locked only if another modal is still open.
+  const anotherModalOpen = Array.from(document.querySelectorAll(".modalOverlay.active"))
+    .some(el => el !== modal);
+
+  if (!anotherModalOpen){
+    document.body.classList.remove("modalOpen");
+  }
+}
+
+function openStatesWarPromo(){
+  const s = loadSession();
+
+  // General text chat only.
+  if (!s || s.tier !== "general") return;
+
+  // Only while the actual chat screen is active.
+  if (!viewChat || !viewChat.classList.contains("active")) return;
+
+  const modal = document.getElementById("statesWarPromoModal");
+  if (!modal) return;
+
+  modal.classList.add("active");
+  document.body.classList.add("modalOpen");
+}
+
+function startStatesWarPromoForGeneral(session){
+  if (statesWarPromoTimer){
+    clearInterval(statesWarPromoTimer);
+    statesWarPromoTimer = null;
+  }
+
+  if (!session || session.tier !== "general") return;
+
+  // Show once right after entering General chat.
+  setTimeout(()=>{
+    const current = loadSession();
+    if (current && current.tier === "general"){
+      openStatesWarPromo();
+    }
+  }, 400);
+
+  // Then show again every 10 minutes while it remains General chat.
+  statesWarPromoTimer = setInterval(()=>{
+    const current = loadSession();
+
+    if (!current || current.tier !== "general"){
+      clearInterval(statesWarPromoTimer);
+      statesWarPromoTimer = null;
+      return;
+    }
+
+    openStatesWarPromo();
+  }, 10 * 60 * 1000);
+}
+
+document.getElementById("closeStatesWarPromo")?.addEventListener("click", closeStatesWarPromo);
+document.getElementById("statesWarPromoLater")?.addEventListener("click", closeStatesWarPromo);
+
+document.getElementById("statesWarPromoModal")?.addEventListener("click", (e)=>{
+  if (e.target?.id === "statesWarPromoModal"){
+    closeStatesWarPromo();
+  }
+});
+
     // --------- Fill chat view (NULL-SAFE)
 async function enterChat(session){
   // ✅ 채팅 타이틀 변경
@@ -2436,6 +2570,9 @@ async function enterChat(session){
 
   // ✅ 화면 전환
   show(viewChat);
+
+  // 🇺🇸 General chat: States War promo on entry + every 10 minutes
+  startStatesWarPromoForGeneral(session);
 
 // ⭐ 채팅 최초 진입 팝업
 setTimeout(()=>{
