@@ -165,9 +165,21 @@ export const onRequestPost: PagesFunction<{
 const isSexTrigger =
   tier === "uncensored" && containsSexKeyword(userMsg);
 
+const normalizedHistory = rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
+
+// The browser saves the current user message before calling this endpoint, so
+// it can already be the final item in `history`. Do not send that same turn to
+// the model twice when `userMsg` is appended below.
+const lastHistoryMsg = normalizedHistory[normalizedHistory.length - 1];
+const historyWithoutCurrent =
+  lastHistoryMsg?.role === "user" &&
+  String(lastHistoryMsg.content).trim() === userMsg.trim()
+    ? normalizedHistory.slice(0, -1)
+    : normalizedHistory;
+
 const history = isSexTrigger
   ? [] // 🔥 여기서 기존 거절 히스토리 완전 차단
-  : rawHistory.filter(isValidMsg).slice(-MAX_HISTORY_MSGS);
+  : historyWithoutCurrent;
 
 
     // ✅ CHANGED: tier 전달
