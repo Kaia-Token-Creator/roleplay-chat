@@ -1699,65 +1699,57 @@ Deleting browser data will erase your character, chat history, and access permis
   </div>
 </div>
 
-<!-- States War Promo Modal: General text chat only -->
-<div id="statesWarPromoModal"
+<!-- MySecretPass.link Promo Modal: General text chat only -->
+<div id="mySecretPassPromoModal"
      class="modalOverlay"
      role="dialog"
      aria-modal="true"
-     aria-label="States War"
+     aria-labelledby="mySecretPassPromoTitle"
      style="z-index:10050;">
-  <div class="modal" style="width:min(430px,100%);">
-
+  <div class="modal" style="width:min(470px,100%); max-height:88dvh; overflow-y:auto;">
     <div class="modalHeader">
-      <h3 style="margin:0; color:#FFD600; font-size:15px; font-weight:900;">
-        🇺🇸 SAVE AMERICA
+      <h3 id="mySecretPassPromoTitle" style="margin:0; color:#ffcc00; font-size:14px; font-weight:900;">
+        MYSECRETPASS.LINK · 3 WAYS TO EARN
       </h3>
-      <button class="xBtn" id="closeStatesWarPromo" type="button">X</button>
+      <button class="xBtn" id="closeMySecretPassPromo" type="button" aria-label="Close promotion">X</button>
     </div>
 
-    <div class="modalBody" style="text-align:center; padding:22px 18px 20px;">
-      <div style="font-size:27px; font-weight:900; line-height:1.12; margin-bottom:12px;">
-        Take Over America.
+    <div class="modalBody" style="padding:19px 18px 18px;">
+      <div style="text-align:center; font-size:23px; font-weight:900; line-height:1.2; margin-bottom:7px;">
+        Share it. Get paid. One link.
+      </div>
+      <p style="text-align:center; color:rgba(255,255,255,.7); font-size:12px; line-height:1.5; margin:0 0 16px;">
+        Three ways to earn with MySecretPass.link
+      </p>
+
+      <div style="display:grid; gap:9px;">
+        <div style="padding:12px 13px; background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.16); border-radius:12px;">
+          <div style="color:#ffcc00; font-size:13px; font-weight:900; margin-bottom:4px;">01 · SELL YOUR CONTENT</div>
+          <div style="color:rgba(255,255,255,.84); font-size:12px; line-height:1.55;">Have content? Sell access to your files, videos, communities, or any link.</div>
+        </div>
+        <div style="padding:12px 13px; background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.16); border-radius:12px;">
+          <div style="color:#ffcc00; font-size:13px; font-weight:900; margin-bottom:4px;">02 · AFFILIATE · 4%</div>
+          <div style="color:rgba(255,255,255,.84); font-size:12px; line-height:1.55;">No content? Introduce MySecretPass.link as an affiliate and earn a 4% commission on eligible sales.</div>
+        </div>
+        <div style="padding:12px 13px; background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.16); border-radius:12px;">
+          <div style="color:#ffcc00; font-size:13px; font-weight:900; margin-bottom:4px;">03 · REFERRAL · UP TO 40%</div>
+          <div style="color:rgba(255,255,255,.84); font-size:12px; line-height:1.55;">Promote content listed by other sellers. Earn up to 40% for sales made through your referral link.</div>
+        </div>
       </div>
 
-      <div style="color:rgba(255,255,255,.76); font-size:13px; line-height:1.65;">
-        Pick a side. Fight for your state.<br>
-        Turn America <b style="color:#ff6868;">RED</b> or
-        <b style="color:#6da2ff;">BLUE</b> — and become a State Master.
-      </div>
-
-      <a href="https://stateswar.com"
+      <a href="https://mysecretpass.link/"
          target="_blank"
          rel="noopener noreferrer"
-         id="statesWarPromoGo"
+         id="mySecretPassPromoGo"
          class="btn"
-         style="
-           margin-top:19px;
-           display:flex;
-           align-items:center;
-           justify-content:center;
-           background:#e0b400;
-           border:1px solid #c9a200;
-           color:#000;
-           font-weight:900;
-           text-decoration:none;
-         ">
-        🇺🇸 Enter States War
+         style="margin-top:17px; display:flex; align-items:center; justify-content:center; background:#ffcc00; border:1px solid #e5b800; color:#000; font-weight:900; text-decoration:none;">
+        Explore MySecretPass.link ↗
       </a>
-
-      <button class="btn"
-              id="statesWarPromoLater"
-              type="button"
-              style="
-                margin-top:9px;
-                background:rgba(255,255,255,.05);
-                color:#fff;
-                font-size:11px;
-              ">
+      <button class="btn" id="mySecretPassPromoLater" type="button"
+         style="margin-top:9px; background:rgba(255,255,255,.05); color:#fff; font-size:11px;">
         Maybe later
       </button>
     </div>
-
   </div>
 </div>
 
@@ -2466,11 +2458,11 @@ async function clearHistory(){
 }
 
 
-    // --------- States War promo (General text chat only)
-let statesWarPromoTimer = null;
+    // --------- MySecretPass.link promo (General text chat only)
+let mySecretPassPromoTimer = null;
 
-function closeStatesWarPromo(){
-  const modal = document.getElementById("statesWarPromoModal");
+function closeMySecretPassPromo(){
+  const modal = document.getElementById("mySecretPassPromoModal");
   if (!modal) return;
   modal.classList.remove("active");
 
@@ -2483,7 +2475,7 @@ function closeStatesWarPromo(){
   }
 }
 
-function openStatesWarPromo(){
+function openMySecretPassPromo(){
   const s = loadSession();
 
   // General text chat only.
@@ -2492,17 +2484,17 @@ function openStatesWarPromo(){
   // Only while the actual chat screen is active.
   if (!viewChat || !viewChat.classList.contains("active")) return;
 
-  const modal = document.getElementById("statesWarPromoModal");
+  const modal = document.getElementById("mySecretPassPromoModal");
   if (!modal) return;
 
   modal.classList.add("active");
   document.body.classList.add("modalOpen");
 }
 
-function startStatesWarPromoForGeneral(session){
-  if (statesWarPromoTimer){
-    clearInterval(statesWarPromoTimer);
-    statesWarPromoTimer = null;
+function startMySecretPassPromoForGeneral(session){
+  if (mySecretPassPromoTimer){
+    clearInterval(mySecretPassPromoTimer);
+    mySecretPassPromoTimer = null;
   }
 
   if (!session || session.tier !== "general") return;
@@ -2511,30 +2503,30 @@ function startStatesWarPromoForGeneral(session){
   setTimeout(()=>{
     const current = loadSession();
     if (current && current.tier === "general"){
-      openStatesWarPromo();
+      openMySecretPassPromo();
     }
   }, 400);
 
   // Then show again every 10 minutes while it remains General chat.
-  statesWarPromoTimer = setInterval(()=>{
+  mySecretPassPromoTimer = setInterval(()=>{
     const current = loadSession();
 
     if (!current || current.tier !== "general"){
-      clearInterval(statesWarPromoTimer);
-      statesWarPromoTimer = null;
+      clearInterval(mySecretPassPromoTimer);
+      mySecretPassPromoTimer = null;
       return;
     }
 
-    openStatesWarPromo();
+    openMySecretPassPromo();
   }, 10 * 60 * 1000);
 }
 
-document.getElementById("closeStatesWarPromo")?.addEventListener("click", closeStatesWarPromo);
-document.getElementById("statesWarPromoLater")?.addEventListener("click", closeStatesWarPromo);
+document.getElementById("closeMySecretPassPromo")?.addEventListener("click", closeMySecretPassPromo);
+document.getElementById("mySecretPassPromoLater")?.addEventListener("click", closeMySecretPassPromo);
 
-document.getElementById("statesWarPromoModal")?.addEventListener("click", (e)=>{
-  if (e.target?.id === "statesWarPromoModal"){
-    closeStatesWarPromo();
+document.getElementById("mySecretPassPromoModal")?.addEventListener("click", (e)=>{
+  if (e.target?.id === "mySecretPassPromoModal"){
+    closeMySecretPassPromo();
   }
 });
 
@@ -2571,8 +2563,8 @@ async function enterChat(session){
   // ✅ 화면 전환
   show(viewChat);
 
-  // 🇺🇸 General chat: States War promo on entry + every 10 minutes
-  startStatesWarPromoForGeneral(session);
+  // 🇺🇸 General chat: MySecretPass.link promo on entry + every 10 minutes
+  startMySecretPassPromoForGeneral(session);
 
 // ⭐ 채팅 최초 진입 팝업
 setTimeout(()=>{
